@@ -57,6 +57,26 @@ for tid, name in (("epsindib", "Epsilon Indi B — a pair of nearby brown dwarfs
     if not m:
         continue
     pa, pd_ = m["proper_motion"]["pmra"], m["proper_motion"]["pmdec"]
+    chi2 = sum(((x["spherex_mas_yr"] - x["gaia_mas_yr"]) / x["err_mas_yr"]) ** 2 for x in (pa, pd_))
+    from math import exp
+    p_agree = exp(-chi2 / 2)  # chi-square survival function for 2 dof
+    if p_agree < 0.01:
+        write(tid, dict(
+            title=name,
+            plain_result=("This star is so bright that it saturates SPHEREx's detector, and our position measurement fails for it: "
+                          f"from SPHEREx we get {pa['spherex_mas_yr']/1000:+.1f} ± {pa['err_mas_yr']/1000:.1f}″ and {pd_['spherex_mas_yr']/1000:+.1f} ± {pd_['err_mas_yr']/1000:.1f}″ per year, "
+                          f"which disagrees with Gaia's {pa['gaia_mas_yr']/1000:+.2f}″ and {pd_['gaia_mas_yr']/1000:+.2f}″. The picture of survey 1 minus survey 2 does show the star's light "
+                          "moving north, as Gaia predicts, but we do not turn that picture into a number."),
+            numbers=[num("Motion east–west (SPHEREx, fails)", round(pa["spherex_mas_yr"] / 1000, 2), round(pa["err_mas_yr"] / 1000, 2), unit="″/yr"),
+                     num("Motion east–west (Gaia DR3)", round(pa["gaia_mas_yr"] / 1000, 3), None, kind="data", unit="″/yr"),
+                     num("Motion north–south (SPHEREx, fails)", round(pd_["spherex_mas_yr"] / 1000, 2), round(pd_["err_mas_yr"] / 1000, 2), unit="″/yr"),
+                     num("Motion north–south (Gaia DR3)", round(pd_["gaia_mas_yr"] / 1000, 3), None, kind="data", unit="″/yr"),
+                     num("Chance the two agree", f"{p_agree:.0e}", None)],
+            evidence_links=[dict(text="Why it fails: What failed, item 13", href="failed.html"),
+                            dict(text="See the survey difference live", href="timemachine.html?ra=269.4463&dec=4.7677&fov=2&mode=subtract")],
+            method_note="Saturated pixels are masked, so the position rests on the star's outer light, which is not enough here.",
+            method_anchor="failed.html"))
+        continue
     write(tid, dict(
         title=name,
         plain_result=(f"From SPHEREx pictures alone we measured how fast it moves across the sky: "

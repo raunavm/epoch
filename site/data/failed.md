@@ -52,3 +52,7 @@ We list every approach that did not work, because a result is only believable if
 ## 12. A clean-up rule that also removed faint real sources
 **What happened.** To stop isolated bad pixels from swamping every method, we removed pixels whose neighbours were quiet. SPHEREx's images of stars are so compact that this also removed many faint real sources, lowering every method's detection rate equally.
 **What we learned.** Detecting a change in a single picture only works for bright changes (about 20 times the noise or more); fainter objects need many pictures combined along their path, which is what the stacking view does.
+
+## 13. Measuring Barnard's Star's motion did not work
+**What happened.** Barnard's Star is bright enough to saturate SPHEREx's detector. With its saturated centre masked, our position fits rest on the star's outer light, and the motion we derive (about −5.0 ± 1.9 and +5.6 ± 1.5 arcseconds per year) disagrees with Gaia's (−0.80 and +10.36). The same method works for the fainter Epsilon Indi B, where it matches Gaia.
+**What we show instead.** The difference between the two sky surveys, where the star's light visibly shifts north as expected — as a picture, not as a measurement.

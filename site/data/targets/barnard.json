@@ -1,0 +1,53 @@
+{
+ "title": "Barnard's Star \u2014 the fastest-moving star in our sky",
+ "plain_result": "This star is so bright that it saturates SPHEREx's detector, and our position measurement fails for it: from SPHEREx we get -5.0 \u00b1 1.9\u2033 and +5.6 \u00b1 1.5\u2033 per year, which disagrees with Gaia's -0.80\u2033 and +10.36\u2033. The picture of survey 1 minus survey 2 does show the star's light moving north, as Gaia predicts, but we do not turn that picture into a number.",
+ "numbers": [
+  {
+   "label": "Motion east\u2013west (SPHEREx, fails)",
+   "value": -5.01,
+   "err": 1.91,
+   "kind": "derived",
+   "unit": "\u2033/yr"
+  },
+  {
+   "label": "Motion east\u2013west (Gaia DR3)",
+   "value": -0.802,
+   "err": null,
+   "kind": "data",
+   "unit": "\u2033/yr"
+  },
+  {
+   "label": "Motion north\u2013south (SPHEREx, fails)",
+   "value": 5.58,
+   "err": 1.49,
+   "kind": "derived",
+   "unit": "\u2033/yr"
+  },
+  {
+   "label": "Motion north\u2013south (Gaia DR3)",
+   "value": 10.362,
+   "err": null,
+   "kind": "data",
+   "unit": "\u2033/yr"
+  },
+  {
+   "label": "Chance the two agree",
+   "value": "5e-04",
+   "err": null,
+   "kind": "derived",
+   "unit": ""
+  }
+ ],
+ "evidence_links": [
+  {
+   "text": "Why it fails: What failed, item 13",
+   "href": "failed.html"
+  },
+  {
+   "text": "See the survey difference live",
+   "href": "timemachine.html?ra=269.4463&dec=4.7677&fov=2&mode=subtract"
+  }
+ ],
+ "method_note": "Saturated pixels are masked, so the position rests on the star's outer light, which is not enough here.",
+ "method_anchor": "failed.html"
+}
