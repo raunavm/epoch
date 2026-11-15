@@ -39,6 +39,19 @@ if f2 and f2.get("single_frame_snr_max", 99) < 5 and f2.get("stack_snr", 0) >= 5
                                f"(best {f2['single_frame_snr_max']:.1f} times the noise). Combined along its orbit it stands out at "
                                f"{f2['stack_snr']:.1f} times the spread of empty paths beside it — a marginal excess.{offset}{half}{chosen}"),
                      detail=f2)
+e13 = load("data/findings/e13.json")
+if e13 and "f2" in out and e13.get("n_combined_ge5"):
+    top = {str(c["pdes"]) for c in e13["candidates"] if c["stack"] >= 5 and c["max_single"] < 5}
+    ok = [r for r in e13["results"] if r["verdict"] == "consistent with a real signal" and r["pdes"] in top]
+    good = [r for r in ok if abs(r["amp_ratio_measured_over_predicted"] - 1) <= 0.2 + 2 * r["amp_ratio_err"]]
+    out["f2"]["sentence"] = (f"Of the {e13['n_stacked']} faint asteroids we could stack, {e13['n_no_single_5sigma']} never reach the usual "
+        f"detection level (5 times the noise) in any single picture. Combined along their known orbits, {e13['n_combined_ge5']} of those stand out "
+        f"above 5 times the spread of empty paths beside them, and all {e13['n_ge5_pass_split']} still show up when their pictures are split in half. "
+        f"For {len(good)} of them the measured brightness matches, within 20%, what its catalogued brightness predicts. "
+        f"The slider shows {out['f2']['detail']['object']}, picked by hand and not the highest-scoring of the three. "
+        "The stack numbers were computed before the split test was written down, so this is a check, not a blind test.")
+    out["f2"]["detail"] = dict(out["f2"]["detail"], e13="data/findings/e13.json")
+    out["f2"].update(title="Too faint for one picture", number=e13["n_combined_ge5"], unit=f"of {e13['n_no_single_5sigma']}")
 e4 = load("data/findings/e4.json")
 if e4:
     p2 = e4["passes"][1]

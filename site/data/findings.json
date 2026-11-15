@@ -18,10 +18,10 @@
   "title": "Too faint for one picture",
   "interaction": "reveal",
   "label": "derived",
-  "unit": "\u03c3",
-  "number": 5.4,
+  "unit": "of 7",
+  "number": 3,
   "err": null,
-  "sentence": "Asteroid 98397 (2000 UC3) never reaches the usual detection level in any of its 295 single pictures (best 4.3 times the noise). Combined along its orbit it stands out at 5.4 times the spread of empty paths beside it \u2014 a marginal excess. Without removing the empty paths' average offset it is 4.9. Split in half (odd/even pictures, or early/late in time), each half gives 3.2\u20134.6 times the noise, against about 3.8 expected for half the data if the signal is real. It was picked by hand after a first pick failed: of 8 faint asteroids stacked, 3 meet the same rule and this one scores lowest of them, so the number is not corrected for that choice.",
+  "sentence": "Of the 8 faint asteroids we could stack, 7 never reach the usual detection level (5 times the noise) in any single picture. Combined along their known orbits, 3 of those stand out above 5 times the spread of empty paths beside them, and all 3 still show up when their pictures are split in half. For 2 of them the measured brightness matches, within 20%, what its catalogued brightness predicts. The slider shows 98397 (2000 UC3), picked by hand and not the highest-scoring of the three. The stack numbers were computed before the split test was written down, so this is a check, not a blind test.",
   "detail": {
    "object": "98397 (2000 UC3)",
    "designation": "98397",
@@ -58,7 +58,8 @@
    },
    "significance_note": "scale from 12 inner empty tracks, verified on 12 outer tracks (docs/PROTOCOLS.md E5)",
    "depth_gain_mag": 3.55,
-   "ideal_gain_mag": 3.74
+   "ideal_gain_mag": 3.74,
+   "e13": "data/findings/e13.json"
   }
  },
  "f3": {
