@@ -303,6 +303,7 @@ if e9:
                       caption="Brightness through the year in six colour bands; open circles are outside the pre-set range and for information only.")],
         evidence_links=[dict(text="Open the prepared field", href="timemachine.html?field=rdra"), dict(text="Method (Science page)", href="science.html#e9")],
         method_note=("Halo photometry (annulus 7–12 pixels) chosen on comparison stars before R Draconis was measured (docs/protocols/E9.md). "
+                     "For a star this bright, much of the 'halo' is detector bloom rather than starlight (Fazar et al. 2026: bloom reaches 100–270 px and depends on detector position and timing); ordinary stars of this brightness swing by factors of 2–4 in detectors 1–4, so the pre-set 5× threshold corresponds to a 35–65% change per band — a weak test. "
                      "Detectors 5–6 are excluded by a pre-set saturation guard; the 4.4–5 µm light curve was made after the result with that guard "
                      "switched off, so it is descriptive. Published infrared maxima of such stars lag the visible ones by about 0.05–0.13 of a period, "
                      "12–32 days for R Draconis (Smith et al. 2002)."),

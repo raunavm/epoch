@@ -219,7 +219,7 @@ Both variable-star targets overload SPHEREx's detector at their centres in almos
 
 ![R Draconis through the year](figs/e9_rdra.png "R Draconis: brightness through the year in six colour bands")
 
-**R Draconis.** The pre-set test could use only three noisy colour bands, and no change passes. Outside the pre-set range (a check made after the result, with a saturation guard switched off), its 4.4–5 µm brightness rises and falls by about 0.3 magnitudes either side of average and peaks in early February 2026, (± 3 days, formal). The catalogue predicts a visible-light maximum near 21 January 2026, uncertain by 2–3 weeks, so the infrared–visible lag is not measured; published infrared maxima of such stars lag by about 0.05–0.13 of a period, 12–32 days for R Draconis (Smith et al. 2002).
+**R Draconis.** The pre-set test could use only three noisy colour bands, and no change passes. For a star this bright, much of the halo is detector bloom rather than starlight (Fazar et al. 2026), and ordinary stars of the same brightness swing by factors of 2–4 in detectors 1–4, so the 5× threshold there corresponds to a 35–65% change per band: a weak test. Outside the pre-set range (a check made after the result, with a saturation guard switched off), its 4.4–5 µm brightness rises and falls by about 0.3 magnitudes either side of average and peaks in early February 2026, (± 3 days, formal). The catalogue predicts a visible-light maximum near 21 January 2026, uncertain by 2–3 weeks, so the infrared–visible lag is not measured; published infrared maxima of such stars lag by about 0.05–0.13 of a period, 12–32 days for R Draconis (Smith et al. 2002).
 
 ###### E6 {#e6-label}
 

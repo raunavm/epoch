@@ -7,32 +7,28 @@
    "value": 3.96,
    "err": 0.07,
    "kind": "derived",
-   "unit": "\u2033/yr",
-   "label_es": "Movimiento este\u2013oeste (SPHEREx)"
+   "unit": "\u2033/yr"
   },
   {
    "label": "Motion east\u2013west (Gaia DR3)",
    "value": 3.982,
    "err": null,
    "kind": "data",
-   "unit": "\u2033/yr",
-   "label_es": "Movimiento este\u2013oeste (Gaia DR3)"
+   "unit": "\u2033/yr"
   },
   {
    "label": "Motion north\u2013south (SPHEREx)",
    "value": -2.43,
    "err": 0.07,
    "kind": "derived",
-   "unit": "\u2033/yr",
-   "label_es": "Movimiento norte\u2013sur (SPHEREx)"
+   "unit": "\u2033/yr"
   },
   {
    "label": "Motion north\u2013south (Gaia DR3)",
    "value": -2.467,
    "err": null,
    "kind": "data",
-   "unit": "\u2033/yr",
-   "label_es": "Movimiento norte\u2013sur (Gaia DR3)"
+   "unit": "\u2033/yr"
   },
   {
    "label": "Absorption bands found in its SPHEREx spectrum (water, methane, carbon monoxide)",
@@ -40,8 +36,7 @@
    "err": null,
    "kind": "derived",
    "unit": "",
-   "method": "science.html#e11",
-   "label_es": "Bandas de absorci\u00f3n encontradas en su espectro de SPHEREx (agua, metano, mon\u00f3xido de carbono)"
+   "method": "science.html#e11"
   },
   {
    "label": "Parallax from SPHEREx positions (pre-registered test, passed)",
@@ -49,8 +44,7 @@
    "err": 53,
    "kind": "derived",
    "unit": "mas",
-   "method": "science.html#e12",
-   "label_es": "Paralaje a partir de posiciones de SPHEREx (prueba registrada de antemano, superada)"
+   "method": "science.html#e12"
   },
   {
    "label": "Parallax (Gaia DR3: Ba 270.7; system, from Epsilon Indi A, 274.8)",
@@ -65,21 +59,17 @@
    "err": null,
    "kind": "derived",
    "unit": "",
-   "method": "science.html#e12",
-   "label_es": "Distancia (intervalo del 68%)",
-   "value_es": "13.4 a\u00f1os luz (11.0\u201317.2)"
+   "method": "science.html#e12"
   }
  ],
  "evidence_links": [
   {
    "text": "Per-picture positions (data/findings/motion_epsindib.json)",
-   "href": "science.html#motion",
-   "text_es": "Posiciones por imagen (data/findings/motion_epsindib.json)"
+   "href": "science.html#motion"
   },
   {
    "text": "Gaia DR3 (Vallenari et al. 2023)",
-   "href": "https://www.cosmos.esa.int/web/gaia/dr3",
-   "text_es": "Gaia DR3 (Vallenari et al. 2023)"
+   "href": "https://www.cosmos.esa.int/web/gaia/dr3"
   }
  ],
  "method_note": "Each picture is fitted with the star's position free, saturated pixels masked and Gaia neighbours modelled; the motion is a straight-line fit to SPHEREx positions with Gaia's parallax held fixed. This fit was not written down in advance. Positions sit a steady ~0.5\u2033 south and ~0.2\u2033 east of Gaia's prediction in every window. Gaia's entry is Ba alone and its motion includes its orbit; from the pair's published orbit (Chen et al. 2022) the centre of Ba+Bb's infrared light should sit 0.50\u20130.56\u2033 south and 0.13\u20130.19\u2033 east \u2014 a check we made after the measurement (Science page). Distance test (E12): five quantities fitted to the per-picture positions (offset, motion, parallax); the error is the largest of the fit, a bootstrap and the scatter of 8 ordinary stars fitted the same way; those stars all come out with a parallax below zero (mean -50 mas), a shared bias we did not correct.",
@@ -90,21 +80,14 @@
    "src": "data/figs/e12_parallax.png",
    "href": "science.html#e12",
    "alt": "Epsilon Indi B's path across the sky over a year, with the yearly wobble that gives its distance",
-   "caption": "Left: its path over a year; the straight dashed line is motion alone, the blue curve adds the yearly wobble. Right: the wobble with the steady motion removed. Error bar set by 8 ordinary stars measured the same way, which all show a small false wobble of their own (Science page).",
-   "alt_es": "Camino de Epsilon Indi B por el cielo durante un a\u00f1o, con la oscilaci\u00f3n anual que da su distancia",
-   "caption_es": "Izquierda: su camino durante un a\u00f1o; la l\u00ednea discontinua recta es solo el movimiento, la curva azul a\u00f1ade la oscilaci\u00f3n anual. Derecha: la oscilaci\u00f3n sin el movimiento constante. Barra de error fijada por 8 estrellas corrientes medidas de la misma manera, que muestran todas una peque\u00f1a oscilaci\u00f3n falsa propia (p\u00e1gina de Ciencia)."
+   "caption": "Left: its path over a year; the straight dashed line is motion alone, the blue curve adds the yearly wobble. Right: the wobble with the steady motion removed. Error bar set by 8 ordinary stars measured the same way, which all show a small false wobble of their own (Science page)."
   },
   {
    "src": "data/figs/e11_epsindib.png",
    "href": "science.html#e11",
    "alt": "SPHEREx spectrum of Epsilon Indi B from 0.75 to 5 micrometres with water, methane and carbon monoxide bands marked",
-   "caption": "SPHEREx spectrum from 246 pictures. Grey strips: absorption bands that passed our pre-set test. Green: published brightness through standard filters.",
-   "alt_es": "Espectro de SPHEREx de Epsilon Indi B de 0.75 a 5 micr\u00f3metros, con las bandas de agua, metano y mon\u00f3xido de carbono marcadas",
-   "caption_es": "Espectro de SPHEREx a partir de 246 im\u00e1genes. Franjas grises: bandas de absorci\u00f3n que superaron nuestra prueba fijada de antemano. Verde: brillo publicado con filtros est\u00e1ndar."
+   "caption": "SPHEREx spectrum from 246 pictures. Grey strips: absorption bands that passed our pre-set test. Green: published brightness through standard filters."
   }
  ],
- "generated_with": "scripts in this repository",
- "title_es": "Epsilon Indi B \u2014 una pareja de enanas marrones cercanas",
- "plain_result_es": "A partir de las posiciones de SPHEREx (con la distancia de Gaia fija) medimos lo r\u00e1pido que se mueve por el cielo: +3.96 \u00b1 0.07\u2033 y -2.43 \u00b1 0.07\u2033 por a\u00f1o (este\u2013oeste, norte\u2013sur). Gaia, de la ESA, midi\u00f3 +3.98\u2033 y -2.47\u2033. Si adem\u00e1s ajustamos su oscilaci\u00f3n anual, sin tomar nada de Gaia para este objeto, SPHEREx da un paralaje de 243 \u00b1 53 mil\u00e9simas de segundo de arco: una distancia de unos 13 a\u00f1os luz (11\u201317); Gaia da 12.1.",
- "method_note_es": "Cada imagen se ajusta con la posici\u00f3n de la estrella libre, los p\u00edxeles saturados enmascarados y las vecinas de Gaia modeladas; el movimiento es un ajuste en l\u00ednea recta a las posiciones de SPHEREx con el paralaje de Gaia fijo. Este ajuste no se dej\u00f3 por escrito de antemano. Las posiciones quedan de forma constante ~0.5\u2033 al sur y ~0.2\u2033 al este de la predicci\u00f3n de Gaia en todas las ventanas. La entrada de Gaia es solo Ba y su movimiento incluye su \u00f3rbita; seg\u00fan la \u00f3rbita publicada de la pareja (Chen et al. 2022), el centro de la luz infrarroja de Ba+Bb deber\u00eda estar 0.50\u20130.56\u2033 al sur y 0.13\u20130.19\u2033 al este \u2014 una comprobaci\u00f3n que hicimos despu\u00e9s de la medida (p\u00e1gina de Ciencia). Prueba de distancia (E12): cinco cantidades ajustadas a las posiciones de cada imagen (desplazamiento, movimiento, paralaje); el error es el mayor entre el del ajuste, el de un bootstrap y la dispersi\u00f3n de 8 estrellas corrientes ajustadas de la misma manera; todas esas estrellas salen con un paralaje por debajo de cero (media -50 mas), un sesgo compartido que no corregimos."
+ "generated_with": "scripts in this repository"
 }
