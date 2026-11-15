@@ -2,7 +2,7 @@ import { init, getJSON, h, t, link, unavailable } from './core.js';
 import { mountReveal } from './components/reveal.js';
 
 await init();
-document.getElementById('explore').href = link('timemachine.html');
+document.getElementById('explore').href = link('timemachine.html?target=barnard');
 const el = document.getElementById('reveal');
 const data = await getJSON('reveal.json');
 if (!data || !(data.frames?.length || data.stack_pngs?.length)) el.replaceChildren(unavailable(t('what.reveal')));

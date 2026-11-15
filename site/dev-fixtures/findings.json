@@ -3,7 +3,23 @@
   "sentence": "Fixture: share of raw-blink changes that are only colour.",
   "number": 0.0,
   "err": 0.0,
-  "unit": "%"
+  "unit": "%",
+  "detail": {
+   "all_fields": {
+    "n_naive": 10,
+    "n_corrected": 5,
+    "fraction_removed": 0.5,
+    "note": "fixture note"
+   },
+   "per_field": [
+    {
+     "field": "a"
+    },
+    {
+     "field": "b"
+    }
+   ]
+  }
  },
  "f2": {
   "sentence": "Fixture: magnitudes gained by combining frames.",

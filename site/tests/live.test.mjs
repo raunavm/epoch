@@ -5,7 +5,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { tileOf, neighbourTiles, containsWithMargin, footprintContains, s3Key } from '../js/live/index.js';
+import { tileOf, neighbourTiles, containsWithMargin, footprintContains, s3Key, spreadInTime } from '../js/live/index.js';
 import { makeWCS, project, deproject, waveAt } from '../js/live/wcs.js';
 import { readHeader, parseCards } from '../js/live/fits.js';
 import { changeModel, countChanges, despike } from '../js/live/change.js';
@@ -152,4 +152,13 @@ test('aperture photometry subtracts the annulus', () => {
   const a = aperture(v, S, 7, 7);
   assert.ok(Math.abs(a.flux - 10) < 1e-6);
   assert.equal(a.err, 0);
+});
+
+test('spreadInTime keeps n distinct frames spanning the whole time range', () => {
+  const fr = [...Array(1000)].map((_, i) => ({ mjd: i < 900 ? i * 0.01 : 100 + i })); // dense cluster + sparse tail
+  const sub = spreadInTime(fr, 300);
+  assert.equal(new Set(sub).size, 300);
+  assert.equal(sub[0], fr[0]); assert.equal(sub[299], fr[999]);
+  assert.ok(sub.filter(f => f.mjd > 100).length >= 90); // the sparse tail is fully represented
+  assert.ok(sub.every((f, k) => !k || f.mjd > sub[k - 1].mjd));
 });

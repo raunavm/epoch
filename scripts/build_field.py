@@ -132,7 +132,7 @@ def cut(key, gra, gdec):
     return out
 
 
-def gather(name, ra0, dec0, S, threads=8):
+def gather(name, ra0, dec0, S, threads=4):
     cache = f"data/cache/fields/{name}_S{S}.npz"
     os.makedirs(os.path.dirname(cache), exist_ok=True)
     if os.path.exists(cache):
@@ -156,6 +156,21 @@ def gather(name, ra0, dec0, S, threads=8):
                 fails.append((futs[fu], repr(e)))
             if (i + 1) % 25 == 0:
                 print(f"  {i + 1}/{len(futs)} read, {time.time() - t:.0f}s", flush=True)
+    for rnd in range(3):                      # failures are transient (S3 throttling): retry them, gently
+        if not fails:
+            break
+        print(f"retry round {rnd + 1}: {len(fails)} failed reads", flush=True)
+        time.sleep(30)
+        keys, fails = [k for k, _ in fails], []
+        with ThreadPoolExecutor(min(threads, 4)) as ex:
+            futs = {ex.submit(cut, k, gra, gdec): k for k in keys}
+            for fu in futs:
+                try:
+                    r = fu.result()
+                    if r is not None:
+                        res.append(r)
+                except Exception as e:
+                    fails.append((futs[fu], repr(e)))
     if fails:
         print(f"WARNING {len(fails)} read failures, e.g. {fails[0]}")
     res.sort(key=lambda r: (r["mjd"], r["detector"]))
@@ -172,7 +187,7 @@ def gather(name, ra0, dec0, S, threads=8):
 def gaia(name, ra0, dec0, S):
     path = f"data/cache/fields/{name}_S{S}_gaia.json"
     if os.path.exists(path):
-        return pd.read_json(path)
+        return pd.read_json(path, dtype={"source_id": "int64"})
     import pyvo
     r = S * SCALE_ARCSEC / 2 * 1.5 / 3600
     q = (f"SELECT source_id, ra, dec, pmra, pmdec, parallax, phot_g_mean_mag FROM gaiadr3.gaia_source "
@@ -180,6 +195,171 @@ def gaia(name, ra0, dec0, S):
     t = pyvo.dal.TAPService("https://gaia.aip.de/tap").run_sync(q, maxrec=100000).to_table().to_pandas()
     t.to_json(path)
     return t
+
+
+# ---------------------------------------------------------------- known asteroids (IMCCE SkyBoT)
+SKYBOT = "https://ssp.imcce.fr/webservices/skybot/api/conesearch.php"
+SKYBOT_SR_DEG = 240 / 3600     # cone radius; the 48 px field's half-diagonal is 209"
+VMAG_MAX = 21.0                # asteroids fainter than this are neither labelled nor cross-matched
+
+
+def _skybot_query(jd, ra0, dec0):
+    """One geocentric (LOC=500) cone search, cached under data/cache/skybot/. HTTP 204 = no objects (re-asked once)."""
+    path = f"data/cache/skybot/{ra0:.5f}_{dec0:+.5f}_{jd:.5f}_sr{SKYBOT_SR_DEG * 3600:.0f}.json"
+    if os.path.exists(path):
+        return json.load(open(path))["objects"]
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    p = {"EPOCH": f"{jd:.6f}", "RA": ra0, "DEC": dec0, "SR": SKYBOT_SR_DEG, "LOC": "500", "-mime": "json",
+         "-output": "basic"}
+    n204 = 0
+    for i in range(8):
+        try:
+            q = requests.get(SKYBOT, params=p, timeout=120)
+        except requests.RequestException:
+            time.sleep(5 * (i + 1))
+            continue
+        if q.status_code == 200:
+            objs = q.json()
+            break
+        if q.status_code == 204:
+            n204 += 1
+            if n204 == 2:
+                objs = []
+                break
+        time.sleep(5 * (i + 1))
+    else:
+        raise RuntimeError(f"SkyBoT failed for JD {jd}")
+    json.dump(dict(url=SKYBOT, params=p, objects=objs), open(path, "w"))
+    return objs
+
+
+def known_asteroids(mjd, S, ra0, dec0, tol=0.05):
+    """Per frame: [{name, cls, vmag, err, x, y}] for SkyBoT objects. Frames within `tol` d of a group's first frame
+    share one query at the group's mean epoch; positions are moved to each frame time with the SkyBoT rates
+    (dRA includes cos dec; checked against two-epoch queries). Epoch: MJD-AVG (UTC) + 2400000.5."""
+    from astropy.coordinates import Angle
+    out = [[] for _ in mjd]
+    order = np.argsort(mjd)
+    groups, start = [], None
+    for e in order:
+        if start is None or mjd[e] - start > tol:
+            groups.append([]); start = mjd[e]
+        groups[-1].append(e)
+    for G in groups:
+        t0 = float(np.mean(mjd[G]))
+        for o in _skybot_query(t0 + 2400000.5, ra0, dec0):
+            ra, dec = Angle(o["RA (hms)"], "hourangle").deg, Angle(o["DEC (dms)"], "deg").deg
+            for e in G:
+                h = (mjd[e] - t0) * 24
+                dd = dec + o["dDEC (arcsec/h)"] * h / 3600
+                x, y = world_to_grid(ra + o["dRA (arcsec/h)"] * h / 3600 / np.cos(np.radians(dec)), dd, S, ra0, dec0)
+                out[e].append(dict(name=o["Name"], cls=o["Class"], vmag=o["VMag (mag)"], err=o["Err (arcsec)"],
+                                   x=float(x), y=float(y)))
+    return out, len(groups)
+
+
+def predicted_snr2(vmag, wl, x, y, fwhm, denom):
+    """Second-highest predicted pixel S/N of a point source with V = vmag (reflected sunlight, flat reflectance,
+    no thermal emission: a lower bound beyond ~3.5 um) at grid position (x, y), Gaussian PSF of the frame's
+    PSF_FWHM, against the per-pixel noise `denom` (MJy/sr, the corrected map's denominator). Ignores the extra
+    smoothing of bilinear resampling. Returns (snr2, both brightest pixels have data)."""
+    from scipy.special import erf
+    from orrery.physics import V_WAVELENGTH_UM, V_ZERO_POINT_MJY, solar_flux_mJy
+    F = V_ZERO_POINT_MJY * 10 ** (-0.4 * vmag) * solar_flux_mJy(wl) / solar_flux_mJy(V_WAVELENGTH_UM)
+    s = fwhm / 2.3548 / SCALE_ARCSEC * np.sqrt(2)
+    ii = np.arange(int(np.floor(x)) - 2, int(np.floor(x)) + 4)
+    jj = np.arange(int(np.floor(y)) - 2, int(np.floor(y)) + 4)
+    fx = 0.5 * (erf((ii + 0.5 - x) / s) - erf((ii - 0.5 - x) / s))
+    fy = 0.5 * (erf((jj + 0.5 - y) / s) - erf((jj - 0.5 - y) / s))
+    sb = F * 1e-9 * np.outer(fy, fx) / (SCALE_ARCSEC / 206264.806) ** 2          # MJy/sr
+    S = denom.shape[0]
+    ok = (jj[:, None] >= 0) & (jj[:, None] < S) & (ii[None] >= 0) & (ii[None] < S)
+    dn = np.full(sb.shape, np.nan)
+    dn[ok] = denom[np.clip(jj, 0, S - 1)[:, None], np.clip(ii, 0, S - 1)[None]][ok]
+    top = np.argsort(sb.ravel())[::-1][:2]
+    snr = sb.ravel()[top] / dn.ravel()[top]
+    return float(snr[1]) if np.isfinite(snr).all() else float(sb.ravel()[top[1]] / np.nanmedian(denom)), \
+        bool(np.isfinite(snr).all())
+
+
+def asteroid_summary(rows, n_groups):
+    """Known asteroids (V < VMAG_MAX) inside the grid: how many corrected-map changes they produced and how many
+    that should have been flagged (predicted second-brightest pixel S/N >= thr, both pixels with data) were not."""
+    out = dict(source="IMCCE SkyBoT conesearch, geocentric (LOC=500; no SPHEREx observer code; parallax from "
+                      "low Earth orbit < 1\" for main-belt objects)", n_queries=n_groups, vmag_max=VMAG_MAX,
+               n_instances=len(rows), n_unique=len({r_["name"] for r_ in rows}),
+               n_instances_flagged=sum(r_["flagged"] for r_ in rows),
+               n_instances_no_data=sum(not r_["has_data"] for r_ in rows),
+               expected_rule="reflected sunlight only (flat reflectance, no thermal), Gaussian PSF of the frame's "
+                             "PSF_FWHM; expected if the second-brightest predicted pixel has S/N >= thr against the "
+                             "corrected-map noise and both pixels have data")
+    lim = [r_["vmag"] + 2.5 * np.log10(r_["snr2_pred"] / 5) for r_ in rows if r_["has_data"] and r_["snr2_pred"] > 0]
+    out["vmag_limit_snr2_5_median"] = round(float(np.median(lim)), 2) if lim else None
+    for thr in (5, 10):
+        exp = [r_ for r_ in rows if r_["has_data"] and r_["snr2_pred"] >= thr]
+        miss = [r_ for r_ in exp if not r_["flagged"]]
+        out[f"snr{thr}"] = dict(n_expected=len(exp), n_flagged=len(exp) - len(miss), n_missed=len(miss),
+                                n_unique_expected=len({r_["name"] for r_ in exp}),
+                                n_unique_missed_every_frame=len({r_["name"] for r_ in exp} -
+                                                                {r_["name"] for r_ in exp if r_["flagged"]}))
+    out["rows"] = rows
+    return out
+
+
+def labels_sheet(title, d, r, frames, path, n=6):
+    """n frames, raw (top, asinh of background-subtracted unmasked image / sigma) vs corrected (bottom, PuOr +-8),
+    with labels: cyan circle = known asteroid (V), lime + = target, yellow + = known star, red square = unexplained.
+    Frames chosen: brightest predicted known asteroids first (distinct epochs), then most unexplained changes."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    score = []
+    for e, fr in enumerate(frames):
+        a_ = [l_ for l_ in fr["labels"] if l_["kind"] == "asteroid" and 0 <= l_["x"] < len(d["v"][e]) and 0 <= l_["y"] < len(d["v"][e])]
+        score.append(max((l_.get("snr2_pred") or 0 for l_ in a_), default=-1))
+    sel = []
+    for e in np.argsort(score)[::-1]:
+        if score[e] <= 0 or len(sel) >= n - 2:
+            break
+        if all(abs(d["mjd"][e] - d["mjd"][q]) > 0.5 for q in sel):
+            sel.append(int(e))
+    nun = [sum(l_["label"] == "unexplained" for l_ in fr["labels"]) for fr in frames]
+    for e in np.argsort(nun)[::-1]:
+        if len(sel) >= n:
+            break
+        if int(e) not in sel:
+            sel.append(int(e))
+    sel = sorted(sel)
+    fig, ax = plt.subplots(2, len(sel), figsize=(2.4 * len(sel), 5.2))
+    gray = plt.get_cmap("gray").copy(); gray.set_bad("#203050")
+    div = plt.get_cmap("PuOr_r").copy(); div.set_bad("#203050")
+    for k, e in enumerate(sel):
+        raw = (d["v_raw"][e] - r["bg"][e]) / r["sigma"][e]
+        ax[0, k].imshow(np.arcsinh(raw / 3), cmap=gray, vmin=0, vmax=np.arcsinh(max(np.nanpercentile(raw, 99.5), 10) / 3))
+        ax[1, k].imshow(r["corr"][e], cmap=div, vmin=-8, vmax=8)
+        for a_ in ax[:, k]:
+            a_.set_xticks([]); a_.set_yticks([])
+            for l_ in frames[e]["labels"]:
+                x, y = l_["x"], l_["y"]
+                if l_["kind"] == "asteroid":
+                    a_.plot(x, y, "o", mfc="none", mec="cyan", ms=11, mew=0.8)
+                    a_.text(x + 2, y - 2, f"V{l_['vmag']:.1f}", color="cyan", fontsize=5)
+                elif l_["label"] == "unexplained":
+                    a_.plot(x, y, "s", mfc="none", mec="red", ms=9, mew=0.8)
+                elif l_["kind"] == "star":
+                    a_.plot(x, y, "+", color="yellow", ms=9, mew=0.8)
+                else:
+                    a_.plot(x, y, "+", color="lime", ms=11, mew=0.8)
+            a_.set_xlim(-0.5, len(d["v"][e]) - 0.5); a_.set_ylim(len(d["v"][e]) - 0.5, -0.5)
+        ast_ = [l_ for l_ in frames[e]["labels"] if l_["kind"] == "asteroid"]
+        ax[0, k].set_title(f"{frames[e]['date']} D{frames[e]['detector']} {frames[e]['wl_um']:.2f} um", fontsize=6)
+        ax[1, k].set_title(f"corr: {frames[e]['n_changes_corr']} chg, ast flagged "
+                           f"{sum(l_['change'] for l_ in ast_)}/{len(ast_)}", fontsize=6)
+    fig.suptitle(f"{title}: raw (top) vs corrected +-8 sigma (bottom). cyan o known asteroid (SkyBoT, V<{VMAG_MAX:g}), "
+                 f"lime + target, yellow + known star, red square unexplained", fontsize=6)
+    fig.tight_layout()
+    fig.savefig(path, dpi=110)
+    plt.close(fig)
 
 
 def passes(mjd, gap=30):
@@ -238,56 +418,72 @@ def diverging_png(v, path, clip=8):
     Image.fromarray(np.round(rgb).astype(np.uint8)).save(path, optimize=True)
 
 
-def contact_sheet(name, title, d, r, tpos, path, n_per_pass=6):
+def contact_sheet(name, title, d, r, tpos, path, n_per_pass=3):
+    """Top: per-pass S/N stacks (detectors 1-3 and 4-6) with the predicted target position per pass.
+    Below: n_per_pass frames per pass as raw / naive (all frames in time order) / corrected, +-8 sigma."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     P = passes(d["mjd"])
-    sel = [p[np.linspace(0, len(p) - 1, min(n_per_pass, len(p))).astype(int)] for p in P]
-    rows = [e for s in sel for e in s]
-    fig, ax = plt.subplots(len(rows), 3, figsize=(6.6, 2.2 * len(rows)))
-    ax = np.atleast_2d(ax)
-    for k, e in enumerate(rows):
-        vs = r["vs"][e]
-        lo, hi = np.nanpercentile(vs, [50, 99.5])
-        sd = max(1e-9, np.nanpercentile(vs, 84) - np.nanpercentile(vs, 16)) / 2
-        ax[k, 0].imshow(np.arcsinh((vs - lo) / sd), cmap="gray", vmin=0, vmax=np.arcsinh(max(hi - lo, 3 * sd) / sd))
+    sel = [e for p in P for e in p[np.linspace(0, len(p) - 1, min(n_per_pass, len(p))).astype(int)]]
+    nc = max(3, len(P))
+    fig, ax = plt.subplots(2 + len(sel), nc, figsize=(2.3 * nc, 2.3 * (2 + len(sel))))
+    for a in ax.ravel():
+        a.set_xticks([]); a.set_yticks([]); a.set_axis_off()
+    gray = plt.get_cmap("gray").copy(); gray.set_bad("#203050")
+    div = plt.get_cmap("PuOr_r").copy(); div.set_bad("#203050")
+    for k, p in enumerate(P):
+        for g, dets in enumerate([(1, 2, 3), (4, 5, 6)]):
+            e = [i for i in p if d["detector"][i] in dets]
+            a = ax[g, k]; a.set_axis_on()
+            if not e:
+                continue
+            sn = np.nanmean([r["vs"][i] / r["sigma"][i] for i in e], 0) * np.sqrt(len(e))
+            a.imshow(np.arcsinh(sn / 3), cmap=gray, vmin=0, vmax=np.arcsinh(max(np.nanpercentile(sn, 99.5), 10) / 3))
+            if tpos is not None:
+                a.plot(*np.nanmean(tpos[p], 0), "+", color="lime", ms=12, mew=0.8)
+            a.set_title(f"pass {k} {Time(d['mjd'][p].mean(), format='mjd').iso[:7]} D{dets[0]}-{dets[-1]} n={len(e)}", fontsize=6)
+    for k, e in enumerate(sel):
+        row = ax[2 + k]
+        vs = r["vs"][e] / r["sigma"][e]
+        row[0].imshow(np.arcsinh(vs / 3), cmap=gray, vmin=0, vmax=np.arcsinh(max(np.nanpercentile(vs, 99.5), 10) / 3))
         nv = r["naive_all"][e]
-        ax[k, 1].imshow(nv if nv is not None else np.full_like(vs, np.nan), cmap="PuOr_r", vmin=-8, vmax=8)
-        ax[k, 2].imshow(r["corr"][e], cmap="PuOr_r", vmin=-8, vmax=8)
-        for a in ax[k]:
-            a.set_xticks([]); a.set_yticks([])
+        row[1].imshow(nv if nv is not None else np.full_like(vs, np.nan), cmap=div, vmin=-8, vmax=8)
+        row[2].imshow(r["corr"][e], cmap=div, vmin=-8, vmax=8)
+        for a in row[:3]:
+            a.set_axis_on()
             if tpos is not None:
                 a.plot(*tpos[e], "+", color="lime", ms=10, mew=0.8)
-        ax[k, 0].set_ylabel(f"{Time(d['mjd'][e], format='mjd').iso[:10]}\nD{d['detector'][e]} "
-                            f"{np.nanmean(d['lam'][e]):.2f}um", fontsize=7)
-        ax[k, 1].set_title(f"naive(all) n={r['n_naive_all'][e]}", fontsize=7)
-        ax[k, 2].set_title(f"corrected n={r['n_corr'][e]}", fontsize=7)
-    ax[0, 0].set_title("raw (asinh)", fontsize=7)
-    fig.suptitle(f"{title}: {len(d['mjd'])} frames, {len(P)} passes (PuOr, +-8 sigma)", fontsize=8)
+        row[0].set_title(f"{Time(d['mjd'][e], format='mjd').iso[:10]} D{d['detector'][e]} "
+                         f"{np.nanmean(d['lam'][e]):.2f} um", fontsize=6)
+        row[1].set_title(f"naive (all) n={r['n_naive_all'][e]}", fontsize=6)
+        row[2].set_title(f"corrected n={r['n_corr'][e]}", fontsize=6)
+    fig.suptitle(f"{title}: {len(d['mjd'])} frames, {len(P)} passes; naive/corrected PuOr +-8 sigma; "
+                 f"navy = masked/no data", fontsize=7)
     fig.tight_layout()
-    fig.savefig(path, dpi=110)
+    fig.savefig(path, dpi=100)
     plt.close(fig)
 
 
 # ---------------------------------------------------------------- target diagnostics
 def target_check(d, r, tpos, P):
-    """Per pass: mean measured centroid offset of the target (5x5 first moment of the background-subtracted
-    image about the predicted mean position) and the predicted mean position; 3x3 data/model flux ratio."""
-    S = r["vs"].shape[1]
+    """Per pass: mean measured centroid of the target (5x5 first moment of the background-subtracted, UNMASKED
+    image about the predicted mean position) vs the predicted mean position; 3x3 data/model flux ratio
+    (data unmasked, model from the masked fit, so only meaningful where the core is unmasked)."""
+    raw = d["v_raw"] - r["bg"][:, None, None]   # unmasked: bright targets have hard-bad (BLOOM/PERSIST) cores
     ref = np.nanmean(tpos, 0)
     cx, cy = int(round(ref[0])), int(round(ref[1]))
     out = []
     for p in P:
         cen, rat, cm = [], [], []
         for e in p:
-            w = r["vs"][e, cy - 2:cy + 3, cx - 2:cx + 3]
+            w = raw[e, cy - 2:cy + 3, cx - 2:cx + 3]
             sn = np.nansum(w) / (r["sigma"][e] * 5)
             if np.isfinite(w).all() and sn > 10:
                 ww = np.clip(w, 0, None)
                 jj, ii = np.mgrid[cy - 2:cy + 3, cx - 2:cx + 3]
                 cen.append(((ww * ii).sum() / ww.sum(), (ww * jj).sum() / ww.sum()))
-            a, m = r["vs"][e, cy - 1:cy + 2, cx - 1:cx + 2], r["model"][e, cy - 1:cy + 2, cx - 1:cx + 2]
+            a, m = raw[e, cy - 1:cy + 2, cx - 1:cx + 2], r["model"][e, cy - 1:cy + 2, cx - 1:cx + 2]
             if np.isfinite(a).all() and np.isfinite(m).all() and m.sum() > 5 * r["sigma"][e] * 3:
                 rat.append(a.sum() / m.sum())
             c = r["corr"][e, cy - 1:cy + 2, cx - 1:cx + 2]
@@ -304,6 +500,32 @@ def target_check(d, r, tpos, P):
             rec["measured_xy_err"] = (cen.std(0, ddof=1) / np.sqrt(len(cen))).round(3).tolist()
         out.append(rec)
     res = {"per_pass": out, "box_centre_xy": [cx, cy]}
+    # wavelength-matched brightness per pass: per detector, fit 3x3 raw flux = a + b (lam - lam_d) within each pass,
+    # report a (flux at the detector's mean wavelength) relative to the first pass with >= 4 frames
+    fl = []
+    for dd in sorted(set(d["detector"].tolist())):
+        E = np.flatnonzero(d["detector"] == dd)
+        A = np.array([np.nansum(raw[e, cy - 1:cy + 2, cx - 1:cx + 2]) if np.isfinite(raw[e, cy - 1:cy + 2, cx - 1:cx + 2]).all()
+                      else np.nan for e in E])
+        L = d["lam"][E, cy, cx].astype(float)
+        lbar = np.nanmean(L)
+        rows = []
+        for k, p in enumerate(P):
+            m = np.isin(E, p) & np.isfinite(A) & np.isfinite(L)
+            if m.sum() < 4:
+                continue
+            X = np.stack([np.ones(m.sum()), L[m] - lbar], 1)
+            coef, *_ = np.linalg.lstsq(X, A[m], rcond=None)
+            res_ = A[m] - X @ coef
+            cov = np.linalg.inv(X.T @ X) * (res_ @ res_) / max(1, m.sum() - 2)
+            rows.append(dict(pass_index=k, n=int(m.sum()), flux=float(coef[0]), err=float(np.sqrt(cov[0, 0]))))
+        if len(rows) >= 2:
+            f0 = rows[0]
+            for r_ in rows:
+                r_["ratio_to_first"] = round(r_["flux"] / f0["flux"], 4)
+                r_["ratio_err"] = round(abs(r_["flux"] / f0["flux"]) * np.hypot(r_["err"] / r_["flux"], f0["err"] / f0["flux"]), 4)
+        fl.append(dict(detector=dd, lam_um=round(float(lbar), 3), passes=rows))
+    res["flux_vs_pass_at_fixed_wavelength"] = fl
     ok = [o for o in out if "measured_xy" in o]
     if len(ok) >= 2:
         a, b = ok[0], ok[-1]
@@ -363,32 +585,56 @@ def main(a):
         tra16, tdec16 = position(a.ra, a.dec, a.pmra, a.pmdec, 0, J2000, GAIA_EPOCH)
         hp = hp[np.hypot((hp.ra - tra16) * np.cos(np.radians(dec0)), hp.dec - tdec16) * 3600 > 15]
     hpos = []
-    for _, s in hp.iterrows():
+    for s in hp.itertuples():
         sra, sdec = position(s.ra, s.dec, s.pmra, s.pmdec, s.parallax if np.isfinite(s.parallax) else 0, GAIA_EPOCH, d["mjd"])
         hpos.append((f"Gaia DR3 {s.source_id}", np.stack(world_to_grid(sra, sdec, S, ra0, dec0), -1)))
 
     out_dir = f"site/data/timemachine/{a.name}"
     os.makedirs(out_dir, exist_ok=True)
-    frames, n_known, n_unexp = [], 0, 0
+    ast, n_groups = known_asteroids(d["mjd"], S, ra0, dec0)
+    frames, n_unexp = [], 0
+    n_match = dict(target=0, star=0, asteroid=0)
+    ast_rows = []              # one row per (asteroid with V < VMAG_MAX, frame) inside the grid
     for e in range(N):
         labels = []
         known = []
         if tpos is not None:
             known.append(dict(name=a.target_name, kind=a.kind, label="variable star" if a.kind == "variable star" else "target",
-                              xy=tpos[e]))
+                              xy=tpos[e], cat="target"))
         for nm, xy in hpos:
-            known.append(dict(name=nm, kind="star", label="known star", xy=xy[e]))
+            known.append(dict(name=nm, kind="star", label="known star", xy=xy[e], cat="star"))
+        for o in ast[e]:
+            if o["vmag"] < VMAG_MAX:
+                known.append(dict(name=o["name"], kind="asteroid", label="known asteroid", xy=(o["x"], o["y"]),
+                                  cat="asteroid", o=o))
         ch = find_changes(r["corr"][e])
+        denom = np.sqrt(r["sigma"][e] ** 2 + (f * r["model"][e]) ** 2)
+        fwhm = json.loads(str(d["meta"][e])).get("PSF_FWHM") or 7.5
         used = set()
         for k in known:
             m = [c for c in ch if np.hypot(c["x"] - k["xy"][0], c["y"] - k["xy"][1]) <= 2]
+            n_match[k["cat"]] += sum(id(c) not in used for c in m)      # each change is matched once, in this order
             used |= {id(c) for c in m}
             pk = max((c["peak"] for c in m), key=abs, default=None)
-            if -1 <= k["xy"][0] <= S and -1 <= k["xy"][1] <= S:
-                labels.append(dict(x=round(float(k["xy"][0]), 2), y=round(float(k["xy"][1]), 2), name=k["name"],
-                                   kind=k["kind"], label=k["label"], confidence=None, change=bool(m),
-                                   peak=round(pk, 2) if pk is not None else None))
-            n_known += len(m)
+            if not (-1 <= k["xy"][0] <= S and -1 <= k["xy"][1] <= S):
+                continue
+            lab = dict(x=round(float(k["xy"][0]), 2), y=round(float(k["xy"][1]), 2), name=k["name"],
+                       kind=k["kind"], label=k["label"], confidence=None, change=bool(m),
+                       peak=round(pk, 2) if pk is not None else None)
+            if k["cat"] == "asteroid":
+                o = k["o"]
+                ix, iy = int(np.clip(round(o["x"]), 0, S - 1)), int(np.clip(round(o["y"]), 0, S - 1))
+                wl = float(d["lam"][e][iy, ix]) if np.isfinite(d["lam"][e][iy, ix]) else float(np.nanmean(d["lam"][e]))
+                snr2, has = predicted_snr2(o["vmag"], wl, o["x"], o["y"], fwhm, denom)
+                lab.update(confidence=round(min(1.0, SCALE_ARCSEC / max(o["err"], 1e-9)), 3), vmag=o["vmag"],
+                           orbit_class=o["cls"], snr2_pred=round(snr2, 1))
+                if 0 <= o["x"] <= S - 1 and 0 <= o["y"] <= S - 1:
+                    box = r["corr"][e][max(0, iy - 1):iy + 2, max(0, ix - 1):ix + 2]
+                    ast_rows.append(dict(frame=e, obs_id=str(d["obs_id"][e]), mjd=float(d["mjd"][e]), name=o["name"],
+                                         vmag=o["vmag"], wl_um=round(wl, 3), x=round(o["x"], 2), y=round(o["y"], 2),
+                                         snr2_pred=round(snr2, 1), has_data=has, flagged=bool(m),
+                                         corr_max_3x3=round(float(np.nanmax(box)), 2) if np.isfinite(box).any() else None))
+            labels.append(lab)
         for c in ch:
             if id(c) in used:
                 continue
@@ -414,7 +660,10 @@ def main(a):
     field = dict(field=a.name, name=title, ra=round(ra0, 6), dec=round(dec0, 6), size_px=S, scale_arcsec=SCALE_ARCSEC,
                  release="dr1", noise_floor_f=f, method="docs/INTERFACES.md#wavelength-aware-change-model (revision 2)",
                  corr_colormap="blue #56B4E9 (negative) - black - orange #E69F00 (positive), clipped at +-8 sigma",
-                 confidence_rule="unexplained: clip(0.5 + (|peak| - 5)/20, 0, 1)",
+                 confidence_rule="unexplained: clip(0.5 + (|peak| - 5)/20, 0, 1); known asteroid: min(1, 6.15 / "
+                                 "SkyBoT position error in arcsec)",
+                 asteroid_labels=f"IMCCE SkyBoT cone search (geocentric, LOC=500), V < {VMAG_MAX:g}, "
+                                 f"{n_groups} queries; positions moved to each frame time with SkyBoT rates",
                  rerun_command=" ".join(["scripts/build_field.py"] + sys.argv[1:]),
                  n_passes=len(P), frames=frames)
     if has_t:
@@ -436,14 +685,19 @@ def main(a):
               passes=[dict(n=len(p), start=Time(d["mjd"][p[0]], format="mjd").iso[:10],
                            end=Time(d["mjd"][p[-1]], format="mjd").iso[:10]) for p in P],
               f=f, n_naive_all=int(r["n_naive_all"].sum()), n_naive_det=int(r["n_naive_det"].sum()),
-              n_corrected=int(r["n_corr"].sum()), corrected_matched_known=n_known, corrected_unexplained=n_unexp,
+              n_corrected=int(r["n_corr"].sum()), corrected_matched_known=sum(n_match.values()),
+              corrected_matched_target=n_match["target"], corrected_matched_hpm_star=n_match["star"],
+              corrected_matched_asteroids=n_match["asteroid"], corrected_unexplained=n_unexp,
+              known_asteroids=asteroid_summary(ast_rows, n_groups),
               n_gaia_hpm=len(hpos), by_detector=by_det, index_src=str(d["index_src"]),
               method="docs/INTERFACES.md#wavelength-aware-change-model (revision 2)")
     if tpos is not None:
         f1["target_check"] = target_check(d, r, tpos, P)
     json.dump(f1, open(f"data/findings/f1_{a.name}.json", "w"), indent=1)
     contact_sheet(a.name, title, d, r, tpos, f"data/findings/contact_{a.name}.png")
-    print(json.dumps({k: v for k, v in f1.items() if k != "target_check"}, indent=1))
+    labels_sheet(title, d, r, frames, f"data/findings/contact_labels_{a.name}.png")
+    print(json.dumps({k: v for k, v in f1.items() if k not in ("target_check", "known_asteroids")}, indent=1))
+    print(json.dumps({k: v for k, v in f1["known_asteroids"].items() if k != "rows"}, indent=1))
     if tpos is not None:
         print(json.dumps(f1["target_check"], indent=1))
 

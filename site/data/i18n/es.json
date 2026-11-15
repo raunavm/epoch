@@ -130,7 +130,7 @@
  "obj.albedo": "Reflectividad (fracción de luz solar reflejada)",
  "obj.eta": "Factor de reparto del calor (η)",
  "obj.eta_check": "Es un ajuste del modelo de calor, elegido para encajar con los colores infrarrojos; no se mide de forma independiente.",
- "obj.fam_same": "Más o menos del tamaño de {name}",
+ "obj.fam_same": "Parecido a {name}",
  "obj.fam_times": "Unas {x} veces {name}",
  "obj.this_object": "este objeto",
  "obj.spec_h": "Colores",
@@ -277,5 +277,10 @@
  "live.changes_h": "¿Cuántos cambios son reales?",
  "live.changes_view": "Esta vista (en vivo):",
  "live.changes_method": "Un cambio es un grupo de al menos 2 píxeles a más de 5 unidades de ruido de lo esperado. El ruido incluye un mínimo de {f} × brillo por la forma imperfecta de las estrellas. Los picos de un solo píxel se eliminan con una prueba de mediana 3×3, porque el modo en vivo no lee el plano de marcas de píxeles.",
- "live.provisional": "El mínimo {f} es provisional hasta que se mida en el campo de calibración."
+ "live.provisional": "El mínimo {f} es provisional hasta que se mida en el campo de calibración.",
+ "obj.ours_size": "Nuestro tamaño (este sitio)",
+ "obj.indep_size": "Tamaño independiente ({src})",
+ "live.subset": "Se muestran {n} de {N} imágenes, repartidas por igual en el tiempo.",
+ "live.load_all": "Cargar las {N} (unos {mb} MB)",
+ "finding.all_fields": "En los {n} campos, incluidas las estrellas objetivo: se eliminó el {pct}% de los cambios del parpadeo simple ({naive} → {corr})."
 }

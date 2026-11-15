@@ -1,4 +1,4 @@
-import { init, getJSON, h, t, safeUrl, unavailable } from './core.js';
+import { init, getJSON, h, put, t, safeUrl, unavailable } from './core.js';
 
 await init();
 const box = document.getElementById('about');
@@ -8,11 +8,11 @@ const sec = (key, body) => h('section', { 'aria-labelledby': `h-${key}` }, h('h2
 const list = items => items?.length ? h('ul', {}, items.map(c => h('li', {}, cite(c)))) : unavailable('');
 
 if (!a) box.replaceChildren(unavailable(t('what.about')));
-else box.replaceChildren(
+else put(box,
   sec('data_sources', list(a.data_sources)),
   sec('credits', a.acknowledgement ? h('p', {}, a.acknowledgement) : unavailable('')),
   sec('note', h('div', { class: 'note-box', role: 'note' }, h('p', { class: 'muted small' }, t('about.note_marker')),
     a.note_statement ? h('p', {}, a.note_statement) : unavailable(''))),
-  sec('repo', safeUrl(a.repo_url) ? h('p', {}, h('a', { href: a.repo_url, rel: 'noopener' }, a.repo_url)) : unavailable('')),
+  safeUrl(a.repo_url) ? sec('repo', h('p', {}, h('a', { href: a.repo_url, rel: 'noopener' }, a.repo_url))) : null,
   sec('citations', list(a.citations)),
 );

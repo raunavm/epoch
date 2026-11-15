@@ -1,14 +1,14 @@
 // Live mode: any RA/Dec -> SPHEREx DR1 frames read straight from the public S3 bucket in the browser.
 import { h, put, t, fmt, badge, wlColor, REDUCED_MOTION, getJSON, findingLine } from '../core.js';
 import { plot, s as svg } from '../plot.js';
-import { findFrames } from './index.js';
+import { findFrames, spreadInTime } from './index.js';
 import { readHeader, readRows } from './fits.js';
 import { makeWCS, waveAt } from './wcs.js';
 import { gridSize, rowsNeeded, resample, aperture, toMJy, asinhRGBA, divergingRGBA, SCALE_ARCSEC } from './grid.js';
 import { changeModel } from './change.js';
 
 const INDEX = 'data/index/dr1/';
-const MAX_CONCURRENT = 6, CONFIRM_MB = 120, F_PROVISIONAL = 0.1;
+const MAX_CONCURRENT = 6, CONFIRM_MB = 120, F_PROVISIONAL = 0.1, SUBSET_ABOVE = 400, SUBSET_N = 300;
 const PASS_COLORS = ['#56B4E9', '#E69F00'];
 const META_KEYS = [['PSF_FWHM', 'live.meta_psf'], ['L2DQAFLG', 'live.meta_dqa'], ['L2 N_OUTLIER', 'live.meta_outlier'],
   ['L2 N_PERSIST', 'live.meta_persist'], ['L2 SATSTRKS', 'live.meta_streaks'], ['L2 N_GHOST', 'live.meta_ghost']];
@@ -54,6 +54,7 @@ export function mountLive(el, target, onState) {
   const specBox = h('section', { class: 'live-spec', 'aria-labelledby': 'h-live-spec' },
     h('h3', { id: 'h-live-spec' }, t('live.spec_h')), h('p', { class: 'hint' }, t('live.spec_hint')));
   const findingBox = h('div', { class: 'finding-box' });
+  const subsetNote = h('p', { class: 'hint' });
 
   function setCorrected(on) {
     if (on && !st.cm) return;
@@ -178,7 +179,7 @@ export function mountLive(el, target, onState) {
 
   // ---- loading ----
   put(el,
-    h('div', { class: 'live-head' }, status, prog),
+    h('div', { class: 'live-head' }, status, prog, subsetNote),
     h('div', { class: 'segmented big', role: 'group', 'aria-label': t('tm.switch_label') }, sw), swExplain,
     h('div', { class: 'segmented', role: 'group', 'aria-label': t('live.view_label') }, views),
     blinkBox, addBox, subBox, findingBox, specBox);
@@ -201,9 +202,15 @@ export function mountLive(el, target, onState) {
     if (!idx) { status.textContent = t('live.no_index'); return; }
     const { meta, wave, f: fFloor, fProvisional } = idx;
     const tileCache = {};
-    const { frames } = await findFrames(meta, target.ra, target.dec, target.fov / 60,
-      n => (tileCache[n] ??= getJSONAbs(`${INDEX}${n}.json`, signal)));
+    const found = (await findFrames(meta, target.ra, target.dec, target.fov / 60,
+      n => (tileCache[n] ??= getJSONAbs(`${INDEX}${n}.json`, signal)))).frames;
     if (signal.aborted) return;
+    const frames = found.length > SUBSET_ABOVE && !target.all ? spreadInTime(found, SUBSET_N) : found;
+    if (frames.length < found.length) {
+      put(subsetNote, t('live.subset', { n: frames.length, N: found.length }), ' ',
+        h('button', { type: 'button', class: 'btn small', onclick: () => target.onLoadAll?.() },
+          t('live.load_all', { N: found.length, mb: fmt(found.length * bytesPerFrame(S) / 1e6, 2) })));
+    }
     if (!frames.length) {
       status.textContent = t('live.none', { n: meta.n_frames.toLocaleString(), a: mjdDate(meta.mjd_min), b: mjdDate(meta.mjd_max) });
       return;

@@ -112,7 +112,11 @@ if __name__ == "__main__":
     ids = [x for x in a.ids.split(",") if x] + ([l.strip() for l in open(a.file) if l.strip()] if a.file else [])
     index = load_index()
     for pdes in ids:
-        df = run(pdes, index, a.workers, a.stamps, a.vmax, a.redo, a.cap)
+        try:
+            df = run(pdes, index, a.workers, a.stamps, a.vmax, a.redo, a.cap)
+        except Exception as e:  # one failing object (e.g. Horizons outage) must not stop the run
+            print(f"{pdes}: FAILED {e!r}", flush=True)
+            continue
         n = 0 if df is None else len(df)
         good = 0 if df is None or "snr" not in df else int((df["snr"] > 5).sum())
         print(f"{pdes}: frames={n} snr>5={good}", flush=True)

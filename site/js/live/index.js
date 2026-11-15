@@ -65,3 +65,15 @@ export async function findFrames(meta, ra, dec, fovDeg, getTile) {
   }
   return { tiles: names, frames: [...byKey.values()].sort((a, b) => a.mjd - b.mjd) };
 }
+
+// Pick n frames (sorted by mjd) closest to n evenly spaced times, without repeats.
+export function spreadInTime(frames, n) {
+  const t0 = frames[0].mjd, t1 = frames[frames.length - 1].mjd, taken = new Set();
+  for (let k = 0; k < n; k++) {
+    const target = t0 + (t1 - t0) * k / (n - 1);
+    let best = -1, bd = Infinity;
+    for (let i = 0; i < frames.length; i++) if (!taken.has(i) && Math.abs(frames[i].mjd - target) < bd) { bd = Math.abs(frames[i].mjd - target); best = i; }
+    taken.add(best);
+  }
+  return [...taken].sort((a, b) => a - b).map(i => frames[i]);
+}

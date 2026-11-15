@@ -30,5 +30,53 @@
   "class_plain": "main asteroid belt, between Mars and Jupiter",
   "page": "object.html?id=84",
   "gaia_chi2_dof": 0.98
+ },
+ {
+  "id": "266",
+  "name": "266 Aline (A887 KA)",
+  "number": "266",
+  "kind": "MBA",
+  "n_frames": 191,
+  "D_km": 125.16,
+  "D_err_km": 13.79,
+  "sigma_lnD": 0.112,
+  "D_truth_km": 109.494,
+  "D_truth_source": "urn:nasa:pds:neowise_diameters_albedos::2.0[mainbelt] (http://adsabs.harvard.edu/abs/2014ApJ...791..121M)",
+  "pV": 0.037,
+  "class_plain": "main asteroid belt, between Mars and Jupiter",
+  "page": "object.html?id=266",
+  "gaia_chi2_dof": 2.85
+ },
+ {
+  "id": "2241",
+  "name": "2241 Alcathous (1979 WM)",
+  "number": "2241",
+  "kind": "TJN",
+  "n_frames": 223,
+  "D_km": 186.51,
+  "D_err_km": 93.47,
+  "sigma_lnD": 0.528,
+  "D_truth_km": 113.682,
+  "D_truth_source": "urn:nasa:pds:neowise_diameters_albedos::2.0[jupiter_trojans] (http://adsabs.harvard.edu/abs/2012ApJ...759...49G)",
+  "pV": 0.02,
+  "class_plain": "Jupiter Trojan, sharing Jupiter's orbit",
+  "page": "object.html?id=2241",
+  "gaia_chi2_dof": 2.01
+ },
+ {
+  "id": "757",
+  "name": "757 Portlandia (A908 TG)",
+  "number": "757",
+  "kind": "MBA",
+  "n_frames": 256,
+  "D_km": 37.82,
+  "D_err_km": 4.66,
+  "sigma_lnD": 0.123,
+  "D_truth_km": 32.894,
+  "D_truth_source": "urn:nasa:pds:neowise_diameters_albedos::2.0[mainbelt] (http://adsabs.harvard.edu/abs/2014ApJ...791..121M)",
+  "pV": 0.117,
+  "class_plain": "main asteroid belt, between Mars and Jupiter",
+  "page": "object.html?id=757",
+  "gaia_chi2_dof": 5.52
  }
 ]

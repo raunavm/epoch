@@ -39,13 +39,13 @@ def fetch_epochs(pdes, mjds):
     rows = []
     for i in range(0, len(mjds), 40):
         jd = [m + 2400000.5 for m in mjds[i:i + 40]]
-        for attempt in range(4):
+        for attempt in range(8):
             try:
                 e = Horizons(id=pdes, id_type="smallbody", location=OBS, epochs=jd).ephemerides(
                     quantities="1,3,9,19,20,24", extra_precision=True)
                 break
             except Exception:
-                time.sleep(3 * (attempt + 1))
+                time.sleep(5 * (attempt + 1))
         else:
             raise RuntimeError(f"Horizons failed for {pdes}")
         cols = [c for c in ["datetime_jd", "RA", "DEC", "RA_rate", "DEC_rate", "V", "r", "delta", "alpha"] if c in e.colnames]

@@ -1,7 +1,7 @@
 """Finding 2: one real known asteroid invisible in every single frame, revealed by stacking along its orbit.
 
 Steps: forced photometry (scripts/run_forced.py output + stamps) for candidate faint asteroids ->
-choose the object with max single-frame S/N < 3 and the highest stack S/N -> cumulative stacks
+choose the object with max single-frame S/N < 5 (the standard 5σ detection threshold) and the highest stack S/N -> cumulative stacks
 (n = 1..N in time order) -> PNGs + site/data/reveal.json + data/findings/f2.json.
 Null test: the same frames stacked on tracks displaced by fixed offsets (off-orbit) must give
 S/N consistent with zero.
@@ -36,6 +36,9 @@ def items_for(pdes, df, offset=(0.0, 0.0)):
     H, G = t["H"], t["G"] or 0.15
     D, pV = t.get("diameter"), t.get("albedo")
     items = []
+    # data-quality rule, applied identically to single pictures and the stack: drop frames where the
+    # fitted scene is poor near the object (local chi2/dof > 3: an uncatalogued source, cosmic ray or artefact).
+    df = df[(df.chi2_local / df.dof_local.clip(lower=1)) <= 3]
     for _, row in df.sort_values("mjd").iterrows():
         f = f"data/stamps/{pdes}/{row.obs_id}_D{row.detector}.npz"
         if not os.path.exists(f):
@@ -48,7 +51,7 @@ def items_for(pdes, df, offset=(0.0, 0.0)):
         items.append(dict(res=res, w=w, xs=xs, ys=ys, p=p, A=r.A, A_err=r.A_err, mjd=row.mjd, wl=row.wl_um,
                           obs_id=row.obs_id, det=int(row.detector), img=st.image, key=row.key,
                           f_mJy=row.flux_mJy, f_err=row.flux_err_mJy, snr=r.A / r.A_err))
-    return items, dict(H=H, G=G, D=D, pV=pV, D_ref=t.get("diameter_ref"))
+    return items, dict(H=H, G=G, D=D, pV=pV, D_ref=t.get("diameter_ref"), name=(t.get("fullname") or str(pdes)).strip())
 
 
 def png(arr, path, vmin, vmax, cmap="magma", mark=None):
@@ -82,11 +85,11 @@ def main(ids, pick):
     os.makedirs("data/findings", exist_ok=True)
     st.to_csv("data/findings/f2_candidates.csv", index=False)
     if pick is None:
-        ok = st[(st.max_single < 3) & (st.stack > 0)]
+        ok = st[(st["max_single"] < 5) & (st["stack"] > 0)]
         if len(ok) == 0:
-            print("NO CANDIDATE satisfies max single-frame S/N < 3; finding 2 not met with this sample")
+            print("NO CANDIDATE satisfies max single-frame S/N < 5 (the standard 5σ detection threshold); finding 2 not met with this sample")
             return
-        pick = ok.sort_values("stack", ascending=False).pdes.iloc[0]
+        pick = ok.sort_values("stack", ascending=False)["pdes"].iloc[0]
     df = pd.read_parquet(f"data/forced/{pick}.parquet")
     items, meta = items_for(pick, df)
     N = len(items)
@@ -134,14 +137,15 @@ def main(ids, pick):
     s_single = np.array([i["A_err"] / i["p"] for i in items])
     gain = 2.5 * np.log10(np.median(s_single) / stacks[-1]["a_err"])
     ideal = 2.5 * np.log10(np.median(s_single) * np.sqrt(np.sum(1 / s_single ** 2)))
-    rev = dict(object=f"{pick}", meta=meta, frames=frames, stack_pngs=stacks, spectrum_points=spec,
+    n_all = len(pd.read_parquet(f"data/forced/{pick}.parquet"))
+    rev = dict(object=meta["name"], designation=f"{pick}", n_frames_before_quality_cut=n_all, meta=meta, frames=frames, stack_pngs=stacks, spectrum_points=spec,
                depth_gain_mag=None if gain is None else round(float(gain), 2), ideal_gain_mag=round(float(ideal), 2),
                single_frame_snr_max=round(float(single.max()), 2), single_frame_snr_median=round(float(np.median(single)), 2),
                stack_snr=stack_snr, null_snrs=[round(x, 2) for x in nulls], n_frames=N,
                units="stack images: per-pixel S/N of the matched-filter stack; singles: per-frame S/N per pixel",
                rerun="python scripts/run_forced.py --ids %s --stamps && python scripts/build_reveal.py --pick %s" % (pick, pick))
     json.dump(rev, open("site/data/reveal.json", "w"), indent=1)
-    f2 = dict(object=pick, n_frames=N, single_frame_snr_max=rev["single_frame_snr_max"],
+    f2 = dict(object=meta["name"], designation=pick, n_frames=N, n_frames_dropped_quality=n_all - N, single_frame_snr_max=rev["single_frame_snr_max"],
               single_frame_snr_median=rev["single_frame_snr_median"], stack_snr=stack_snr,
               null_snr_mean=round(float(np.mean(nulls)), 2), null_snr_std=round(float(np.std(nulls)), 2),
               depth_gain_mag=rev["depth_gain_mag"], ideal_gain_mag=rev["ideal_gain_mag"])

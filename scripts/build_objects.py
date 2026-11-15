@@ -89,7 +89,14 @@ def build(pdes, ver):
                 break
     rsel = good[good.wl_um < lam_max]
     R, Re, _ = reflectance(rsel, H, G)
-    size = fit_size(df, H, G)
+    eta_prior = (0.95, 0.20)  # Masiero et al. 2021 default, used only if no frozen calibration exists
+    cal = "data/findings/eta_calibration.json"
+    if os.path.exists(cal):
+        cj = json.load(open(cal))
+        sel = cj.get("neo") if t.get("orbit_class") in ("AMO", "APO", "ATE") and cj.get("neo") else cj.get("all")
+        if sel:
+            eta_prior = (sel["eta_median"], sel["eta_spread"])
+    size = fit_size(df, H, G, eta_prior=eta_prior)
     gaia = None
     try:
         num = int(pdes)
@@ -99,7 +106,27 @@ def build(pdes, ver):
     except Exception:
         pass
     gc = gaia_compare(rsel.wl_um.values, R, Re, gaia, visit_groups(rsel.mjd.values)) if gaia is not None else None
-    bd = band_depth_3um(rsel.wl_um.values, R, Re) if lam_max >= 3.15 else None
+    bd = band_depth_3um(rsel.wl_um.values, R, Re) if lam_max >= 3.0 else None
+    bd_method = "no thermal correction needed (modelled thermal < 1% below 3.0 µm)" if bd else None
+    if bd is None and size is not None:
+        # thermal-corrected 3 µm band: subtract this object's own fitted NEATM thermal model (D, η, pV);
+        # the thermal-model uncertainty is propagated by repeating with D at its ±1σ bounds.
+        w3 = good[(good.wl_um >= 2.2) & (good.wl_um < 3.05)]
+        if len(w3) >= 4:
+            def corr(D):
+                pv = (1329.0 / D) ** 2 * 10 ** (-0.4 * H)
+                th = np.array([neatm_mJy(w, D, pv, size["eta"], r_, d_, a_, G=G, n_grid=32)
+                               for w, r_, d_, a_ in zip(w3.wl_um, w3.r, w3.delta, w3.alpha)])
+                fr = np.array([reflected_mJy(w, H, G, r_, d_, a_) for w, r_, d_, a_ in zip(w3.wl_um, w3.r, w3.delta, w3.alpha)])
+                return (w3.flux_mJy.values - th) / fr, frame_errors(w3) / fr, th / w3.flux_mJy.values
+            Rc, Rce, thf = corr(size["D_km"])
+            b0 = band_depth_3um(w3.wl_um.values, Rc, Rce)
+            if b0 is not None:
+                alt = [band_depth_3um(w3.wl_um.values, corr(D)[0], Rce) for D in (size["D_lo"], size["D_hi"])]
+                sys_ = max(abs(a["depth"] - b0["depth"]) for a in alt if a)
+                bd = dict(b0, err_thermal=float(sys_), err=float(np.hypot(b0["err"], sys_)),
+                          thermal_frac_band_max=float(np.max(thf[(w3.wl_um >= 2.7).values & (w3.wl_um < 3.0).values])) if ((w3.wl_um >= 2.7) & (w3.wl_um < 3.0)).any() else None)
+                bd_method = "thermal emission subtracted with this object's fitted NEATM model; thermal-model error included"
     outdir = f"site/data/objects/{pdes}"
     os.makedirs(outdir, exist_ok=True)
     # thumbnails for up to 40 frames spread over the track
@@ -136,7 +163,7 @@ def build(pdes, ver):
                              lam_max_um=round(lam_max, 2), normalisation="R = F_obs / F_sun-reflected(H, G, geometry); 1 = V-band level",
                              gaia=None if gaia is None else dict(wl_um=gaia.wavelength_um.round(4).tolist(), refl=gaia.reflectance.round(4).tolist(),
                                                                 err=gaia.err.round(4).tolist(), scale_to_ours=None if gc is None else round(gc["k"], 4)),
-                             gaia_check=gc, band_3um=bd),
+                             gaia_check=gc, band_3um=bd, band_3um_method=bd_method),
                size=None if size is None else dict(D_km=round(size["D_km"], 2), D_lo_km=round(size["D_lo"], 2), D_hi_km=round(size["D_hi"], 2),
                                                    pV=round(size["pV"], 3), pV_p16=round(size["pV_p16"], 3), pV_p84=round(size["pV_p84"], 3),
                                                    eta=round(size["eta"], 2), n_thermal=size["n_thermal"], chi2_dof=round(size["chi2_dof"], 2),
@@ -151,7 +178,8 @@ def build(pdes, ver):
                 sigma_lnD=None if size is None else round(size["sigma_lnD"], 3),
                 D_truth_km=D_truth, D_truth_source=t.get("diameter_ref"), pV=None if size is None else round(size["pV"], 3),
                 class_plain=rec["class_plain"], page=f"object.html?id={pdes}",
-                gaia_chi2_dof=None if gc is None else round(gc["chi2"] / max(gc["dof"], 1), 2))
+                gaia_chi2_dof=None if gc is None else round(gc["chi2"] / max(gc["dof"], 1), 2),
+                eta_prior=list(eta_prior), split=("test" if str(pdes).isdigit() and int(pdes) % 2 else "calibration"))
 
 
 def main(ids):
@@ -173,6 +201,8 @@ def main(ids):
     json.dump(list(old.values()), open(path, "w"), indent=1)
     o = pd.DataFrame(list(old.values()))
     v = o.dropna(subset=["D_km", "D_truth_km"])
+    if "split" in v and os.path.exists("data/findings/eta_calibration.json"):
+        v = v[v["split"] == "test"]  # f3 is reported on held-out objects only
     if len(v):
         lr = np.log(v.D_km / v.D_truth_km)
         mad = 1.4826 * np.median(np.abs(lr - np.median(lr)))

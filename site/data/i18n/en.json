@@ -130,7 +130,7 @@
  "obj.albedo": "Reflectivity (fraction of sunlight reflected)",
  "obj.eta": "Heat-spread factor (η)",
  "obj.eta_check": "This is a setting of the heat model, chosen to fit the infrared colors, not measured independently.",
- "obj.fam_same": "About the size of {name}",
+ "obj.fam_same": "Similar to {name}",
  "obj.fam_times": "About {x} times {name}",
  "obj.this_object": "this object",
  "obj.spec_h": "Colors",
@@ -277,5 +277,10 @@
  "live.changes_h": "How many changes are real?",
  "live.changes_view": "This view (live):",
  "live.changes_method": "A change is a group of at least 2 pixels more than 5 noise units away from expected. Noise includes a {f} × brightness floor for imperfect star shapes. Single-pixel spikes are removed with a 3×3 median test, because live mode does not read the pixel-flag plane.",
- "live.provisional": "The {f} floor is provisional until it is measured on the calibration field."
+ "live.provisional": "The {f} floor is provisional until it is measured on the calibration field.",
+ "obj.ours_size": "Our size (this site)",
+ "obj.indep_size": "Independent size ({src})",
+ "live.subset": "Showing {n} of {N} pictures, spread evenly in time.",
+ "live.load_all": "Load all {N} (about {mb} MB)",
+ "finding.all_fields": "Across all {n} fields, including the target stars: {pct}% of plain-blink changes removed ({naive} → {corr})."
 }

@@ -58,7 +58,7 @@ async function go(k, focus = true) {
         h('button', { type: 'button', class: 'dot', 'aria-label': t('start.progress', { k: j + 1, n: steps.length }), 'aria-current': j === k ? 'step' : null, onclick: () => go(j) })))),
       k < steps.length - 1
         ? h('button', { type: 'button', class: 'btn primary', onclick: () => go(cur + 1) }, t('start.next'), ' →')
-        : h('a', { class: 'btn primary', href: link('timemachine.html') }, t('home.cta'))),
+        : h('a', { class: 'btn primary', href: link('timemachine.html?target=barnard') }, t('home.cta'))),
     mini,
     h('p', {}, h('a', { href: link(PAGE[s.kind] || 'index.html') }, t('start.open_full'))),
   );

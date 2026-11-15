@@ -34,7 +34,7 @@ If a file is missing or malformed, the part of the page that needs it shows "Not
 
 ## Live mode (any coordinates)
 
-`timemachine.html?ra=<deg|hms>&dec=<deg|dms>&fov=<1|2|4|8>&mode=<raw|corrected|add|subtract>` (or `?target=barnard|epsindib|wise0855|rwaur|rdra`) reads SPHEREx DR1 pixels **directly from the public S3 bucket in the browser**. The bucket allows cross-origin requests and the `Range` header. IRSA services are never called.
+`timemachine.html?ra=<deg|hms>&dec=<deg|dms>&fov=<1|2|4|8>&mode=<raw|corrected|add|subtract>` (or `?target=barnard|epsindib|wise0855|rwaur|rdra`). Positions covered by more than 400 frames load 300 frames spread evenly in time by default; `&all=1` (or the "Load all" button) loads every frame. The page then reads SPHEREx DR1 pixels **directly from the public S3 bucket in the browser**. The bucket allows cross-origin requests and the `Range` header. IRSA services are never called.
 
 1. The page loads `data/index/dr1/meta.json` and the 3×3 neighbourhood of sky tiles (`js/live/index.js`, the same rule as `scripts/build_tiles.py`). It keeps frames whose footprint contains the target with a margin of FOV/2.
 2. For each frame, at most 6 at a time, it makes two range requests: the header (bytes 0–28799), then the needed full-width image rows. Each frame costs about `rows × 8160` bytes (`js/live/fits.js`).
@@ -49,6 +49,8 @@ Tests (pure functions; the WCS test reads real headers from S3, set `OFFLINE=1` 
 ```bash
 node --test site/tests/live.test.mjs
 ```
+
+Object pages accept `&check=all` to open every "Check it" panel on load (for screenshots).
 
 ## Dev fixtures
 

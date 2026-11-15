@@ -1,0 +1,102 @@
+{
+ "f1": {
+  "title": "Which change is real?",
+  "interaction": "timemachine",
+  "label": "derived",
+  "unit": "%",
+  "number": 85,
+  "err": 2,
+  "sentence": "In a plain blink, 85% (\u00b12%) of the apparent changes in our test areas are only colour: they disappear once each picture's wavelength is accounted for, while moving objects remain.",
+  "detail": {
+   "fraction_removed": 0.853,
+   "err": 0.018,
+   "basis": "control field (RA 180, Dec 0; declared before results as the field without a special target)",
+   "n_naive": 389,
+   "n_corrected": 57,
+   "all_fields": {
+    "n_naive": 3878,
+    "n_corrected": 1761,
+    "fraction_removed": 0.546,
+    "note": "includes R Draconis (pulsating star: real change in every picture, 1198 of the corrected changes) and the moving target stars"
+   },
+   "per_field": [
+    {
+     "field": "barnard",
+     "name": "Barnard's Star",
+     "n_frames": 239,
+     "n_passes": 2,
+     "n_naive_all": 836,
+     "n_naive_det": 26,
+     "n_corrected": 158,
+     "corrected_matched_known": 4,
+     "corrected_unexplained": 154,
+     "n_read_failures": 0
+    },
+    {
+     "field": "ecliptic_control",
+     "name": "Control field on the ecliptic (RA 180, Dec 0)",
+     "n_frames": 221,
+     "n_passes": 2,
+     "n_naive_all": 389,
+     "n_naive_det": 52,
+     "n_corrected": 57,
+     "corrected_matched_known": 0,
+     "corrected_unexplained": 57,
+     "n_read_failures": 0
+    },
+    {
+     "field": "epsindib",
+     "name": "Epsilon Indi B (Ba+Bb, unresolved)",
+     "n_frames": 338,
+     "n_passes": 3,
+     "n_naive_all": 575,
+     "n_naive_det": 47,
+     "n_corrected": 190,
+     "corrected_matched_known": 120,
+     "corrected_unexplained": 70,
+     "n_read_failures": 0
+    },
+    {
+     "field": "rdra",
+     "name": "R Draconis",
+     "n_frames": 894,
+     "n_passes": 3,
+     "n_naive_all": 397,
+     "n_naive_det": 82,
+     "n_corrected": 1198,
+     "corrected_matched_known": 0,
+     "corrected_unexplained": 1198,
+     "n_read_failures": 741
+    },
+    {
+     "field": "rwaur",
+     "name": "RW Aurigae",
+     "n_frames": 225,
+     "n_passes": 2,
+     "n_naive_all": 1009,
+     "n_naive_det": 54,
+     "n_corrected": 101,
+     "corrected_matched_known": 11,
+     "corrected_unexplained": 90,
+     "n_read_failures": 0
+    },
+    {
+     "field": "wise0855",
+     "name": "WISE 0855\u22120714",
+     "n_frames": 258,
+     "n_passes": 3,
+     "n_naive_all": 672,
+     "n_naive_det": 45,
+     "n_corrected": 57,
+     "corrected_matched_known": 0,
+     "corrected_unexplained": 57,
+     "n_read_failures": 0
+    }
+   ],
+   "f": 0.15123029572619215,
+   "f_calibration": "data/findings/f1_calibration.json (frozen before test fields)",
+   "method": "docs/INTERFACES.md#wavelength-aware-change-model revision 2",
+   "err_note": "binomial; changes within a field are not fully independent"
+  }
+ }
+}

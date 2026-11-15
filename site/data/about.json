@@ -1,0 +1,101 @@
+{
+ "note_statement": "Made by the Epoch team.",
+ "citations": [
+  {
+   "text": "SPHEREx DR1 Spectral Images, doi:10.26131/IRSA678.",
+   "url": "https://doi.org/10.26131/IRSA678"
+  },
+  {
+   "text": "SPHEREx Explanatory Supplement v2.1.",
+   "url": "https://irsa.ipac.caltech.edu/data/SPHEREx/docs/SPHEREx_Expsupp.pdf"
+  },
+  {
+   "text": "Bock et al. 2026, The SPHEREx Satellite Mission, ApJ.",
+   "url": "https://doi.org/10.3847/1538-4357/ae2be2"
+  },
+  {
+   "text": "Akeson et al. 2026, The SPHEREx Image and Spectrophotometry Processing Pipeline, ApJS.",
+   "url": "https://doi.org/10.3847/1538-4365/ae8843"
+  },
+  {
+   "text": "Hui et al. 2026, Spectral Response of SPHEREx, ApJS.",
+   "url": "https://doi.org/10.3847/1538-4365/ae522c"
+  },
+  {
+   "text": "Korngut et al. 2026, The SPHEREx Instrument, arXiv:2603.29835.",
+   "url": "https://arxiv.org/abs/2603.29835"
+  },
+  {
+   "text": "Harris 1998, A Thermal Model for Near-Earth Asteroids, Icarus 131, 291.",
+   "url": "https://doi.org/10.1006/icar.1997.5865"
+  },
+  {
+   "text": "Masiero et al. 2021, Asteroid Diameters and Albedos from NEOWISE Reactivation Years Six and Seven, PSJ 2, 162.",
+   "url": "https://doi.org/10.3847/PSJ/ac15fb"
+  },
+  {
+   "text": "Galluccio et al. 2023, Gaia DR3 reflectance spectra of Solar System small bodies, A&A 674, A35.",
+   "url": "https://doi.org/10.1051/0004-6361/202243791"
+  },
+  {
+   "text": "Bohlin et al. 2014, absolute flux calibration (CALSPEC), PASP 126, 711.",
+   "url": "https://doi.org/10.1086/677655"
+  },
+  {
+   "text": "Willmer 2018, The Absolute Magnitude of the Sun in Several Filters, ApJS 236, 47.",
+   "url": "https://doi.org/10.3847/1538-4365/aabfdf"
+  },
+  {
+   "text": "Whidden et al. 2019, Fast Algorithms for Slow Moving Asteroids (shift-and-stack), AJ 157, 119.",
+   "url": "https://doi.org/10.3847/1538-3881/aafd2d"
+  },
+  {
+   "text": "Mahlke et al. 2026, The SPHEREx Year 1 Census of Asteroid Spectral Diversity, EPSC2026-797.",
+   "url": "https://doi.org/10.5194/epsc2026-797"
+  },
+  {
+   "text": "WiseView (Backyard Worlds), the tool this one follows.",
+   "url": "http://byw.tools/wiseview"
+  }
+ ],
+ "acknowledgement": "This publication makes use of data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration. This research has made use of the NASA/IPAC Infrared Science Archive, which is funded by the National Aeronautics and Space Administration and operated by the California Institute of Technology. SPHEREx DR1 data: doi:10.26131/IRSA678. This work has made use of data from the European Space Agency (ESA) mission Gaia, processed by the Gaia Data Processing and Analysis Consortium (DPAC). Orrery is not endorsed by NASA.",
+ "data_sources": [
+  {
+   "text": "SPHEREx DR1 Level-2 spectral images, read in the browser from NASA's public archive copy on AWS (no server, no IRSA services). Our index covers 1,179,406 pictures.",
+   "url": "https://nasa-irsa-spherex.s3.amazonaws.com/"
+  },
+  {
+   "text": "IRSA SPHEREx documentation and tutorials.",
+   "url": "https://irsa.ipac.caltech.edu/Missions/spherex.html"
+  },
+  {
+   "text": "JPL Horizons, with SPHEREx as the observer (500@-163182): predicted asteroid positions.",
+   "url": "https://ssd.jpl.nasa.gov/horizons/"
+  },
+  {
+   "text": "JPL Small-Body Database: H magnitudes, orbits, and reference diameters from NEOWISE, IRAS and AKARI.",
+   "url": "https://ssd-api.jpl.nasa.gov/doc/sbdb.html"
+  },
+  {
+   "text": "NEOWISE diameters and albedos (Planetary Data System).",
+   "url": "https://pds.nasa.gov/"
+  },
+  {
+   "text": "ESA Gaia DR3 stars and asteroid reflectance spectra, via the AIP mirror.",
+   "url": "https://gaia.aip.de/"
+  },
+  {
+   "text": "IMCCE SkyBoT: known-asteroid labels.",
+   "url": "https://ssp.imcce.fr/webservices/skybot/"
+  },
+  {
+   "text": "CDS SIMBAD: positions and motions of the five test targets.",
+   "url": "https://simbad.cds.unistra.fr/"
+  },
+  {
+   "text": "CALSPEC solar spectrum sun_mod_001.",
+   "url": "https://archive.stsci.edu/hlsps/reference-atlases/cdbs/current_calspec/sun_mod_001.fits"
+  }
+ ],
+ "repo_url": ""
+}

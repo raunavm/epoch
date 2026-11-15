@@ -24,6 +24,10 @@ function render(o) {
     } }, t('obj.check'));
     return [btn, region];
   }
+  const Dtxt = sz.D_err_km != null ? `${fmtPM(sz.D_km, sz.D_err_km)} km`
+    : sz.D_lo_km != null && sz.D_hi_km != null ? `${fmt(sz.D_km)} km (${fmt(sz.D_lo_km)}–${fmt(sz.D_hi_km)})` : `${fmt(sz.D_km)} km`;
+  const Ttxt = tr.D_km != null ? `${fmtPM(tr.D_km, tr.D_sigma_km)} km` : null;
+  const shortSrc = src => /neowise/i.test(src || '') ? 'NEOWISE' : (src || '—');
   const toFrames = () => h('a', { href: '#frames', onclick: () => { document.getElementById('frames').open = true; } }, t('obj.see_pixels', { n: frames.length }));
   const numRow = (label, value, kind, ...check) => h('div', { class: 'num-row' }, h('dt', {}, label), h('dd', {}, h('span', { class: 'big-num' }, value), ' ', badge(kind), ' ', ...(check.length ? checkIt(...check) : [])));
 
@@ -31,15 +35,22 @@ function render(o) {
   const sizeSec = h('section', { 'aria-labelledby': 'h-size' }, h('h2', { id: 'h-size' }, t('obj.size_h')));
   if (sz.D_km != null) {
     const dl = h('dl', { class: 'facts' },
-      numRow(t('obj.diameter'), `${fmtPM(sz.D_km, sz.D_err_km)} km`, L('D_km', 'derived'),
-        tr.D_km != null ? [t('obj.independent'), ' ', h('strong', {}, `${fmt(tr.D_km)} km`), ` (${tr.source || '—'}) `, badge('data'),
+      numRow(t('obj.diameter'), Dtxt, L('D_km', 'derived'),
+        tr.D_km != null ? [t('obj.independent'), ' ', h('strong', {}, Ttxt), ` (${tr.source || '—'}) `, badge('data'),
           ` · ${t('obj.ratio', { r: fmt(sz.D_km / tr.D_km, 3) })} `, badge('derived'), ' · '] : [t('obj.no_independent'), ' · '], toFrames()),
       sz.pV != null ? numRow(t('obj.albedo'), fmt(sz.pV, 2), L('pV', 'derived'),
         tr.pV != null ? [t('obj.independent'), ' ', h('strong', {}, fmt(tr.pV, 2)), ` (${tr.source || '—'}) `, badge('data')] : t('obj.no_independent')) : null,
       sz.eta != null ? numRow(t('obj.eta'), fmt(sz.eta, 2), L('eta', 'model'), t('obj.eta_check')) : null);
     sizeSec.append(dl);
-    if (sz.familiar?.km > 0) sizeSec.append(compare(sz.D_km, sz.familiar));
   } else sizeSec.append(unavailable(t('what.size')));
+
+  // First screen: our size beside the independent one, and a familiar object
+  const sizeTop = sz.D_km != null ? h('div', { class: 'size-top' },
+    h('div', { class: 'tiles' },
+      h('div', { class: 'tile' }, h('span', { class: 'tile-label' }, t('obj.ours_size')), h('span', { class: 'big-num' }, Dtxt), badge(L('D_km', 'derived'))),
+      h('div', { class: 'tile' }, h('span', { class: 'tile-label' }, t('obj.indep_size', { src: shortSrc(tr.source) })),
+        h('span', { class: 'big-num', title: tr.source || '' }, Ttxt ?? '—'), Ttxt ? badge('data') : null)),
+    sz.familiar?.km > 0 ? compare(sz.D_km, sz.familiar) : null) : null;
 
   // Spectrum with Gaia overlay behind "Check it"
   const sp = o.spectrum || {}, specSec = h('section', { 'aria-labelledby': 'h-spec' }, h('h2', { id: 'h-spec' }, t('obj.spec_h')));
@@ -47,10 +58,10 @@ function render(o) {
     const g = sp.gaia;
     const draw = withGaia => plot([
       { x: sp.wl_um, y: sp.refl, err: sp.refl_err, kind: 'points', color: 'var(--accent)', colors: sp.wl_um.map(wlColor), label: t('obj.ours') },
-      ...(withGaia && g?.wl_um?.length ? [{ x: g.wl_um, y: g.refl, err: g.err, kind: 'line', color: '#E69F00', label: t('obj.gaia') }] : []),
+      ...(withGaia && g?.wl_um?.length ? [{ x: g.wl_um, y: g.refl.map(r => r * (g.scale_to_ours ?? 1)), err: g.err?.map(e => e * (g.scale_to_ours ?? 1)), kind: 'line', color: '#E69F00', label: g.scale_to_ours ? `${t('obj.gaia')} × ${fmt(g.scale_to_ours, 3)}` : t('obj.gaia') }] : []),
     ], { xlabel: t('plot.wl'), ylabel: t('plot.refl'), title: t('obj.spec_title', { name: o.name }) });
-    const holder = h('div', {}, draw(false));
-    const gbtn = h('button', { type: 'button', class: 'check', 'aria-pressed': 'false', disabled: !g?.wl_um?.length, onclick: () => {
+    const holder = h('div', {}, draw(!!g?.wl_um?.length));
+    const gbtn = h('button', { type: 'button', class: 'check', 'aria-pressed': String(!!g?.wl_um?.length), disabled: !g?.wl_um?.length, onclick: () => {
       const on = gbtn.getAttribute('aria-pressed') !== 'true'; gbtn.setAttribute('aria-pressed', String(on)); holder.replaceChildren(draw(on));
     } }, g?.wl_um?.length ? t('obj.check_gaia') : t('obj.no_gaia'));
     specSec.append(h('p', {}, t('obj.spec_lede'), ' ', badge(L('refl', 'derived')), ' ', gbtn, ' ', ...soundButton(sp)), holder,
@@ -58,9 +69,10 @@ function render(o) {
   } else specSec.append(unavailable(t('what.spectrum')));
 
   root.replaceChildren(
-    h('h1', {}, o.name),
-    h('p', { class: 'lede' }, [o.kind, o.composition_plain].filter(Boolean).join(' · ')),
-    sizeSec, specSec,
+    h('div', { class: 'obj-hero' },
+      h('div', {}, h('h1', {}, o.name), h('p', { class: 'lede' }, o.class_plain || o.kind || ''), sizeTop),
+      specSec),
+    sizeSec,
     h('section', { 'aria-labelledby': 'h-comp' }, h('h2', { id: 'h-comp' }, t('obj.comp_h')),
       o.composition_plain ? h('p', {}, o.composition_plain, ' ', badge(L('composition', 'derived'))) : unavailable(t('what.composition'))),
     h('section', { 'aria-labelledby': 'h-path' }, h('h2', { id: 'h-path' }, t('obj.path_h')), skyChart(o.track || [], frames)),
@@ -71,6 +83,10 @@ function render(o) {
         h('dt', {}, t('obj.code_version')), h('dd', {}, h('code', {}, o.code_version ?? '—')),
         h('dt', {}, t('obj.rerun')), h('dd', {}, o.rerun_command ? [h('pre', {}, h('code', {}, o.rerun_command)), copyBtn(o.rerun_command)] : '—'))),
   );
+  if (new URLSearchParams(location.search).get('check') === 'all') { // open every "Check it" panel (for screenshots)
+    for (const b of root.querySelectorAll('button.check[aria-expanded="false"]')) b.click();
+    document.getElementById('frames').open = true;
+  }
 }
 
 function compare(D, fam) {
@@ -84,7 +100,7 @@ function compare(D, fam) {
   return h('figure', { class: 'compare-fig' }, svg,
     h('figcaption', {}, h('strong', {}, words), ' ', badge('derived'), h('br'),
       h('span', { class: 'key-bar', style: '--c:var(--accent)' }), ` ${t('obj.this_object')} · `,
-      h('span', { class: 'key-bar', style: '--c:#E69F00' }), ` ${fam.name} (${sizeText(fam.km)})`));
+      h('span', { class: 'key-bar', style: '--c:#E69F00' }), ` ${/\d/.test(fam.name) ? fam.name : `${fam.name} (${sizeText(fam.km)})`}`));
 }
 
 function skyChart(track, frames) {

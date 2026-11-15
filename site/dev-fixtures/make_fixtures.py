@@ -55,7 +55,9 @@ dump("reveal.json", {"object": "Synthetic asteroid FX-1 (fixture)", "frames": fr
 
 # --- findings.json ---------------------------------------------------------
 dump("findings.json", {
-    "f1": {"sentence": "Fixture: share of raw-blink changes that are only colour.", "number": 0.0, "err": 0.0, "unit": "%"},
+    "f1": {"sentence": "Fixture: share of raw-blink changes that are only colour.", "number": 0.0, "err": 0.0, "unit": "%",
+           "detail": {"all_fields": {"n_naive": 10, "n_corrected": 5, "fraction_removed": 0.5, "note": "fixture note"},
+                      "per_field": [{"field": "a"}, {"field": "b"}]}},
     "f2": {"sentence": "Fixture: magnitudes gained by combining frames.", "number": 1.7, "err": 0.2, "unit": "mag"},
     "f3": {"sentence": "Fixture: median ratio of our size to the independent size.", "number": 1.0, "err": 0.1},
     "f4": {"sentence": "Fixture: size found half the time at 2.5 AU.", "number": 1.0, "err": 0.5, "unit": "km"},

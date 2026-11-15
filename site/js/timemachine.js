@@ -47,7 +47,7 @@ form.addEventListener('submit', e => { e.preventDefault(); start(); });
 raIn.addEventListener('input', () => { preset = null; tgtSel.value = ''; note.textContent = ''; });
 decIn.addEventListener('input', () => { preset = null; tgtSel.value = ''; note.textContent = ''; });
 
-function start(mode = params.get('mode') || 'raw') {
+function start(mode = params.get('mode') || 'raw', all = params.get('all') === '1') {
   const ra = parseRA(raIn.value), dec = parseDec(decIn.value), fov = +fovSel.value;
   if (!Number.isFinite(ra) || !Number.isFinite(dec) || dec < -90 || dec > 90) { err.textContent = t('live.bad_coords'); return; }
   err.textContent = '';
@@ -55,15 +55,16 @@ function start(mode = params.get('mode') || 'raw') {
   liveBox.hidden = false;
   $('showcase').hidden = true;
   const pm = preset && refMjd ? { pmra: preset.pmra, pmdec: preset.pmdec, epochMjd: refMjd } : null;
-  const state = { ra, dec, fov, mode };
+  const state = { ra, dec, fov, mode, all };
   const sync = () => {
     const p = new URLSearchParams(location.search);
     p.set('ra', ra.toFixed(6)); p.set('dec', dec.toFixed(6)); p.set('fov', fov); p.set('mode', state.mode);
     if (preset) p.set('target', preset.id); else p.delete('target');
+    if (state.all) p.set('all', '1'); else p.delete('all');
     history.replaceState(null, '', `?${p}`);
   };
   sync();
-  live = mountLive(liveBox, { ...state, pm }, s => { Object.assign(state, s); sync(); });
+  live = mountLive(liveBox, { ...state, pm, onLoadAll: () => start(state.mode, true) }, s => { Object.assign(state, s); sync(); });
 }
 
 // URL parameters: ?ra=&dec=&fov=&mode= (or ?target=barnard)

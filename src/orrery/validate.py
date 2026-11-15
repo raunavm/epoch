@@ -43,16 +43,29 @@ def gaia_compare(wl, R, Re, gaia, groups=None):
                 note="one free scale per visit group; shape compared within visits only")
 
 
-def band_depth_3um(wl, R, Re, cont=(2.2, 2.6), band=(2.85, 3.15)):
-    """Depth = 1 − R_band / R_cont with weighted means; valid only where thermal emission is negligible
-    at ≤ 3.15 µm (main-belt geometry; checked by the caller)."""
+def band_depth_3um(wl, R, Re, cont=(2.2, 2.6), band=(2.7, 3.0)):
+    """Hydration band depth = 1 − R_band / C(λ_band), with C a weighted linear continuum fitted over `cont`
+    and extrapolated to the band's weighted mean wavelength (band window per the 2.7–2.9 µm phyllosilicate
+    feature seen by AKARI, Usui et al. 2019). Valid only after thermal emission is removed (caller)."""
     c = (wl >= cont[0]) & (wl < cont[1])
     b = (wl >= band[0]) & (wl < band[1])
-    if c.sum() < 1 or b.sum() < 1:
+    if c.sum() < 3 or b.sum() < 1:
         return None
-    wc, wb = 1 / Re[c] ** 2, 1 / Re[b] ** 2
-    Rc, Rce = np.sum(wc * R[c]) / wc.sum(), 1 / np.sqrt(wc.sum())
+    W = 1 / Re[c] ** 2
+    A = np.vstack([np.ones(c.sum()), wl[c] - 2.4]).T
+    cov = np.linalg.inv(A.T @ (A * W[:, None]))
+    coef = cov @ (A.T @ (W * R[c]))
+    wb = 1 / Re[b] ** 2
+    lb = np.sum(wb * wl[b]) / wb.sum()
     Rb, Rbe = np.sum(wb * R[b]) / wb.sum(), 1 / np.sqrt(wb.sum())
-    d = 1 - Rb / Rc
-    de = (Rb / Rc) * np.hypot(Rbe / Rb, Rce / Rc)
-    return dict(depth=float(d), err=float(de), n_band=int(b.sum()), n_cont=int(c.sum()))
+    x = np.array([1, lb - 2.4])
+    Cb, Cbe = x @ coef, np.sqrt(x @ cov @ x)
+    d = 1 - Rb / Cb
+    de = (Rb / Cb) * np.hypot(Rbe / Rb, Cbe / Cb)
+    # robustness: flat continuum (weighted mean) as the alternative analysis choice; the difference is a systematic
+    Cf = np.sum(W * R[c]) / W.sum()
+    d_flat = 1 - Rb / Cf
+    sys_cont = abs(d - d_flat)
+    return dict(depth=float(d), err=float(np.hypot(de, sys_cont)), err_stat=float(de), err_continuum=float(sys_cont),
+                depth_flat_continuum=float(d_flat), n_band=int(b.sum()), n_cont=int(c.sum()), lam_band=float(lb),
+                cont_slope_per_um=float(coef[1] / coef[0]))

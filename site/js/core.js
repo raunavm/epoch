@@ -156,9 +156,15 @@ export async function init() {
   );
 }
 
-// One finding from findings.json: {sentence, number, err, unit?, label?}
+// One finding from findings.json: {sentence, number, err, unit?, label?, detail?}.
+// For f1, detail.all_fields adds one line about all test fields (the headline is the control field).
 export function findingLine(f) {
-  return h('p', { class: 'finding' }, f.sentence || '', ' ',
+  const main = h('p', { class: 'finding' }, f.sentence || '', ' ',
     f.number != null ? h('strong', { class: 'num' }, fmtPM(f.number, f.err), f.unit ? ` ${f.unit}` : '') : null, ' ',
     badge(f.label || 'derived'));
+  const a = f.detail?.all_fields;
+  if (!a || a.fraction_removed == null) return main;
+  return h('div', {}, main, h('p', { class: 'muted small' },
+    t('finding.all_fields', { n: f.detail.per_field?.length ?? '', pct: fmt(100 * a.fraction_removed, 2), naive: a.n_naive, corr: a.n_corrected }),
+    a.note ? ` (${a.note})` : '', ' ', badge('derived')));
 }
