@@ -378,5 +378,9 @@
  "ck.wise": "WISE comparison",
  "ck.wise_how": "the same patch as NASA's WISE telescope saw it years earlier, side by side and blinking with SPHEREx, so fast movers jump",
  "live.wise_wait": "The comparison appears once the SPHEREx pictures are in.",
- "live.subset_wise": "Showing only the {n} pictures from detector {d} (of {N} in all): it is the one that matches WISE's colour, and loading it alone keeps the download small."
+ "live.subset_wise": "Showing only the {n} pictures from detector {d} (of {N} in all): it is the one that matches WISE's colour, and loading it alone keeps the download small.",
+ "home.try_h": "Three things to try",
+ "home.try1": "Barnard's Star: NASA's WISE in 2010 next to SPHEREx in 2025–26 — watch it jump",
+ "home.try2": "The coldest known brown dwarf: its SPHEREx spectrum next to JWST's",
+ "home.try3": "A two-minute guided tour of what we measured"
 }

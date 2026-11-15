@@ -378,5 +378,9 @@
  "ck.wise": "Comparación con WISE",
  "ck.wise_how": "el mismo trozo de cielo como lo vio el telescopio WISE de la NASA años antes, lado a lado y alternando con SPHEREx, para que los objetos rápidos salten",
  "live.wise_wait": "La comparación aparece cuando las imágenes de SPHEREx han llegado.",
- "live.subset_wise": "Se muestran solo las {n} imágenes del detector {d} (de {N} en total): es el que coincide con el color de WISE, y cargarlo solo mantiene pequeña la descarga."
+ "live.subset_wise": "Se muestran solo las {n} imágenes del detector {d} (de {N} en total): es el que coincide con el color de WISE, y cargarlo solo mantiene pequeña la descarga.",
+ "home.try_h": "Tres cosas para probar",
+ "home.try1": "La estrella de Barnard: WISE de la NASA en 2010 junto a SPHEREx en 2025–26 — mira cómo salta",
+ "home.try2": "La enana marrón más fría conocida: su espectro de SPHEREx junto al de JWST",
+ "home.try3": "Un recorrido guiado de dos minutos por lo que medimos"
 }
