@@ -103,6 +103,7 @@
  "method_anchor": "science.html#e4",
  "slider": "e4/reveal.json",
  "slider_caption": "Nov\u2013Dec 2025 visits only: slide from one picture to all 22 combined along its path. Each step is measured against the same pictures combined along 24 empty paths.",
+ "_e11": true,
  "figures": [
   {
    "src": "data/figs/e11_wise0855.png",

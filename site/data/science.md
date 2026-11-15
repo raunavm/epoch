@@ -149,6 +149,32 @@ The challenge asks for spectra. Every SPHEREx picture sees a source at one colou
 
 **Barnard's Star did not work this way.** The same method on Barnard's Star gives a north–south motion of 5.6 ± 1.5 ″/yr, far from Gaia's 10.4 (`data/findings/motion_barnard.json`). Likely cause (untested): it is a bright star (Gaia G = 8.2) that saturates SPHEREx's detector, so with its centre masked the fit rests on its outer light; and only two time windows are available. We make no numeric motion claim for it. Its motion is still plain to see in the tool: subtracting the later pictures (Mar–May 2026) from the earlier ones (Aug–Oct 2025) shows it as an orange–blue pair ([open it](../timemachine.html?ra=269.4463&dec=4.7677&fov=2&mode=subtract)). The tool splits the pictures at the largest gap in time, and this picture is made from the experimental colour-aware pictures. It is a picture, not a measurement.
 
+###### E12 {#e12-label}
+
+## A distance from one year of pictures {#e12}
+
+As Earth goes round the Sun, a nearby object seems to trace a small yearly loop against distant stars; the loop's size gives its distance (its parallax). We fitted Epsilon Indi B's SPHEREx positions with five free quantities — position, motion and parallax — taking nothing from Gaia for this object (`docs/protocols/E12.md`, written down before the fit).
+
+![Epsilon Indi B's path and yearly wobble](figs/e12_parallax.png "Left: path over a year. Right: the yearly wobble with the motion removed.")
+
+**Result.** Parallax 243 ± 53 mas, 4.6σ from zero, 0.5σ below Gaia's 270.7 mas: a distance of about 13.4 light-years (68% interval 11.0–17.2). Without the parallax term the four visit averages fit far worse (χ² 162 against 2.1).
+
+**The control.** 8 ordinary Gaia stars in the same pictures, measured with the same code, should show no parallax. All of them come out slightly negative (mean -50 mas): a small shared shift between spring and autumn pictures that mimics a negative parallax. We did not correct for it; it sets our error bar (53 mas, the largest of the fit, a bootstrap and this scatter). One change after the run is recorded in the protocol (a floor on a clipping threshold); exactly as frozen the result is 243 ± 43 mas, also a pass.
+
+**Context.** We found no published parallax measured from SPHEREx positions; a SPHEREx brown-dwarf atlas notes that parallax is "negligible compared to a SPHEREx pixel" (Gagné et al. 2026) — here it is 0.04 pixels, recovered by averaging 139 pictures. The pair is unresolved; the steady offset from Gaia's position matches the pair's orbit (previous section).
+
+###### E8 {#e8-label}
+
+## Barnard's Star: the motion, and a check that failed {#e8}
+
+Barnard's Star overloads SPHEREx's detector in essentially every picture, and the archive flags a block of 30–50 pixels around it, so our first motion fit (from the few unflagged core pixels) failed (What failed #13). In E8 we chose a new method on 26 bright comparison stars before measuring Barnard's Star: the centre of symmetry of its unflagged outer glow, corrected for a small per-detector offset (`docs/protocols/E8.md`).
+
+![Barnard's Star in two visits next to Gaia](figs/e8_barnard.png "Left: positions in two visits. Right: offsets from Gaia next to comparison stars.")
+
+**Result.** 10.34 ± 0.37″ per year north and -0.75 ± 0.37″ east (236 pictures, two visit windows), against Gaia's +10.36 and −0.80: within 0.2σ, and 27.7σ from zero.
+
+**Why it still counts as failed.** We also required 8 faint stars nearby, measured with the standard fit, to agree with Gaia within their own errors. They share a drift of -0.17″ per year east–west — small (under half of Barnard's error bar) but beyond their own. By our rule the result is FAILED. A reading made afterwards: the drift flips with the detector's orientation between the two visits, which points to a tiny fixed offset in detector pixels — the same effect that biases the control stars in the distance test.
+
 ## Stacking along an orbit {#stacking-along-an-orbit}
 
 For an asteroid with a known orbit, we predict where it is in every picture (JPL Horizons, SPHEREx as observer). We subtract the fitted stars and background, centre each leftover picture on the predicted position, and add them with weights proportional to the expected brightness divided by the noise squared (a matched filter).

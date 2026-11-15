@@ -1,6 +1,6 @@
 {
  "title": "Epsilon Indi B \u2014 a pair of nearby brown dwarfs",
- "plain_result": "From SPHEREx positions (with Gaia's distance held fixed) we measured how fast it moves across the sky: +3.96 \u00b1 0.07\u2033 and -2.43 \u00b1 0.07\u2033 per year (east\u2013west, north\u2013south). ESA's Gaia measured +3.98\u2033 and -2.47\u2033.",
+ "plain_result": "From SPHEREx positions (with Gaia's distance held fixed) we measured how fast it moves across the sky: +3.96 \u00b1 0.07\u2033 and -2.43 \u00b1 0.07\u2033 per year (east\u2013west, north\u2013south). ESA's Gaia measured +3.98\u2033 and -2.47\u2033. Fitting its yearly wobble as well, with nothing taken from Gaia for this object, SPHEREx gives a parallax of 243 \u00b1 53 thousandths of an arcsecond: a distance of about 13 light-years (11\u201317); Gaia gives 12.1.",
  "numbers": [
   {
    "label": "Motion east\u2013west (SPHEREx)",
@@ -31,19 +31,35 @@
    "unit": "\u2033/yr"
   },
   {
-   "label": "Pictures used",
-   "value": 140,
-   "err": null,
-   "kind": "data",
-   "unit": ""
-  },
-  {
    "label": "Absorption bands found in its SPHEREx spectrum (water, methane, carbon monoxide)",
    "value": 6,
    "err": null,
    "kind": "derived",
    "unit": "",
    "method": "science.html#e11"
+  },
+  {
+   "label": "Parallax from SPHEREx positions (pre-registered test, passed)",
+   "value": 243,
+   "err": 53,
+   "kind": "derived",
+   "unit": "mas",
+   "method": "science.html#e12"
+  },
+  {
+   "label": "Parallax (Gaia DR3)",
+   "value": 270.7,
+   "err": null,
+   "kind": "data",
+   "unit": "mas"
+  },
+  {
+   "label": "Distance (68% interval)",
+   "value": "13.4 light-years (11.0\u201317.2)",
+   "err": null,
+   "kind": "derived",
+   "unit": "",
+   "method": "science.html#e12"
   }
  ],
  "evidence_links": [
@@ -56,9 +72,16 @@
    "href": "https://www.cosmos.esa.int/web/gaia/dr3"
   }
  ],
- "method_note": "Each picture is fitted with the star's position free, saturated pixels masked and Gaia neighbours modelled; the motion is a straight-line fit to SPHEREx positions with Gaia's parallax held fixed. This fit was not written down in advance. Positions sit a steady ~0.5\u2033 south and ~0.2\u2033 east of Gaia's prediction in every window. Gaia's entry is Ba alone and its motion includes its orbit; from the pair's published orbit (Chen et al. 2022) the centre of Ba+Bb's infrared light should sit 0.50\u20130.56\u2033 south and 0.13\u20130.19\u2033 east \u2014 a check we made after the measurement (Science page).",
+ "method_note": "Each picture is fitted with the star's position free, saturated pixels masked and Gaia neighbours modelled; the motion is a straight-line fit to SPHEREx positions with Gaia's parallax held fixed. This fit was not written down in advance. Positions sit a steady ~0.5\u2033 south and ~0.2\u2033 east of Gaia's prediction in every window. Gaia's entry is Ba alone and its motion includes its orbit; from the pair's published orbit (Chen et al. 2022) the centre of Ba+Bb's infrared light should sit 0.50\u20130.56\u2033 south and 0.13\u20130.19\u2033 east \u2014 a check we made after the measurement (Science page). Distance test (E12): five quantities fitted to the per-picture positions (offset, motion, parallax); the error is the largest of the fit, a bootstrap and the scatter of 8 ordinary stars fitted the same way; those stars all come out with a parallax below zero (mean -50 mas), a shared bias we did not correct.",
  "method_anchor": "science.html#motion",
+ "_e11": true,
  "figures": [
+  {
+   "src": "data/figs/e12_parallax.png",
+   "href": "science.html#e12",
+   "alt": "Epsilon Indi B's path across the sky over a year, with the yearly wobble that gives its distance",
+   "caption": "Left: its path over a year; the straight dashed line is motion alone, the blue curve adds the yearly wobble. Right: the wobble with the steady motion removed. Error bar set by 8 ordinary stars measured the same way, which all show a small false wobble of their own (Science page)."
+  },
   {
    "src": "data/figs/e11_epsindib.png",
    "href": "science.html#e11",

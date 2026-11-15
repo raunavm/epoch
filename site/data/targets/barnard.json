@@ -1,56 +1,78 @@
 {
  "title": "Barnard's Star \u2014 the fastest-moving star in our sky",
- "status": "picture only",
- "plain_result": "Subtract the later pictures (Mar\u2013May 2026) from the earlier ones (Aug\u2013Oct 2025) and this star shows as an orange\u2013blue pair. By eye, its light has moved north, as Gaia predicts; we do not turn this picture into a number, and it is made from the experimental colour-aware pictures (open the live view below). Measuring its speed from SPHEREx positions did not work: we get -5.0 \u00b1 1.9\u2033 and +5.6 \u00b1 1.5\u2033 per year, against Gaia's -0.80\u2033 and +10.36\u2033 (likely cause, untested: the star saturates SPHEREx's detector, so the fit rests on its outer light; only two time windows are available; What failed #13).",
+ "status": "motion matches Gaia; pre-set check failed",
+ "plain_result": "Measured from the centre of its outer glow (its core overloads SPHEREx's detector), Barnard's Star moves +10.3 \u00b1 0.4\u2033 per year north and -0.8 \u00b1 0.4\u2033 east, against Gaia's +10.4\u2033 and -0.8\u2033. By the rule we wrote down beforehand the result still counts as failed: a check on 8 faint stars nearby, measured the same way, showed a small shared drift (-0.17\u2033 per year east\u2013west), larger than their own error bars allow. Our first attempt, from the overloaded core, failed outright (What failed #13).",
  "numbers": [
   {
-   "label": "Motion east\u2013west (SPHEREx fit, failed)",
-   "value": -5.0,
-   "err": 1.9,
+   "label": "Motion north\u2013south (SPHEREx)",
+   "value": 10.34,
+   "err": 0.37,
    "kind": "derived",
-   "unit": "\u2033/yr"
-  },
-  {
-   "label": "Motion east\u2013west (Gaia DR3)",
-   "value": -0.802,
-   "err": null,
-   "kind": "data",
-   "unit": "\u2033/yr"
-  },
-  {
-   "label": "Motion north\u2013south (SPHEREx fit, failed)",
-   "value": 5.6,
-   "err": 1.5,
-   "kind": "derived",
-   "unit": "\u2033/yr"
+   "unit": "\u2033/yr",
+   "method": "science.html#e8"
   },
   {
    "label": "Motion north\u2013south (Gaia DR3)",
-   "value": 10.362,
+   "value": 10.36,
    "err": null,
    "kind": "data",
    "unit": "\u2033/yr"
   },
   {
-   "label": "p-value for agreement with Gaia",
-   "value": "p = 5 \u00d7 10\u207b\u2074",
+   "label": "Motion east\u2013west (SPHEREx)",
+   "value": -0.75,
+   "err": 0.37,
+   "kind": "derived",
+   "unit": "\u2033/yr",
+   "method": "science.html#e8"
+  },
+  {
+   "label": "Motion east\u2013west (Gaia DR3)",
+   "value": -0.8,
+   "err": null,
+   "kind": "data",
+   "unit": "\u2033/yr"
+  },
+  {
+   "label": "Total motion against zero",
+   "value": 27.7,
+   "err": null,
+   "kind": "derived",
+   "unit": "\u03c3",
+   "method": "science.html#e8"
+  },
+  {
+   "label": "Pre-set check on faint neighbours",
+   "value": "failed (shared drift)",
    "err": null,
    "kind": "derived",
    "unit": ""
   }
  ],
+ "figures": [
+  {
+   "src": "data/figs/e8_barnard.png",
+   "href": "science.html#e8",
+   "alt": "Barnard's Star's position in two SPHEREx visits about seven months apart, next to Gaia's prediction",
+   "caption": "Left: SPHEREx positions in two visits (236 pictures) and Gaia's prediction. Right: how far each visit lands from Gaia, next to 26 comparison stars that do not move."
+  }
+ ],
  "evidence_links": [
   {
-   "text": "See the earlier-minus-later picture live",
+   "text": "NASA WISE (2010) next to SPHEREx (2025\u201326): the star has moved",
+   "href": "timemachine.html?target=barnard&fov=8&wise=1#live"
+  },
+  {
+   "text": "Earlier minus later SPHEREx pictures, live",
    "href": "timemachine.html?ra=269.4463&dec=4.7677&fov=2&mode=subtract"
   },
   {
-   "text": "Why the motion fit fails: What failed, item 13",
-   "href": "failed.html"
+   "text": "Method and the failed check (Science page)",
+   "href": "science.html#e8"
   }
  ],
- "method_note": "The picture: the tool splits the pictures at the largest gap in time and subtracts the later set from the earlier one, using the experimental colour-aware pictures. The motion fit: likely cause of the failure (untested) is saturation \u2014 saturated pixels are masked, so the position rests on the star's outer light; Gaia's parallax is held fixed. A spectrum also failed: 238 of 239 pictures have a saturated pixel next to the star (Science page, spectra).",
- "method_anchor": "failed.html",
- "figures": [],
+ "method_note": "Method chosen on 26 bright comparison stars before Barnard's Star was measured (docs/protocols/E8.md): the centre of symmetry of the unflagged outer light, with a per-detector correction; error per visit from the comparison stars (0.15\u2033). Only two visit windows, so the fit has no spare freedom. Gaia's parallax held fixed. The faint-neighbour drift flips sign with the detector's orientation between visits, which points to a small offset in the detector frame (a reading made after the result). A spectrum also failed: 238 of 239 pictures have a saturated pixel next to the star (Science page, spectra).",
+ "method_anchor": "science.html#e8",
+ "_e11": true,
  "generated_with": "scripts in this repository"
 }

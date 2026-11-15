@@ -45,10 +45,11 @@ E11 = (load("data/findings/e11.json") or {}).get("targets", {})
 
 
 def add_e11(tid, card):
-    """Spectrum figure + one summary number from E11 (docs/protocols/E11.md), if present."""
+    """Spectrum figure + one summary number from E11 (docs/protocols/E11.md), if present (once per card)."""
     t = E11.get(tid)
-    if not t:
+    if not t or card.get("_e11"):
         return card
+    card["_e11"] = True
     figs = card.setdefault("figures", [])
     nums = card.setdefault("numbers", [])
     if tid == "wise0855":
@@ -189,3 +190,61 @@ for tid, name in (("rwaur", "RW Aurigae — a young variable star"), ("rdra", "R
         evidence_links=[dict(text="Open the prepared field", href=f"timemachine.html?field={tid}")],
         method_note="Counts use the same rule as the 20-patch test (groups of ≥ 2 pixels beyond 5σ).",
         method_anchor="science.html#which-change-is-real"))
+
+# Phase 2: E12 (distance to Epsilon Indi B) and E8 (Barnard's Star motion) — docs/PROTOCOLS.md PHASE 2
+e12 = load("data/findings/e12.json")
+if e12 and os.path.exists(f"{OUT}/epsindib.json"):
+    card = json.load(open(f"{OUT}/epsindib.json"))
+    lo, hi = e12["distance_interval_ly_68"]
+    card["plain_result"] += (f" Fitting its yearly wobble as well, with nothing taken from Gaia for this object, SPHEREx gives a parallax of "
+                             f"{e12['parallax_mas']:.0f} ± {e12['parallax_err_mas']['adopted']:.0f} thousandths of an arcsecond: a distance of about "
+                             f"{e12['distance_ly']:.0f} light-years ({lo:.0f}–{hi:.0f}); Gaia gives {3.26156 * e12['gaia_distance_pc']:.1f}.")
+    card["numbers"] = [n for n in card["numbers"] if not n["label"].startswith("Pictures used")] + [
+        num("Parallax from SPHEREx positions (pre-registered test, passed)", round(e12["parallax_mas"]), round(e12["parallax_err_mas"]["adopted"]),
+            unit="mas", method="science.html#e12"),
+        num("Parallax (Gaia DR3)", round(e12["gaia_parallax_mas"], 1), None, kind="data", unit="mas"),
+        num("Distance (68% interval)", f"{e12['distance_ly']:.1f} light-years ({lo:.1f}–{hi:.1f})", None, method="science.html#e12")]
+    card.setdefault("figures", []).insert(0, dict(src="data/figs/e12_parallax.png", href="science.html#e12",
+        alt="Epsilon Indi B's path across the sky over a year, with the yearly wobble that gives its distance",
+        caption=(f"Left: its path over a year; the straight dashed line is motion alone, the blue curve adds the yearly wobble. Right: the wobble "
+                 f"with the steady motion removed. Error bar set by {e12['null']['summary']['n_used']} ordinary stars measured the same way, which "
+                 "all show a small false wobble of their own (Science page).")))
+    card["method_note"] += (" Distance test (E12): five quantities fitted to the per-picture positions (offset, motion, parallax); the error is the "
+                            f"largest of the fit, a bootstrap and the scatter of {e12['null']['summary']['n_used']} ordinary stars fitted the same way; "
+                            f"those stars all come out with a parallax below zero (mean {e12['null']['summary']['mean_mas']:.0f} mas), a shared bias we "
+                            "did not correct.")
+    card.pop("generated_with", None)
+    write("epsindib", card)  # add_e11 skipped: card already carries "_e11"
+
+e8 = load("data/findings/e8.json")
+if e8:
+    g = e8["gaia"]
+    c = e8["controls"]["summary"]
+    write("barnard", dict(
+        title="Barnard's Star — the fastest-moving star in our sky",
+        status="motion matches Gaia; pre-set check failed",
+        plain_result=(f"Measured from the centre of its outer glow (its core overloads SPHEREx's detector), Barnard's Star moves "
+                      f"{e8['pmdec_arcsec_yr']:+.1f} ± {e8['pmdec_err']:.1f}″ per year north and {e8['pmra_arcsec_yr']:+.1f} ± {e8['pmra_err']:.1f}″ east, "
+                      f"against Gaia's {g['pmdec_mas_yr']/1000:+.1f}″ and {g['pmra_mas_yr']/1000:+.1f}″. By the rule we wrote down beforehand the "
+                      f"result still counts as failed: a check on {e8['controls']['n_used']} faint stars nearby, measured the same way, showed a small "
+                      f"shared drift ({c['mean_d_pmra_arcsec_yr']:+.2f}″ per year east–west), larger than their own error bars allow. "
+                      "Our first attempt, from the overloaded core, failed outright (What failed #13)."),
+        numbers=[num("Motion north–south (SPHEREx)", round(e8["pmdec_arcsec_yr"], 2), round(e8["pmdec_err"], 2), unit="″/yr", method="science.html#e8"),
+                 num("Motion north–south (Gaia DR3)", round(g["pmdec_mas_yr"] / 1000, 2), None, kind="data", unit="″/yr"),
+                 num("Motion east–west (SPHEREx)", round(e8["pmra_arcsec_yr"], 2), round(e8["pmra_err"], 2), unit="″/yr", method="science.html#e8"),
+                 num("Motion east–west (Gaia DR3)", round(g["pmra_mas_yr"] / 1000, 2), None, kind="data", unit="″/yr"),
+                 num("Total motion against zero", round(e8["total_sigma"], 1), None, unit="σ", method="science.html#e8"),
+                 num("Pre-set check on faint neighbours", "failed (shared drift)", None)],
+        figures=[dict(src="data/figs/e8_barnard.png", href="science.html#e8",
+                      alt="Barnard's Star's position in two SPHEREx visits about seven months apart, next to Gaia's prediction",
+                      caption=(f"Left: SPHEREx positions in two visits ({e8['pictures']['used']} pictures) and Gaia's prediction. Right: how far each "
+                               f"visit lands from Gaia, next to {e8['comparison']['n_stars']} comparison stars that do not move."))],
+        evidence_links=[dict(text="NASA WISE (2010) next to SPHEREx (2025–26): the star has moved", href="timemachine.html?target=barnard&fov=8&wise=1#live"),
+                        dict(text="Earlier minus later SPHEREx pictures, live", href=SUBTRACT_URL),
+                        dict(text="Method and the failed check (Science page)", href="science.html#e8")],
+        method_note=(f"Method chosen on {e8['comparison']['n_stars']} bright comparison stars before Barnard's Star was measured (docs/protocols/E8.md): "
+                     "the centre of symmetry of the unflagged outer light, with a per-detector correction; error per visit from the comparison stars "
+                     f"({e8['per_window_error_arcsec']:.2f}″). Only two visit windows, so the fit has no spare freedom. Gaia's parallax held fixed. "
+                     "The faint-neighbour drift flips sign with the detector's orientation between visits, which points to a small offset in "
+                     "the detector frame (a reading made after the result)."),
+        method_anchor="science.html#e8"))

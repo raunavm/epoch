@@ -58,7 +58,7 @@ We list every approach that did not work, because a result is only believable if
 
 ## 13. Measuring Barnard's Star's motion did not work
 **What happened.** The motion we derive for Barnard's Star (about −5.0 ± 1.9 and +5.6 ± 1.5 arcseconds per year) disagrees with Gaia's (−0.80 and +10.36). Likely cause (untested): the star saturates SPHEREx's detector, so with its centre masked the fit rests on its outer light; and only two time windows are available. The same method works for the fainter Epsilon Indi B, where it matches Gaia.
-**What we show instead.** The earlier pictures (Aug–Oct 2025) minus the later ones (Mar–May 2026), where the star's light visibly shifts north as expected — as a picture, not as a measurement. The tool splits the pictures at the largest gap in time, and the picture is made from the experimental colour-aware pictures.
+**What we did next (E8).** We chose a new method on 26 bright comparison stars first (the centre of the star's unflagged outer glow), then measured Barnard's Star once: +10.3 ± 0.4″ per year north and −0.8 ± 0.4″ east, matching Gaia. By our own pre-set rule the result still counts as failed, because a check on 8 faint stars nearby showed a small shared drift beyond their error bars (Science page, E8). The earlier-minus-later picture and the WISE 2010 comparison still show the motion directly.
 
 
 ## 14. Our change maps miss real asteroids
@@ -74,3 +74,8 @@ We list every approach that did not work, because a result is only believable if
 ## 16. A per-star change test could not reach a verdict
 **What happened.** We tested each star on its own: fit one smooth spectrum to all its pictures, then let its brightness shift between visits, and compare the improvement with what ordinary stars show. The error calibration worked — per-picture error bars were 1.1 to 3 times too small depending on the detector, and after a correction fixed on separate control patches the scatter of constant stars matched its error bars (spread 1.01). But we had fixed in advance a comparison set of only 7 ordinary stars, so no star could ever pass our significance rule (the best possible p-value was 0.125). RW Aurigae and R Draconis also saturate the detector: R Draconis left 3 usable pictures of 250, and RW Aurigae's fit of its outer light was poor, so a change could not be told apart from a bad fit.
 **What we would do next.** A comparison set of hundreds of stars, and a model for saturated stars.
+
+## 17. Barnard's Star, second attempt: the motion matches, the pre-set check does not
+**What happened.** The new method recovers Barnard's Star's motion within 0.2σ of Gaia, but our pre-registered criterion also required 8 faint neighbouring stars to agree with Gaia within their own errors. They share a drift of about −0.17″ per year east–west, so the registered verdict is FAILED.
+**Why (likely, read after the result).** The drift reverses with the detector's orientation between the two visits, which points to a tiny fixed offset in detector pixels (about 0.01 pixel). The same effect makes ordinary stars show a small false negative parallax in the distance test (E12), where it is inside the error bar.
+**What we would do next.** Calibrate positions in the detector frame on many stars, then repeat both tests.
