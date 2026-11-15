@@ -58,7 +58,7 @@ async function go(k, focus = true) {
   const title = h('h2', { tabindex: '-1' }, s.f.title || t(`start.title_${s.kind}`));
   box.replaceChildren(
     h('p', { class: 'muted' }, t('start.progress', { k: k + 1, n: steps.length })),
-    title, s.key === 'f1' && headline?.sentence ? headlineLine(headline) : findingLine(s.f, s.key),
+    title, s.key === 'f1' && headline?.number != null ? headlineLine(headline, t('start.f1_line')) : findingLine(s.f, s.key),
     h('div', { class: 'tour-nav' },
       h('button', { type: 'button', class: 'btn', disabled: k === 0, onclick: () => go(cur - 1) }, '← ', t('start.back')),
       h('ol', { class: 'dots', 'aria-label': t('start.dots') }, steps.map((_, j) => h('li', {},

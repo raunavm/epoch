@@ -86,7 +86,7 @@ export function findingLine(f, key) {
     return r?.frames?.map(x => ({ ...x, date: x.mjd ? new Date((x.mjd - 40587) * 864e5).toISOString().slice(0, 10) : null })) || null;
   };
   const num = f.number != null ? evidenceNum(h('strong', { class: 'num' }, fmtPM(f.number, f.err), f.unit ? ` ${f.unit}` : ''), ev) : [null, null];
-  const range = f.err_low != null && f.err_high != null && Number.isFinite(+f.err_low) ? ` (${t('home.range', { lo: fmt(f.err_low), hi: fmt(f.err_high), unit: f.unit || '' })})` : '';
+  const range = f.err_low != null && f.err_high != null && Number.isFinite(+f.err_low) ? ` (${f.err_label || t('home.ci')} ${fmt(f.err_low)}–${fmt(f.err_high)}${f.unit || ''})` : '';
   const main = h('p', { class: 'finding' }, f.sentence || '', ' ', num[0], range, ' ', badge(f.label || 'derived'));
   const a = d.all_fields;
   return h('div', {}, main, num[1], a?.fraction_removed != null ? h('p', { class: 'muted small' },
@@ -94,15 +94,19 @@ export function findingLine(f, key) {
     a.note ? ` (${a.note})` : '', ' ', badge('derived')) : null);
 }
 
-// The measured headline (headline.json): number with its range, opening the per-patch evidence list.
+// The measured headline (headline.json): number with its interval (err_label, e.g. "95% CI on the median")
+// and spread_note, opening the per-patch evidence list. Returns [button, panel, intervalText].
 export function headlineNumber(hd, big = false) {
   const unit = hd.unit || '';
-  const range = hd.err_low != null && hd.err_high != null ? t('home.range', { lo: fmt(hd.err_low), hi: fmt(hd.err_high), unit }) : null;
+  const ci = hd.err_low != null && hd.err_high != null ? `${hd.err_label || t('home.ci')} ${fmt(hd.err_low)}–${fmt(hd.err_high)}${unit}` : null;
+  const interval = [ci, hd.spread_note].filter(Boolean).join('; ') || null;
   return evidenceNum(h('span', { class: big ? 'big-figure' : 'num' }, hd.err != null ? fmtPM(hd.number, hd.err) : fmt(hd.number), unit), {
     note: hd.evidence_note, links: hd.evidence, method: hd.method || 'science.html#which-change-is-real', nulls: hd.nulls, nullsNote: hd.nulls_note,
-  }).concat(range);
+  }).concat(interval);
 }
-export function headlineLine(hd) {
-  const [btn, panel, range] = headlineNumber(hd);
-  return h('div', {}, h('p', { class: 'finding' }, hd.sentence || '', ' ', btn, range ? ` (${range})` : '', ' ', badge(hd.kind || 'derived')), panel);
+// sentence: override the long headline sentence with a shorter line (Start-here tour).
+export function headlineLine(hd, sentence) {
+  const [btn, panel, interval] = headlineNumber(hd);
+  return h('div', {}, h('p', { class: 'finding' }, sentence ?? hd.sentence ?? '', ' ', btn, ' ', hd.number_label || '',
+    interval ? ` (${interval})` : '', ' ', badge(hd.kind || 'derived')), panel);
 }

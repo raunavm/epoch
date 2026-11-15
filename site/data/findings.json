@@ -21,7 +21,7 @@
   "unit": "\u03c3",
   "number": 5.4,
   "err": null,
-  "sentence": "Asteroid 98397 (2000 UC3) never reaches the usual detection level in any of its 295 single pictures (best 4.3 times the noise). Combined along its orbit it stands out at 5.4 times the spread of empty paths beside it \u2014 a modest but real-looking signal. Each half of the pictures shows it on its own (4.0 and 3.9 times the noise), as a real signal should.",
+  "sentence": "Asteroid 98397 (2000 UC3) never reaches the usual detection level in any of its 295 single pictures (best 4.3 times the noise). Combined along its orbit it stands out at 5.4 times the spread of empty paths beside it \u2014 a modest excess. Each half of the pictures shows it on its own (4.0 and 3.9 times the noise), consistent with a real signal.",
   "detail": {
    "object": "98397 (2000 UC3)",
    "designation": "98397",

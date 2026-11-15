@@ -18,10 +18,10 @@ export async function renderTargetCard(el, id, getJSON) {
     if (!d?.frames?.length) return slider.replaceChildren();
     const body = h('div');
     put(slider, h('h3', {}, r.slider_caption || t('tr.slider_caption')), body);
-    mountReveal(body, d, { compact: true, autoplay: false });
+    mountReveal(body, d, { compact: true, autoplay: false, snrNote: d.hedge || null });
   });
   put(el,
-    h('p', { class: 'eyebrow' }, t('tr.eyebrow')),
+    r.status ? h('p', { class: 'eyebrow status' }, t('tr.eyebrow_status', { status: String(r.status).toUpperCase() })) : h('p', { class: 'eyebrow' }, t('tr.eyebrow')),
     h('h2', { id: 'h-result' }, r.title || tg?.name || id),
     h('p', { class: 'plain-result' }, r.plain_result || ''),
     r.numbers?.length ? h('dl', { class: 'facts result-numbers' }, r.numbers.flatMap(n => {
@@ -44,5 +44,8 @@ export async function renderStrip(el, getJSON, current) {
     h('ul', { class: 'strip' }, TARGETS.map((tg, i) => h('li', {},
       h('a', { class: 'strip-card', href: link(`timemachine.html?target=${tg.id}`), 'aria-current': tg.id === current ? 'true' : null },
         h('strong', {}, results[i]?.title || tg.name),
-        h('span', { class: 'small' }, results[i]?.plain_result || t('tr.pending')))))));
+        h('span', { class: 'small' }, results[i]?.status ? t('tr.status_short', { status: results[i].status })
+          : firstSentence(results[i]?.plain_result) || t('tr.pending')))))));
 }
+
+const firstSentence = txt => (txt ? (txt.match(/^.*?[.!?](\s|$)/) || [txt])[0].trim() : '');

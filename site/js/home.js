@@ -23,23 +23,24 @@ if (field?.frames?.length) {
 } else put(box, unavailable(t('what.field')));
 
 if (headline?.number != null) {
-  const [btn, panel, range] = headlineNumber(headline, true);
-  put($('headline-number'), h('p', { class: 'figure-line' }, btn, ' ',
-    h('span', { class: 'figure-label' }, headline.number_label || '', range ? h('span', { class: 'muted' }, ` (${range})`) : null), ' ', badge(headline.kind || 'derived')), panel);
+  const [btn, panel, interval] = headlineNumber(headline, true);
+  put($('headline-number'), h('p', { class: 'figure-line' }, btn, ' ', h('span', { class: 'figure-label' }, headline.number_label || ''), ' ', badge(headline.kind || 'derived')),
+    interval ? h('p', { class: 'figure-ci' }, interval) : null, panel);
 }
 
 // Below the fold: two objects too faint for one picture, each played once when it scrolls into view.
-const examples = [['reveal.json', 'home.faint_asteroid'], ['e4/reveal.json', 'home.faint_bd']];
+const examples = [['reveal.json', 'home.faint_asteroid', null], ['e4/reveal.json', 'home.faint_bd', 'reveal.wise_note']];
 const rv = $('reveal');
 const datas = await Promise.all(examples.map(([f]) => getJSON(f)));
 if (!datas.some(d => d?.frames?.length)) rv.replaceChildren(unavailable(t('what.reveal')));
 else put(rv, ...datas.map((data, k) => {
   if (!data?.frames?.length) return null;
+  const snrNote = examples[k][2] ? t(examples[k][2]) : null;
   const body = h('div'), wrap = h('div', { class: 'example' }, h('h3', { class: 'object-name' }, data.object || data.designation),
-    h('p', { class: 'hint' }, t(examples[k][1])), body);
-  mountReveal(body, data, { autoplay: false });
+    h('p', { class: 'hint' }, t(examples[k][1])), body, data.hedge ? h('p', { class: 'hedge small' }, data.hedge) : null);
+  mountReveal(body, data, { autoplay: false, snrNote });
   if (!REDUCED_MOTION && 'IntersectionObserver' in window) {
-    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); mountReveal(body, data, { autoplay: true }); } }, { threshold: 0.4 });
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); mountReveal(body, data, { autoplay: true, snrNote }); } }, { threshold: 0.4 });
     io.observe(wrap);
   }
   return wrap;

@@ -21,12 +21,12 @@ if h:
 f2 = load("data/findings/f2.json")
 sp = load("data/findings/f2_split.json")
 if f2 and f2.get("single_frame_snr_max", 99) < 5 and f2.get("stack_snr", 0) >= 5:
-    half = f" Each half of the pictures shows it on its own ({sp['odd']['calibrated']:.1f} and {sp['even']['calibrated']:.1f} times the noise), as a real signal should." if sp else ""
+    half = f" Each half of the pictures shows it on its own ({sp['odd']['calibrated']:.1f} and {sp['even']['calibrated']:.1f} times the noise), consistent with a real signal." if sp else ""
     out["f2"] = dict(title="Too faint for one picture", interaction="reveal", label="derived", unit="σ",
                      number=round(f2["stack_snr"], 1), err=None,
                      sentence=(f"Asteroid {f2['object']} never reaches the usual detection level in any of its {f2['n_frames']} single pictures "
                                f"(best {f2['single_frame_snr_max']:.1f} times the noise). Combined along its orbit it stands out at "
-                               f"{f2['stack_snr']:.1f} times the spread of empty paths beside it — a modest but real-looking signal.{half}"),
+                               f"{f2['stack_snr']:.1f} times the spread of empty paths beside it — a modest excess.{half}"),
                      detail=f2)
 e4 = load("data/findings/e4.json")
 if e4:

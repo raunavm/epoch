@@ -1,9 +1,9 @@
 // Finding 2: combining frames along the orbit. Slider from 1 frame to all frames.
-import { h, put, t, asset, badge, fmt, fmtPM, wlColor, REDUCED_MOTION } from '../core.js';
+import { h, put, t, asset, badge, fmt, wlColor, REDUCED_MOTION } from '../core.js';
 import { plot } from '../plot.js';
 import { evidenceNum } from './evidence.js';
 
-export function mountReveal(el, data, { compact = false, autoplay = false } = {}) {
+export function mountReveal(el, data, { compact = false, autoplay = false, snrNote = null } = {}) {
   const frames = data.frames || [], stacks = [...(data.stack_pngs || [])].sort((a, b) => a.n - b.n);
   const specs = [...(data.spectrum_points || [])].sort((a, b) => a.n_frames_used - b.n_frames_used);
   const N = Math.max(frames.length, ...stacks.map(s => s.n), 1);
@@ -45,9 +45,9 @@ export function mountReveal(el, data, { compact = false, autoplay = false } = {}
     imgBadge.replaceChildren(badge(kind));
     slider.setAttribute('aria-valuetext', t('reveal.valuetext', { n, N }));
     cap.replaceChildren(t('reveal.caption', { n: label, N }));
-    if (label === 1 && frames[0]) cap.append(' · ', t('reveal.frame_meta', { wl: fmt(frames[0].wl_um, 3) }));
+    if (label === 1 && frames[0]) cap.append('\u00a0· ', t('reveal.frame_meta', { wl: fmt(frames[0].wl_um, 3) }));
     snr.replaceChildren();
-    if (st && st.snr != null) snr.append(t(data.noise_calibration ? 'reveal.snr_null' : 'reveal.snr', { snr: fmt(st.snr, 3) }), ' ', badge('derived'));
+    if (st && st.snr != null) snr.append(t('reveal.snr_times', { snr: fmt(st.snr, 3), note: snrNote || (data.noise_calibration ? t('reveal.against_empty') : t('reveal.own_noise')) }), ' ', badge('derived'));
 
     const sp = specs.filter(s => s.n_frames_used <= n).pop();
     specBox.replaceChildren();
@@ -58,18 +58,15 @@ export function mountReveal(el, data, { compact = false, autoplay = false } = {}
     specBox.append(svg, h('p', { class: 'caption' }, t('reveal.spec_caption', { n: sp.n_frames_used, k: sp.wl_um.length }), ' ', badge('derived')));
   }
 
-  const gain = data.depth_gain_mag;
-  const gainLine = () => {
-    const [btn, panel] = evidenceNum(t('reveal.gain_mag', { g: fmtPM(gain, data.depth_gain_err) }), evidenceFor(data));
-    return h('div', {}, h('p', { class: 'gain' }, t('reveal.gain', { x: fmt(10 ** (0.4 * gain), 2), N }), ' ', btn, ' ', badge('derived')), panel);
-  };
+  // The pictures and empty-path tests behind every number on this card.
+  const [evBtn, evPanel] = evidenceNum(t('reveal.evidence', { N }), evidenceFor(data));
   put(el,
     h('div', { class: 'reveal' + (compact ? ' compact' : '') + (specs.length ? '' : ' no-spec') },
       h('figure', { class: 'imgpanel' }, h('div', { class: 'imgwrap' }, img, imgBadge), cap, snr),
       specs.length ? h('figure', { class: 'specpanel' }, specBox) : null),
     h('div', { class: 'reveal-controls' },
       h('label', { for: slider.id }, t('reveal.slider')), slider, play),
-    Number.isFinite(gain) ? gainLine() : null,
+    h('p', { class: 'small' }, evBtn), evPanel,
   );
   render();
   if (autoplay && !REDUCED_MOTION && N > 1) play.click();

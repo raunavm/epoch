@@ -23,7 +23,8 @@ const refMjd = idx ? (idx.meta.mjd_min + idx.meta.mjd_max) / 2 : null;
 tgtSel.append(h('option', { value: '' }, t('live.target_pick')),
   h('optgroup', { label: t('live.target_challenge') }, TARGETS.map(x => h('option', { value: x.id }, x.name))));
 const fieldIndex = await getJSON('timemachine/index.json');
-if (fieldIndex?.length) tgtSel.append(h('optgroup', { label: t('live.target_showcase') }, fieldIndex.map(f => h('option', { value: `field:${f.field}` }, f.name))));
+const extraFields = (fieldIndex || []).filter(f => !TARGETS.some(x => x.id === f.field)); // challenge targets are listed once, above
+if (extraFields.length) tgtSel.append(h('optgroup', { label: t('live.target_showcase') }, extraFields.map(f => h('option', { value: `field:${f.field}` }, f.name))));
 for (const f of FOVS) fovSel.append(h('option', { value: f, selected: f === 2 }, t('live.fov_opt', { f, px: gridSize(f) })));
 const showCost = () => { $('fov-cost').textContent = t('live.fov_cost', { mb: fmt(bytesPerFrame(gridSize(+fovSel.value)) / 1e6, 2) }); };
 fovSel.addEventListener('change', showCost); showCost();

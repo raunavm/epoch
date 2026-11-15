@@ -117,7 +117,7 @@ export function mountLive(el, target, onState) {
     const useCorr = st.mode === 'corr' && st.cm;
     paint(canvas, useCorr ? divergingRGBA(st.cm.corr[f.idx]) : f.rgba);
     caption.replaceChildren(h('span', { class: 'swatch', style: `background:${wlColor(f.wl)}`, 'aria-hidden': 'true' }),
-      h('strong', {}, f.date), ` · ${fmt(f.wl, 3)} µm · ${t('live.detector')} ${f.det} · ${st.i + 1}/${L.length} · `, badge(useCorr ? 'resid' : 'data'));
+      h('strong', {}, f.date), `\u00a0· ${fmt(f.wl, 3)}\u00a0µm\u00a0· ${t('live.detector')}\u00a0${f.det}\u00a0· ${st.i + 1}/${L.length} `, badge(useCorr ? 'resid' : 'data'));
     put(metaBox, ...META_KEYS.flatMap(([k, key]) => [h('dt', {}, t(key)), h('dd', {}, f.hdr[k] ?? '—')]),
       h('dt', {}, t('live.meta_file')), h('dd', {}, h('a', { href: f.url, rel: 'noopener' }, f.obs_id + ` D${f.det}`)));
     markers(ov, f.mjd);

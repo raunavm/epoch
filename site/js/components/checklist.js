@@ -17,6 +17,5 @@ export function checklist() {
     h('h2', { id: 'h-check' }, t('ck.h')), h('p', { class: 'muted small' }, t('ck.lede')),
     h('ul', {}, ITEMS.map(([k, href]) => h('li', {},
       h('span', { class: 'tick', 'aria-hidden': 'true' }, '✓'), ' ',
-      h('a', { href: link(href) }, t(`ck.${k}`)), h('span', { class: 'muted small' }, ` — ${t(`ck.${k}_how`)}`),
-      k === 'update' ? h('pre', {}, h('code', {}, '.venv/bin/python scripts/build_index.py --release <release>\n.venv/bin/python scripts/build_tiles.py --release <release>')) : null))));
+      h('a', { href: link(href) }, t(`ck.${k}`)), h('span', { class: 'muted small' }, ` — ${t(`ck.${k}_how`)}`)))));
 }

@@ -9,6 +9,6 @@ const md = await getText(file);
 if (!md) doc.replaceChildren(h('h1', {}, t(document.body.dataset.title)), unavailable(t(file === 'failed.md' ? 'what.failed' : 'what.science')));
 else {
   doc.innerHTML = renderMarkdown(md, asset); // renderer escapes all text; see markdown.js
-  const target = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  const target = location.hash ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
   target?.scrollIntoView();
 }

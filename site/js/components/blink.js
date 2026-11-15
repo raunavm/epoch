@@ -25,7 +25,7 @@ export function viewControls(info, st, onChange) {
   const views = VIEWS.map(k => h('button', { type: 'button', class: 'seg', onclick: () => onChange(k, st.det) }, t(`view.${k}`)));
   const dets = [1, 2, 3, 4, 5, 6].map(d => h('button', { type: 'button', class: 'seg', onclick: () => onChange('det', d) }, String(d)));
   const range = h('span', { class: 'small det-range' });
-  const detRow = h('div', { class: 'det-row' }, h('span', { class: 'small muted' }, t('view.det_pick')), ' ',
+  const detRow = h('div', { class: 'det-row' }, h('p', { class: 'small det-what' }, t('view.det_what')), h('span', { class: 'small muted' }, t('view.det_pick')), ' ',
     h('div', { class: 'segmented small-seg', role: 'group', 'aria-label': t('view.det_pick') }, dets), ' ', range);
   const explain = h('p', { class: 'hint' });
   const root = h('div', {}, h('div', { class: 'segmented big views', role: 'group', 'aria-label': t('view.label') }, views), detRow, explain);
@@ -81,6 +81,8 @@ export function mountBlink(el, field, { compact = false, minimal = false, view =
   const scrub = h('input', { type: 'range', class: 'scrub', min: 0, max: frames.length - 1, value: 0, id: `sc-${uid}`, oninput: e => { st.i = +e.target.value; st.playing = false; schedule(); render(); } });
   const ends = h('div', { class: 'scrub-ends muted' });
   const labelList = h('ul', { class: 'labels' });
+  const counter = h('p', { class: 'flag-counter', 'aria-live': 'off' });
+  const COUNT_KEY = { all: 'n_changes_naive_all', det: 'n_changes_naive_det', corr: 'n_changes_corr' };
   const astList = h('p', { class: 'small asteroid-list' });
   const flagBox = h('dl', { class: 'facts small' });
   const hasGaia = Array.isArray(field.gaia) && field.gaia.length > 0;
@@ -114,8 +116,8 @@ export function mountBlink(el, field, { compact = false, minimal = false, view =
     v.img.alt = t(corr() ? 'tm.alt_corr' : 'tm.alt_raw', { name: field.name, date: f.date, wl: fmt(f.wl_um, 3) });
     v.meta.replaceChildren(
       h('span', { class: 'swatch', style: `background:${wlColor(f.wl_um)}`, 'aria-hidden': 'true' }),
-      h('strong', {}, f.date), ` · ${fmt(f.wl_um, 3)} µm`, f.detector != null ? ` · ${t('live.detector')} ${f.detector}` : '',
-      ` · ${k + 1}/${n} · `, badge(corr() ? 'resid' : 'data'));
+      h('strong', {}, f.date), `\u00a0· ${fmt(f.wl_um, 3)}\u00a0µm`, f.detector != null ? `\u00a0· ${t('live.detector')}\u00a0${f.detector}` : '',
+      `\u00a0· ${k + 1}/${n} `, badge(corr() ? 'resid' : 'data'));
     v.ov.replaceChildren();
     if (st.gaia && hasGaia) for (const g of field.gaia) v.ov.append(s('circle', { cx: g.x + 0.5, cy: g.y + 0.5, r: size / 32, fill: 'none', stroke: '#ffffff', 'stroke-opacity': 0.55, 'stroke-width': size / 160 }));
     for (const L of f.labels || []) {
@@ -172,6 +174,12 @@ export function mountBlink(el, field, { compact = false, minimal = false, view =
     scrub.value = st.i;
     scrub.setAttribute('aria-valuetext', `${L[st.i].date}, ${fmt(L[st.i].wl_um, 3)} µm`);
     selA.value = st.a; selB.value = st.b;
+    // Running count of flagged changes in the current view (from the field file's per-picture counts).
+    const key = COUNT_KEY[st.view];
+    if (L.some(f => f[key] != null)) {
+      const upto = L.slice(0, st.i + 1).reduce((a, f) => a + (f[key] || 0), 0), total = L.reduce((a, f) => a + (f[key] || 0), 0);
+      counter.replaceChildren(h('strong', {}, t('view.flagged', { n: upto })), ' ', h('span', { class: 'muted' }, t('view.flagged_total', { total, N: L.length })), ' ', badge('derived'));
+    } else counter.replaceChildren();
     const nxt = L[(st.i + 1) % L.length];
     new Image().src = asset(corr() ? nxt.corr_png : nxt.img_png); // preload one ahead only
     if (small) return;
@@ -209,7 +217,7 @@ export function mountBlink(el, field, { compact = false, minimal = false, view =
   put(el,
     controls,
     small ? null : h('div', { class: 'segmented', role: 'group', 'aria-label': t('tm.mode_label') }, layoutBtns),
-    h('div', { class: 'tm-views' }, viewA.root, viewB.root),
+    counter, h('div', { class: 'tm-views' }, viewA.root, viewB.root),
     minimal ? null : [blinkCtl, sideCtl,
       h('div', { class: 'scrub-wrap' }, h('label', { for: scrub.id, class: 'sr-only' }, t('tm.timeline')), scrub, ends)],
     small ? null : [astList, legend, h('p', {}, gaiaBtn, hasGaia ? null : h('span', { class: 'muted small' }, ' ', t('tm.gaia_live_note'))), labelList,

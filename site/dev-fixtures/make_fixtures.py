@@ -162,9 +162,14 @@ dump("about.json", {
     "repo_url": "https://example.invalid/repo",
 })
 # --- one-question landing, target cards, what failed ---------------------------
-dump("headline.json", {"field": "fx-field", "question": "Fixture: at this spot in the sky, what really changed?", "number": 0.0, "err": 0.0,
-                       "unit": "%", "number_label": "fixture: share of plain-blink changes that are only colour", "kind": "derived",
-                       "sentence": "Fixture sentence: switch between raw and corrected to see which changes are real.", "version": "A"})
+dump("headline.json", {"version": "B", "field": "fx-field", "question": "Fixture: at this spot in the sky, what really changed?",
+                       "number": 0, "unit": "%", "err_low": 0, "err_high": 0, "kind": "derived",
+                       "number_label": "fixture: share of plain-blink changes that are only colour",
+                       "sentence": "Fixture sentence: compare a plain blink with one detector at a time.",
+                       "modes": [{"id": "all", "label": "Plain blink (every picture, in time order)"}, {"id": "det", "label": "One detector at a time"},
+                                 {"id": "corr", "label": "Colour-aware view (experimental)"}], "default_mode": "all",
+                       "method": "science.html#which-change-is-real", "evidence_note": "Fixture evidence note.",
+                       "evidence": [{"text": "fixture patch: 10 -> 1", "href": "science.html#which-change-is-real"}]})
 for tid, name in [("barnard", "Barnard's Star"), ("wise0855", "WISE 0855")]:
     dump(f"targets/{tid}.json", {"title": f"{name} (fixture)", "plain_result": "Fixture result sentence.",
                                  "numbers": [{"label": "fixture motion", "value": 1.0, "err": 0.1, "unit": "″/yr", "kind": "derived"},

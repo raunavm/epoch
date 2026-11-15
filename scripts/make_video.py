@@ -1,8 +1,9 @@
 """Render the 30-second demo video from real data products only (no generated imagery).
 
-Segments (owner's script): reveal slider 0–6 s; raw vs corrected blink 6–13 s; object page with
-check-it 13–20 s; measured numbers 20–26 s; name and address 26–30 s. English subtitles are burned in
-and also written as an .srt file. Every number shown is read from site/data/findings.json.
+Segments: plain blink vs one-detector change maps 0–7 s; WISE 0855 combined along its path 7–13 s;
+Barnard's Star survey difference 13–19 s; measured numbers 19–26 s; name and address 26–30 s. English
+subtitles are burned in and also written as an .srt file. Numbers are read from site/data/headline.json,
+data/findings/e4.json, data/findings/motion_epsindib.json and site/data/index/dr1/meta.json.
 Usage: .venv/bin/python scripts/make_video.py --url "https://<github-user>.github.io/orrery/"
        [--field ecliptic_control] [--object-shot path.png]
 Outputs: dist/orrery_demo.mp4, dist/orrery_demo.srt (length verified with ffprobe).
@@ -118,7 +119,7 @@ def seg_shift(shot, crop, frames_out, n_frames):
         im.paste(im0, (410, 70))
         d.text((410, 30), "Barnard's Star: survey 1 minus survey 2", font=font(28), fill=FG)
         tag(d, 410, 540, "MODEL / RESIDUAL", (204, 121, 167))
-        subtitle(d, "Six months apart: the star has moved")
+        subtitle(d, "About seven months apart: the star has moved")
         frames_out.append(im)
 
 
@@ -162,8 +163,8 @@ def main(a):
     meta = json.load(open(f"{SITE}/index/dr1/meta.json"))
     pm = mo["proper_motion"]
     nums = [(f"{hl['number']}%", "of a plain blink's changes vanish, one detector at a time"),
-            (f"{e4['passes'][1]['significance']:.0f}×", "the noise: coldest known brown dwarf, along its path"),
-            (f"{pm['pmra']['spherex_mas_yr']/1000:.2f}″/yr", f"Eps Indi B's motion; Gaia says {pm['pmra']['gaia_mas_yr']/1000:.2f}"),
+            (f"{e4['passes'][1]['significance']:.1f}σ", "coldest known brown dwarf, against empty paths"),
+            (f"{pm['pmra']['spherex_mas_yr']/1000:+.2f} ± {pm['pmra']['err_mas_yr']/1000:.2f}″/yr", f"Eps Indi B east–west; Gaia {pm['pmra']['gaia_mas_yr']/1000:+.2f}"),
             (f"{meta['n_frames']:,}", "SPHEREx pictures indexed, any spot in the sky")]
     os.makedirs("dist/frames", exist_ok=True)
     for f in os.listdir("dist/frames"):
@@ -180,7 +181,7 @@ def main(a):
                     "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", "dist/orrery_demo.mp4"], check=True)
     subs = [(0, 3.5, "Plain blink: everything flickers"), (3.5, 7, "Most of that flicker is colour, not change"),
             (7, 9.7, "The coldest known brown dwarf, picture by picture"), (9.7, 13, "Combine pictures along its path: there it is"),
-            (13, 19, "Six months apart: the star has moved"), (19, 26, "Measured, and checked against independent data"),
+            (13, 19, "About seven months apart: the star has moved"), (19, 26, "Measured, and checked against independent data"),
             (26, 29.7, "Try any spot in the sky")]
     with open("dist/orrery_demo.srt", "w") as f:
         for i, (s_, e_, t) in enumerate(subs, 1):

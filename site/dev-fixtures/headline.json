@@ -1,11 +1,35 @@
 {
+ "version": "B",
  "field": "fx-field",
  "question": "Fixture: at this spot in the sky, what really changed?",
- "number": 0.0,
- "err": 0.0,
+ "number": 0,
  "unit": "%",
- "number_label": "fixture: share of plain-blink changes that are only colour",
+ "err_low": 0,
+ "err_high": 0,
  "kind": "derived",
- "sentence": "Fixture sentence: switch between raw and corrected to see which changes are real.",
- "version": "A"
+ "number_label": "fixture: share of plain-blink changes that are only colour",
+ "sentence": "Fixture sentence: compare a plain blink with one detector at a time.",
+ "modes": [
+  {
+   "id": "all",
+   "label": "Plain blink (every picture, in time order)"
+  },
+  {
+   "id": "det",
+   "label": "One detector at a time"
+  },
+  {
+   "id": "corr",
+   "label": "Colour-aware view (experimental)"
+  }
+ ],
+ "default_mode": "all",
+ "method": "science.html#which-change-is-real",
+ "evidence_note": "Fixture evidence note.",
+ "evidence": [
+  {
+   "text": "fixture patch: 10 -> 1",
+   "href": "science.html#which-change-is-real"
+  }
+ ]
 }

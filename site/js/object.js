@@ -1,4 +1,4 @@
-import { init, getJSON, h, t, asset, safeUrl, badge, fmt, fmtPM, wlColor, unavailable } from './core.js';
+import { init, getJSON, h, put, t, link, asset, safeUrl, badge, fmt, fmtPM, wlColor, unavailable } from './core.js';
 import { plot } from './plot.js';
 import { sizeText } from './components/injgrid.js';
 
@@ -24,8 +24,8 @@ function render(o) {
     } }, t('obj.check'));
     return [btn, region];
   }
-  const Dtxt = sz.D_err_km != null ? `${fmtPM(sz.D_km, sz.D_err_km)} km`
-    : sz.D_lo_km != null && sz.D_hi_km != null ? `${fmt(sz.D_km)} km (${fmt(sz.D_lo_km)}–${fmt(sz.D_hi_km)})` : `${fmt(sz.D_km)} km`;
+  const Dtxt = sz.D_lo_km != null && sz.D_hi_km != null ? `${fmt(sz.D_km)} km (${fmt(sz.D_lo_km)}–${fmt(sz.D_hi_km)}${sz.interval_label ? `; ${sz.interval_label}` : ''})`
+    : sz.D_err_km != null ? `${fmtPM(sz.D_km, sz.D_err_km)} km` : `${fmt(sz.D_km)} km`;
   const Ttxt = tr.D_km != null ? `${fmtPM(tr.D_km, tr.D_sigma_km)} km` : null;
   const shortSrc = src => /neowise/i.test(src || '') ? 'NEOWISE' : (src || '—');
   const toFrames = () => h('a', { href: '#frames', onclick: () => { document.getElementById('frames').open = true; } }, t('obj.see_pixels', { n: frames.length }));
@@ -68,20 +68,21 @@ function render(o) {
       h('p', { class: 'muted' }, t('obj.spec_note', { n: sp.wl_um.length }), ' ', toFrames()));
   } else specSec.append(unavailable(t('what.spectrum')));
 
-  root.replaceChildren(
+  put(root,
+    o.banner ? h('p', { class: 'banner', role: 'note' }, o.banner) : null,
     h('div', { class: 'obj-hero' },
       h('div', {}, h('h1', {}, o.name), h('p', { class: 'lede' }, o.class_plain || o.kind || ''), sizeTop),
       specSec),
     sizeSec,
-    h('section', { 'aria-labelledby': 'h-comp' }, h('h2', { id: 'h-comp' }, t('obj.comp_h')),
-      o.composition_plain ? h('p', {}, o.composition_plain, ' ', badge(L('composition', 'derived'))) : unavailable(t('what.composition'))),
+    o.composition_plain ? h('section', { 'aria-labelledby': 'h-comp' }, h('h2', { id: 'h-comp' }, t('obj.comp_h')),
+      h('p', {}, o.composition_plain, ' ', badge(L('composition', 'derived')))) : null,
     h('section', { 'aria-labelledby': 'h-path' }, h('h2', { id: 'h-path' }, t('obj.path_h')), skyChart(o.track || [], frames)),
     framesSection(frames, L),
     h('section', { 'aria-labelledby': 'h-prov' }, h('h2', { id: 'h-prov' }, t('obj.prov_h')),
       h('dl', { class: 'facts' },
         h('dt', {}, t('obj.release')), h('dd', {}, o.release ?? '—'),
         h('dt', {}, t('obj.code_version')), h('dd', {}, h('code', {}, o.code_version ?? '—')),
-        h('dt', {}, t('obj.rerun')), h('dd', {}, o.rerun_command ? [h('pre', {}, h('code', {}, o.rerun_command)), copyBtn(o.rerun_command)] : '—'))),
+        h('dt', {}, t('obj.rerun')), h('dd', {}, h('a', { href: link('science.html#reproduce-every-figure') }, t('obj.reproduce_link'))))),
   );
   if (new URLSearchParams(location.search).get('check') === 'all') { // open every "Check it" panel (for screenshots)
     for (const b of root.querySelectorAll('button.check[aria-expanded="false"]')) b.click();
@@ -140,13 +141,6 @@ function framesSection(frames, L) {
       h('td', {}, thumb(f.resid_png, t('obj.alt_resid', { id: f.obs_id }))),
       h('td', {}, safeUrl(f.s3_url) ? h('a', { href: f.s3_url, rel: 'noopener' }, t('obj.s3')) : '—')))))));
   return det;
-}
-
-function copyBtn(text) {
-  const b = h('button', { type: 'button', class: 'btn small', onclick: async () => {
-    try { await navigator.clipboard.writeText(text); b.textContent = t('obj.copied'); } catch { b.textContent = t('obj.copy_failed'); }
-  } }, t('obj.copy'));
-  return b;
 }
 
 // Spectrum as sound: wavelength → time (3 s), reflectance → pitch (two octaves from 220 Hz).
