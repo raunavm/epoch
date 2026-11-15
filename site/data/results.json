@@ -1,0 +1,323 @@
+{
+ "generated_with": "scripts/build_results.py",
+ "sources": [
+  "docs/CLAIMS.md",
+  "data/findings/*.json"
+ ],
+ "rows": [
+  {
+   "id": "barnard",
+   "group": "target",
+   "target": "barnard",
+   "claims": [
+    {
+     "id": "C17",
+     "verdict": "FAILED",
+     "status": "FAILED as registered",
+     "late": false
+    },
+    {
+     "id": "C15",
+     "verdict": "FAILED",
+     "status": "FAILED",
+     "late": false
+    }
+   ],
+   "numbers": [
+    0,
+    1,
+    5
+   ],
+   "extra": [],
+   "card": "timemachine.html?target=barnard",
+   "science": "science.html#e8",
+   "failed": [
+    {
+     "n": 13,
+     "href": "failed.html#13-measuring-barnard-s-star-s-motion-did-not-work"
+    },
+    {
+     "n": 17,
+     "href": "failed.html#17-barnard-s-star-second-attempt-the-motion-matches-the-pre-set-check-does-not"
+    }
+   ]
+  },
+  {
+   "id": "epsindib",
+   "group": "target",
+   "target": "epsindib",
+   "claims": [
+    {
+     "id": "C10",
+     "verdict": "SUPPORTED",
+     "status": "SUPPORTED",
+     "late": true
+    },
+    {
+     "id": "C16",
+     "verdict": "SUPPORTED",
+     "status": "SUPPORTED",
+     "late": false
+    },
+    {
+     "id": "C14",
+     "verdict": "SUPPORTED",
+     "status": "SUPPORTED",
+     "late": true
+    }
+   ],
+   "numbers": [
+    0,
+    1,
+    5,
+    7
+   ],
+   "extra": [],
+   "card": "timemachine.html?target=epsindib",
+   "science": "science.html#e12",
+   "failed": []
+  },
+  {
+   "id": "wise0855",
+   "group": "target",
+   "target": "wise0855",
+   "claims": [
+    {
+     "id": "C9",
+     "verdict": "SUPPORTED",
+     "status": "SUPPORTED",
+     "late": false
+    },
+    {
+     "id": "C13",
+     "verdict": "SUPPORTED",
+     "status": "SUPPORTED",
+     "late": true
+    }
+   ],
+   "numbers": [
+    0,
+    2,
+    7
+   ],
+   "extra": [],
+   "card": "timemachine.html?target=wise0855",
+   "science": "science.html#e4",
+   "failed": [
+    {
+     "n": 10,
+     "href": "failed.html#10-a-neighbouring-star-was-silently-dropped"
+    }
+   ]
+  },
+  {
+   "id": "rwaur",
+   "group": "target",
+   "target": "rwaur",
+   "claims": [
+    {
+     "id": "C18",
+     "verdict": "NOT CONFIRMED",
+     "status": "NOT CONFIRMED",
+     "late": true
+    }
+   ],
+   "numbers": [
+    4,
+    3
+   ],
+   "extra": [],
+   "card": "timemachine.html?target=rwaur",
+   "science": "science.html#e9",
+   "failed": [
+    {
+     "n": 16,
+     "href": "failed.html#16-a-per-star-change-test-could-not-reach-a-verdict"
+    }
+   ]
+  },
+  {
+   "id": "rdra",
+   "group": "target",
+   "target": "rdra",
+   "claims": [
+    {
+     "id": "C19",
+     "verdict": "NOT CONFIRMED",
+     "status": "NOT CONFIRMED",
+     "late": true
+    }
+   ],
+   "numbers": [
+    1
+   ],
+   "extra": [
+    {
+     "key": "rdra_z",
+     "value": 4.0,
+     "rule": 5.0,
+     "source": "data/findings/e9.json"
+    }
+   ],
+   "card": "timemachine.html?target=rdra",
+   "science": "science.html#e9",
+   "failed": [
+    {
+     "n": 16,
+     "href": "failed.html#16-a-per-star-change-test-could-not-reach-a-verdict"
+    }
+   ]
+  },
+  {
+   "id": "f1",
+   "claims": [
+    {
+     "id": "C6a",
+     "verdict": "SUPPORTED",
+     "status": "SUPPORTED",
+     "late": false
+    },
+    {
+     "id": "C6d",
+     "verdict": "SUPPORTED",
+     "status": "SUPPORTED as a labelled secondary check",
+     "late": true
+    }
+   ],
+   "science": "science.html#which-change-is-real",
+   "failed": [
+    {
+     "n": 2,
+     "href": "failed.html#2-a-fair-comparison-shrank-our-headline"
+    }
+   ],
+   "figure": "data/figs/fig_e2.png",
+   "extra": [],
+   "group": "finding",
+   "finding": "f1",
+   "card": "start.html"
+  },
+  {
+   "id": "f2",
+   "claims": [
+    {
+     "id": "C5b",
+     "verdict": "SUPPORTED",
+     "status": "SUPPORTED",
+     "late": true
+    }
+   ],
+   "science": "science.html#stacking-along-an-orbit",
+   "failed": [
+    {
+     "n": 6,
+     "href": "failed.html#6-our-first-faint-asteroid-was-not-really-invisible"
+    }
+   ],
+   "figure": "data/figs/fig_reveal.png",
+   "extra": [],
+   "group": "finding",
+   "finding": "f2",
+   "card": "start.html"
+  },
+  {
+   "id": "e1",
+   "claims": [
+    {
+     "id": "C6b",
+     "verdict": "FAILED",
+     "status": "FAILED",
+     "late": false
+    }
+   ],
+   "science": "science.html#faint-changes-in-single-pictures-and-a-failure",
+   "failed": [
+    {
+     "n": 11,
+     "href": "failed.html#11-the-colour-aware-view-did-not-beat-a-simple-median"
+    }
+   ],
+   "figure": "data/figs/fig_e1.png",
+   "extra": [
+    {
+     "key": "e1_gain",
+     "text": "NOT MET",
+     "source": "data/findings/e1.json"
+    },
+    {
+     "key": "e1_half",
+     "value": 20,
+     "source": "data/findings/e1.json"
+    }
+   ],
+   "group": "other"
+  },
+  {
+   "id": "e3",
+   "claims": [
+    {
+     "id": "C6c",
+     "verdict": "FAILED",
+     "status": "FAILED",
+     "late": false
+    },
+    {
+     "id": "C6e",
+     "verdict": "FAILED",
+     "status": "FAILED",
+     "late": true
+    }
+   ],
+   "science": "science.html#faint-changes-in-single-pictures-and-a-failure",
+   "failed": [
+    {
+     "n": 14,
+     "href": "failed.html#14-our-change-maps-miss-real-asteroids"
+    }
+   ],
+   "figure": null,
+   "extra": [
+    {
+     "key": "e3_M4",
+     "hits": 2,
+     "n": 79,
+     "lo": 0.7,
+     "hi": 8.8,
+     "source": "data/findings/e3.json"
+    },
+    {
+     "key": "e3_M2",
+     "hits": 0,
+     "n": 79,
+     "lo": 0.0,
+     "hi": 4.6,
+     "source": "data/findings/e3.json"
+    }
+   ],
+   "group": "other"
+  },
+  {
+   "id": "e15",
+   "claims": [
+    {
+     "id": "C20",
+     "verdict": "SUPPORTED",
+     "status": "SUPPORTED",
+     "late": false
+    }
+   ],
+   "science": "science.html#e15",
+   "failed": [],
+   "figure": "data/figs/e15_methane.png",
+   "extra": [
+    {
+     "key": "e15_loo",
+     "hits": 21,
+     "n": 23,
+     "source": "data/findings/e15.json"
+    }
+   ],
+   "group": "other"
+  }
+ ]
+}

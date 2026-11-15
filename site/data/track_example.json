@@ -1,0 +1,38 @@
+{
+ "id": "4260",
+ "name": "4260 Yanai (1989 AX)",
+ "V": 17.56,
+ "ra": 315.18998,
+ "dec": -20.56877,
+ "rate": 14.83,
+ "pa": 66.7,
+ "t0": 60963.8671,
+ "span": 20.0,
+ "fov": 8,
+ "n_rows": 15,
+ "hours": 19.64,
+ "fit_rms_arcsec": 0.8,
+ "href": "timemachine.html?ra=315.18998&dec=-20.56877&fov=8&mode=track&rate=14.83&pa=66.7&t0=60963.8671&span=20#live",
+ "source": "data/forced/4260.parquet (mjd, RA, DEC, V)",
+ "others": [
+  {
+   "id": "14052",
+   "name": "14052 (1995 YH3)",
+   "V": 19.44,
+   "ra": 235.04775,
+   "dec": -12.63135,
+   "rate": 13.98,
+   "pa": 163.2,
+   "t0": 60879.232,
+   "span": 20.0,
+   "fov": 8,
+   "n_rows": 22,
+   "hours": 19.67,
+   "fit_rms_arcsec": 1.14,
+   "href": "timemachine.html?ra=235.04775&dec=-12.63135&fov=8&mode=track&rate=13.98&pa=163.2&t0=60879.2320&span=20#live",
+   "source": "data/forced/14052.parquet (mjd, RA, DEC, V)"
+  }
+ ],
+ "generated_with": "scripts/build_track_example.py",
+ "span_rule": "busiest 20 h of forced-photometry rows; straight-line fit"
+}

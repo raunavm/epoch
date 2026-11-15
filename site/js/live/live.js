@@ -7,7 +7,8 @@ import { findFrames, spreadInTime } from './index.js';
 import { readHeader, readRows } from './fits.js';
 import { makeWCS, waveAt } from './wcs.js';
 import { gridSize, rowsNeeded, resample, aperture, toMJy, asinhRGBA, divergingRGBA, SCALE_ARCSEC } from './grid.js';
-import { changeModel, median } from './change.js';
+import { changeModel, median, despike } from './change.js';
+import { trackShift, motionFromMarks, shiftImage, stackSN, busiestSpan, peakNear } from './track.js';
 import { fetchGaia, starXY, starRadius, starPM, MAX_STARS } from './gaia.js';
 import { wiseStamp, hipsDates, HIPS } from './wise.js';
 
@@ -18,6 +19,7 @@ const PASS_COLORS = ['#56B4E9', '#E69F00'];
 // Gaia overlay: cone margin for stars that drift into view, arrow length, and the speed above which a star gets an arrow.
 const GAIA_COLOR = '#009E73', GAIA_MARGIN_DEG = 0.05, ARROW_YEARS = 10, FAST_PM = 0.3;
 const WISE_K = 3; // WISE picture drawn at 3 x 3 sub-pixels per live-grid pixel
+const TRACK_SPAN_H = 24, TRACK_CLIP = 5, TRACK_PEAK_R = 3; // follow view: default time span (h), colour clip (noise units), peak search radius (px)
 const WISE_DET = 6; // the SPHEREx detector (4.4-5.0 µm) whose band contains WISE's 4.6 µm; enough for the WISE comparison
 const META_KEYS = [['PSF_FWHM', 'live.meta_psf'], ['L2DQAFLG', 'live.meta_dqa'], ['L2 N_OUTLIER', 'live.meta_outlier'],
   ['L2 N_PERSIST', 'live.meta_persist'], ['L2 SATSTRKS', 'live.meta_streaks'], ['L2 N_GHOST', 'live.meta_ghost']];
@@ -46,8 +48,8 @@ export function mountLive(el, target, onState) {
   const LEGACY = { raw: 'all', corrected: 'corr' }, m0 = LEGACY[target.mode] || target.mode;
   // st.mode: which pictures/images the blink shows (all | det | corr); st.view: blink | add | subtract | wise.
   const st = { frames: [], i: 0, playing: !REDUCED_MOTION, fps: 2, mode: VIEWS.includes(m0) ? m0 : 'all', det: null, detChosen: false,
-    view: target.wise ? 'wise' : ['add', 'subtract'].includes(target.mode) ? target.mode : 'blink', cm: null, sel: null, bytes: 0,
-    gaia: !!target.gaia, stars: null, gaiaFrom: '', gaiaFailed: false, wisePlay: !REDUCED_MOTION };
+    view: target.wise ? 'wise' : ['add', 'subtract', 'track'].includes(target.mode) ? target.mode : 'blink', cm: null, sel: null, bytes: 0,
+    track: { rate: 0, pa: 0, t0: null, span: TRACK_SPAN_H, smooth: true, ...target.track }, gaia: !!target.gaia, stars: null, gaiaFrom: '', gaiaFailed: false, wisePlay: !REDUCED_MOTION };
   const list = () => (st.mode === 'det' ? st.frames.filter(f => f.det === st.det) : st.frames);
   let timer = null, wiseTimer = null, wiseFlip = null, wisePanels = [], gaiaAsked = false;
 
@@ -61,11 +63,12 @@ export function mountLive(el, target, onState) {
   const playBtn = h('button', { type: 'button', class: 'btn', onclick: () => { st.playing = !st.playing; schedule(); draw(); } });
   let info = {};
   const controls = viewControls({}, st, (m, d) => setMode(m, d));
-  const VIEW_KEYS = ['blink', 'add', 'subtract', 'wise'];
+  const VIEW_KEYS = ['blink', 'add', 'subtract', 'wise', 'track'];
   const views = VIEW_KEYS.map(k => h('button', { type: 'button', class: 'seg', onclick: () => { st.view = k; emit(); draw(); } }, t(`live.view_${k}`)));
   const addBox = h('div', { class: 'coadds', hidden: true });
   const subBox = h('div', { class: 'subtract', hidden: true });
   const wiseBox = h('div', { class: 'wise', hidden: true }, h('p', { class: 'hint' }, t('live.wise_wait')));
+  const trackBox = h('div', { class: 'track', hidden: true }, h('p', { class: 'hint' }, t('live.track_wait')));
   const gaiaBtn = h('button', { type: 'button', class: 'check', onclick: () => { st.gaia = !st.gaia; emit(); loadGaia(); draw(); } }, t('live.gaia_show'));
   const gaiaNote = h('span', { class: 'muted small', role: 'status' });
   const gaiaTip = h('p', { class: 'marker-tip small', 'aria-live': 'polite' });
@@ -83,7 +86,9 @@ export function mountLive(el, target, onState) {
     st.i = cur ? Math.max(0, L.reduce((best, f, k) => (Math.abs(f.mjd - cur.mjd) < Math.abs(L[best].mjd - cur.mjd) ? k : best), 0)) : 0;
     emit(); draw();
   }
-  function emit() { onState?.({ mode: ['add', 'subtract'].includes(st.view) ? st.view : st.mode, gaia: st.gaia, wise: st.view === 'wise' }); }
+  function emit() {
+    onState?.({ mode: ['add', 'subtract', 'track'].includes(st.view) ? st.view : st.mode, gaia: st.gaia, wise: st.view === 'wise', track: st.view === 'track' ? st.track : null });
+  }
 
   canvas.addEventListener('click', e => {
     const r = canvas.getBoundingClientRect();
@@ -118,7 +123,7 @@ export function mountLive(el, target, onState) {
     controls.update(st.mode, st.det, !st.cm, info);
     controls.hidden = st.view !== 'blink'; // Add, Subtract and the WISE comparison do not use the three blink views
     views.forEach((b, k) => { b.setAttribute('aria-pressed', String(VIEW_KEYS[k] === st.view)); b.disabled = k > 0 && !st.cm; });
-    blinkBox.hidden = st.view !== 'blink'; addBox.hidden = st.view !== 'add'; subBox.hidden = st.view !== 'subtract'; wiseBox.hidden = st.view !== 'wise';
+    blinkBox.hidden = st.view !== 'blink'; addBox.hidden = st.view !== 'add'; subBox.hidden = st.view !== 'subtract'; wiseBox.hidden = st.view !== 'wise'; trackBox.hidden = st.view !== 'track';
     playBtn.textContent = t(st.playing ? 'tm.pause' : 'tm.play');
     gaiaBtn.setAttribute('aria-pressed', String(st.gaia));
     gaiaNote.textContent = !st.gaia ? '' : st.gaiaFailed ? t('live.gaia_none') : !st.stars ? t('live.gaia_loading')
@@ -127,6 +132,7 @@ export function mountLive(el, target, onState) {
     if (st.view === 'add') drawAdd();
     if (st.view === 'subtract') drawSubtract();
     if (st.view === 'wise') drawWise();
+    if (st.view === 'track') drawTrack();
     if (st.view === 'wise') wisePanels.forEach(p => markers(p.o, p.mjd));
     clearInterval(wiseTimer);
     wiseTimer = st.view === 'wise' && st.wisePlay && wiseFlip ? setInterval(wiseFlip, 1000) : null;
@@ -267,6 +273,106 @@ export function mountLive(el, target, onState) {
     } catch { if (!signal.aborted) put(wiseBox, h('p', { class: 'unavailable' }, t('live.wise_none'))); }
   }
 
+  // Follow a moving object: every picture in the chosen time span is shifted back along a straight-line motion to the
+  // reference time, then added. Works on the colour-aware pictures (static sky removed per detector, in noise units).
+  let trackUpdate = null;
+  function drawTrack() { if (st.cm) (trackUpdate ??= buildTrack())(); }
+  function buildTrack() {
+    const T = st.track, clean = new Map(), sw = Math.max(0.15, S / 120);
+    const res = f => { if (!clean.has(f.idx)) clean.set(f.idx, despike(st.cm.corr[f.idx], S)); return clean.get(f.idx); };
+    if (!Number.isFinite(T.t0)) T.t0 = busiestSpan(st.frames.map(f => f.mjd), T.span)?.t0 ?? st.frames[0].mjd;
+    const inSpan = () => st.frames.filter(f => Math.abs(f.mjd - T.t0) * 24 <= T.span / 2);
+    const nearest = () => st.frames.reduce((b, f, k) => (Math.abs(f.mjd - T.t0) < Math.abs(st.frames[b].mjd - T.t0) ? k : b), 0);
+    const set = (k, v) => { if (!Number.isFinite(v)) return; T[k] = v; emit(); update(); };
+    const slider = (k, min, max, step) => {
+      const r = h('input', { type: 'range', id: `trk-${k}`, min, max: Math.max(max, T[k]), step, value: T[k] });
+      const n = h('input', { type: 'number', class: 'num', min, step: 'any', value: T[k], 'aria-label': t(`live.track_${k}`) });
+      r.addEventListener('input', () => { n.value = r.value; set(k, +r.value); });
+      n.addEventListener('change', () => { r.max = Math.max(max, +n.value); r.value = n.value; set(k, +n.value); });
+      return { el: h('div', { class: 'form-row' }, h('label', { for: `trk-${k}` }, t(`live.track_${k}`)), r, n), show: v => { r.max = Math.max(max, v); r.value = v; n.value = v; } };
+    };
+    const rate = slider('rate', 0, 120, 0.1), pa = slider('pa', 0, 360, 1), span = slider('span', 1, 72, 1);
+    const t0 = h('input', { type: 'range', id: 'trk-t0', min: 0, max: st.frames.length - 1, step: 1, value: nearest() });
+    t0.addEventListener('input', () => set('t0', st.frames[+t0.value].mjd));
+    const t0Out = h('output', { for: 'trk-t0', class: 'small' });
+    const smooth = h('input', { type: 'checkbox', id: 'trk-smooth', checked: T.smooth });
+    smooth.addEventListener('change', () => { T.smooth = smooth.checked; update(); });
+    const panel = (label, kind) => {
+      const cv = h('canvas', { width: S, height: S, class: 'live-canvas', role: 'img', 'aria-label': label });
+      const o = svg('svg', { viewBox: `0 0 ${S} ${S}`, class: 'overlay', 'aria-hidden': 'true' });
+      return { cv, o, el: h('figure', {}, h('div', { class: 'imgwrap' }, cv, o), h('figcaption', {}, label, ' ', badge(kind))) };
+    };
+    const A = panel(t('live.track_plain'), 'resid'), B = panel(t('live.track_follow'), 'derived');
+    const info = h('p', { class: 'small', role: 'status' }), peak = h('p', { class: 'small' }), example = h('p', { class: 'small' });
+    // "Mark start / mark end": click the object in two pictures; the rate and angle follow from their times.
+    const pk = { i: 0, arm: null, a: null, b: null };
+    const P = panel(t('live.track_pick_aria'), 'resid');
+    const pkScrub = h('input', { type: 'range', class: 'scrub', min: 0, max: 0, value: 0, 'aria-label': t('live.track_pick_scrub') });
+    const pkCap = h('p', { class: 'frame-meta' }), pkMsg = h('p', { class: 'small', 'aria-live': 'polite' });
+    const arm = ['a', 'b'].map(k => h('button', { type: 'button', class: 'btn small', onclick: () => { pk.arm = pk.arm === k ? null : k; update(); } }, t(`live.track_mark_${k}`)));
+    pkScrub.addEventListener('input', () => { pk.i = +pkScrub.value; update(); });
+    P.cv.addEventListener('click', e => {
+      const f = (inSpan().length ? inSpan() : st.frames)[pk.i];
+      if (!pk.arm || !f) { pkMsg.textContent = t('live.track_mark_first'); return; }
+      const r = P.cv.getBoundingClientRect();
+      pk[pk.arm] = { x: Math.floor((e.clientX - r.left) / r.width * S), y: Math.floor((e.clientY - r.top) / r.height * S), mjd: f.mjd, date: f.date };
+      pk.arm = pk.arm === 'a' ? 'b' : null;
+      const m = pk.a && pk.b ? motionFromMarks(pk.a, pk.b) : null;
+      if (m) { T.rate = +m.rate.toFixed(2); T.pa = +m.pa.toFixed(1); rate.show(T.rate); pa.show(T.pa); emit(); }
+      pkMsg.textContent = pk.a && pk.b ? (m ? t('live.track_mark_done', { rate: fmt(T.rate, 3), pa: fmt(T.pa, 3) }) : t('live.track_mark_same')) : '';
+      update();
+    });
+    getJSON('track_example.json').then(ex => {
+      if (!ex?.href) return;
+      put(example, t('live.track_example_pre'), ' ', h('a', { href: link(ex.href) }, t('live.track_example', { name: ex.name })), ' ', t('live.track_example_post', { V: fmt(ex.V, 3) }),
+        ...(ex.others || []).flatMap(o => [' ', h('a', { href: link(o.href) }, o.name), ' ', t('live.track_faint', { V: fmt(o.V, 3) })]));
+    });
+    put(trackBox,
+      h('p', { class: 'hint' }, t('live.track_hint')),
+      h('div', { class: 'track-controls' }, rate.el, pa.el, span.el, h('div', { class: 'form-row' }, h('label', { for: 'trk-t0' }, t('live.track_t0')), t0, t0Out),
+        h('div', { class: 'form-row' }, smooth, h('label', { for: 'trk-smooth' }, t('live.track_smooth')))),
+      info,
+      h('div', { class: 'coadd-grid track-pair' }, A.el, B.el),
+      peak,
+      h('p', { class: 'muted small' }, t('live.track_scale', { clip: TRACK_CLIP })),
+      example,
+      h('details', { class: 'track-mark' }, h('summary', {}, t('live.track_mark_h')),
+        h('p', { class: 'hint' }, t('live.track_mark_hint')), h('p', {}, arm[0], ' ', arm[1]), pkMsg,
+        h('div', { class: 'coadd-grid wide' }, P.el), pkScrub, pkCap));
+
+    function update() {
+      const W = inSpan(), c0 = Math.round(c) * S + Math.round(c);
+      const shifted = W.map(f => shiftImage(res(f), S, ...trackShift(T.rate, T.pa, f.mjd, T.t0)));
+      const opt = { clip: TRACK_CLIP, smooth: T.smooth }, plain = stackSN(W.map(res), S, opt), moved = stackSN(shifted, S, opt);
+      paint(A.cv, divergingRGBA(plain.z, TRACK_CLIP)); paint(B.cv, divergingRGBA(moved.z, TRACK_CLIP));
+      // On the plain stack, the path a mover centred at the reference time takes across the span.
+      markers(A.o, null); markers(B.o, null);
+      if (W.length) {
+        const [ax, ay] = trackShift(T.rate, T.pa, W[0].mjd, T.t0), [bx, by] = trackShift(T.rate, T.pa, W[W.length - 1].mjd, T.t0);
+        A.o.append(svg('path', { d: `M${c + 0.5 + ax},${c + 0.5 + ay}L${c + 0.5 + bx},${c + 0.5 + by}`, stroke: '#CC79A7', 'stroke-width': sw, 'stroke-dasharray': `${2 * sw} ${2 * sw}`, fill: 'none' }));
+      }
+      t0.value = nearest(); t0Out.textContent = `${mjdTime(T.t0)} UTC`;
+      const hrs = W.length ? (W[W.length - 1].mjd - W[0].mjd) * 24 : 0;
+      put(info, W.length < 2 ? h('strong', {}, t('live.track_few')) : null, ' ', t('live.track_info', {
+        date: mjdTime(T.t0), mjd: T.t0.toFixed(4), n: W.length, N: st.frames.length, h: fmt(hrs, 3),
+        nc: shifted.filter(m => Number.isFinite(m[c0])).length, d: fmt(T.rate * hrs, 3), px: fmt(T.rate * hrs / SCALE_ARCSEC, 2) }));
+      const pA = peakNear(plain.z, S, TRACK_PEAK_R), pB = peakNear(moved.z, S, TRACK_PEAK_R);
+      put(peak, t('live.track_peak', { r: TRACK_PEAK_R, as: fmt(TRACK_PEAK_R * SCALE_ARCSEC, 2), a: fmt(pA?.v, 2), b: fmt(pB?.v, 2) }), ' ', badge('derived'));
+      // marking helper
+      const L = W.length ? W : st.frames;
+      pk.i = Math.min(pk.i, L.length - 1);
+      const f = L[pk.i];
+      pkScrub.max = L.length - 1; pkScrub.value = pk.i;
+      paint(P.cv, divergingRGBA(res(f), TRACK_CLIP));
+      markers(P.o, null);
+      for (const [k, col] of [['a', '#56B4E9'], ['b', '#E69F00']]) if (pk[k]) P.o.append(svg('circle', { cx: pk[k].x + 0.5, cy: pk[k].y + 0.5, r: 1.5, fill: 'none', stroke: col, 'stroke-width': sw }));
+      arm.forEach((b, k) => b.setAttribute('aria-pressed', String(pk.arm === 'ab'[k])));
+      put(pkCap, h('strong', {}, f.date), ` · ${t('live.detector')} ${f.det} · ${pk.i + 1}/${L.length}`,
+        pk.a ? ` · ${t('live.track_mark_a')}: ${pk.a.date}` : '', pk.b ? ` · ${t('live.track_mark_b')}: ${pk.b.date}` : '');
+    }
+    return update;
+  }
+
   function spectrum() {
     if (!st.sel || !st.frames.length) return;
     const [i, j] = st.sel, { split } = passes();
@@ -290,7 +396,7 @@ export function mountLive(el, target, onState) {
     controls,
     h('div', { class: 'segmented', role: 'group', 'aria-label': t('live.view_label') }, views),
     h('p', {}, gaiaBtn, ' ', gaiaNote), gaiaTip,
-    blinkBox, addBox, subBox, wiseBox, findingBox, specBox);
+    blinkBox, addBox, subBox, wiseBox, trackBox, findingBox, specBox);
   blinkBox.append(
     h('div', { class: 'live-grid' },
       h('figure', { class: 'tm-view' }, h('div', { class: 'imgwrap' }, canvas, ov), caption),
@@ -392,3 +498,4 @@ export function mountLive(el, target, onState) {
 export function mjdDate(mjd) {
   return new Date((mjd - 40587) * 86400000).toISOString().slice(0, 10);
 }
+export const mjdTime = mjd => new Date((mjd - 40587) * 86400000).toISOString().slice(0, 16).replace('T', ' ');

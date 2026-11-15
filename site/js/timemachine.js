@@ -1,4 +1,4 @@
-import { init, getJSON, h, t, fmt, loc, unavailable } from './core.js';
+import { init, getJSON, h, t, fmt, loc, link, unavailable } from './core.js';
 import { headlineLine } from './components/evidence.js';
 import { mountBlink } from './components/blink.js';
 import { mountLive, loadIndex, bytesPerFrame, mjdDate } from './live/live.js';
@@ -18,6 +18,9 @@ const liveBox = $('live');
 let live = null, showcase = null, preset = null, cardFor = null;
 let exact = params.get('exact') === '1'; // show exactly the typed position, even on a fast mover's old track
 const overlays = { gaia: params.get('gaia') === '1', wise: params.get('wise') === '1' };
+// Follow view: &mode=track&rate=<″/h>&pa=<deg>&t0=<mjd>&span=<h> (each optional; the view fills in defaults)
+const TRACK_KEYS = ['rate', 'pa', 't0', 'span'];
+let track = Object.fromEntries(TRACK_KEYS.filter(k => params.get(k) !== null && Number.isFinite(+params.get(k))).map(k => [k, +params.get(k)]));
 
 const idx = await loadIndex();
 const refMjd = idx ? (idx.meta.mjd_min + idx.meta.mjd_max) / 2 : null;
@@ -74,24 +77,26 @@ function start(mode = params.get('mode') || 'raw', all = params.get('all') === '
   $('target-result').hidden = !preset;
   if (preset && cardFor !== preset.id) { cardFor = preset.id; renderTargetCard($('target-result'), preset.id, getJSON); }
   const pm = preset && refMjd ? { pmra: preset.pmra, pmdec: preset.pmdec, epochMjd: refMjd } : null;
-  const state = { ra, dec, fov, mode, all, ...overlays };
+  const state = { ra, dec, fov, mode, all, ...overlays, track };
   const sync = () => {
     const p = new URLSearchParams(location.search);
     p.set('ra', ra.toFixed(6)); p.set('dec', dec.toFixed(6)); p.set('fov', fov); p.set('mode', state.mode);
     if (preset) p.set('target', preset.id); else p.delete('target');
     for (const [k, on] of [['all', state.all], ['gaia', state.gaia], ['wise', state.wise], ['exact', exact]]) { if (on) p.set(k, '1'); else p.delete(k); }
+    const tr = state.mode === 'track' ? state.track : null;
+    for (const [k, dp] of [['rate', 2], ['pa', 1], ['t0', 5], ['span', 0]]) { if (Number.isFinite(tr?.[k])) p.set(k, tr[k].toFixed(dp)); else p.delete(k); }
     history.replaceState(null, '', `?${p}`);
   };
   sync();
   live = mountLive(liveBox, { ...state, pm, onLoadAll: () => start(state.mode, true) },
-    s => { Object.assign(state, s); overlays.gaia = state.gaia; overlays.wise = state.wise; sync(); });
+    s => { Object.assign(state, s); overlays.gaia = state.gaia; overlays.wise = state.wise; if (s.track) track = { ...s.track }; sync(); });
 }
 
 // URL parameters: ?ra=&dec=&fov=&mode=&gaia=1&wise=1 (or ?target=barnard, which opens the result card and its prepared field;
 // with &gaia=1, &wise=1 or &mode=add|subtract it opens the live view centred on the target instead)
 const tp = TARGETS.find(x => x.id === params.get('target'));
 if (FOVS.includes(+params.get('fov'))) { fovSel.value = params.get('fov'); showCost(); }
-const wantsLive = overlays.gaia || overlays.wise || ['add', 'subtract'].includes(params.get('mode'));
+const wantsLive = overlays.gaia || overlays.wise || ['add', 'subtract', 'track'].includes(params.get('mode'));
 const openCard = tp && !params.has('ra') && !wantsLive;
 if (openCard) { /* opened below, after the showcase fields are known */ }
 else if (tp && !params.has('ra')) { tgtSel.value = tp.id; choosePreset(tp); start(); }
@@ -114,6 +119,9 @@ else {
 }
 renderStrip($('strip'), getJSON, tp?.id);
 $('checklist').append(checklist());
+getJSON('track_example.json').then(ex => { // the "Follow a mover" view, on a known asteroid
+  if (ex?.href) $('target-note').before(h('p', { class: 'small' }, t('live.track_try'), ' ', h('a', { href: link(ex.href) }, t('live.track_example', { name: ex.name })), '.'));
+});
 
 // A challenge target opens on its own measured result: result card + its prepared field (live stays one click away).
 function openTarget(tg) {
@@ -124,7 +132,7 @@ function openTarget(tg) {
   card.after($('showcase')); // the target's prepared field right under its result
   cardFor = tg.id; renderTargetCard(card, tg.id, getJSON);
   const p = new URLSearchParams(location.search);
-  for (const k of ['ra', 'dec', 'mode', 'all', 'gaia', 'wise', 'exact']) p.delete(k);
+  for (const k of ['ra', 'dec', 'mode', 'all', 'gaia', 'wise', 'exact', ...TRACK_KEYS]) p.delete(k);
   p.set('target', tg.id); history.replaceState(null, '', `?${p}`);
   if (fieldIndex?.some(f => f.field === tg.id)) showField(tg.id); else start();
 }

@@ -13,6 +13,8 @@ import { parseRA, parseDec, aperture, gridSize } from '../js/live/grid.js';
 import { TARGETS, propagate, movedTarget } from '../js/live/targets.js';
 import { parseStars, starXY, starRadius, starPM, fetchGaia, GAIA_EPOCH_MJD } from '../js/live/gaia.js';
 import { healpix, tilePixel, tileUrl, parseTile, wiseStamp, hipsDates, HIPS } from '../js/live/wise.js';
+import { trackShift, motionFromMarks, shiftImage, stackSN, busiestSpan, smooth3 } from '../js/live/track.js';
+import { SCALE_ARCSEC } from '../js/live/grid.js';
 
 const DATA = fileURLToPath(new URL('../data/index/dr1/', import.meta.url));
 const BUCKET = 'https://nasa-irsa-spherex.s3.amazonaws.com';
@@ -242,4 +244,61 @@ test('overlay fetches fail soft: an unreachable service rejects instead of hangi
   await assert.rejects(fetchGaia(10, 10, 0.05, notFound));
   await assert.rejects(wiseStamp(10, 10, 5, 1, notFound));
   await assert.rejects(hipsDates(notFound));
+});
+
+test('track: rate and direction -> per-picture shift on the north-up, east-left grid', () => {
+  const close = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-9, `${msg}: ${a} vs ${b}`);
+  const hr = 1 / 24, t0 = 60963.8671, v = SCALE_ARCSEC; // one grid pixel per hour
+  for (const [pa, hours, ex, ey] of [[0, 1, 0, -1], [90, 2, -2, 0], [180, 1, 0, 1], [270, 3, 3, 0], [0, -1, 0, 1], [45, 1, -Math.SQRT1_2, -Math.SQRT1_2]]) {
+    const [dx, dy] = trackShift(v, pa, t0 + hours * hr, t0);
+    close(dx, ex, `dx pa=${pa} h=${hours}`); close(dy, ey, `dy pa=${pa} h=${hours}`);
+  }
+  close(trackShift(14.83, 66.7, t0, t0)[0], 0, 'no shift at the reference time');
+  // marks -> motion is the inverse of motion -> shift, whichever mark is earlier
+  for (const [rate, pa] of [[14.83, 66.7], [13.98, 163.2], [3, 300], [60, 359.5]]) {
+    const [dx, dy] = trackShift(rate, pa, t0 + 7 * hr, t0);
+    for (const m of [motionFromMarks({ x: 10, y: 10, mjd: t0 }, { x: 10 + dx, y: 10 + dy, mjd: t0 + 7 * hr }),
+      motionFromMarks({ x: 10 + dx, y: 10 + dy, mjd: t0 + 7 * hr }, { x: 10, y: 10, mjd: t0 })]) {
+      close(m.rate, rate, 'rate'); close(m.pa, pa, 'pa');
+    }
+  }
+  assert.equal(motionFromMarks({ x: 1, y: 1, mjd: t0 }, { x: 5, y: 1, mjd: t0 }), null, 'same time: no motion');
+});
+
+test('track: shifting a picture puts a moved source back where it was', () => {
+  const S = 15;
+  for (const [dx, dy] of [[3, -2], [-4, 1], [2.5, 0.5], [-1.25, 3.75]]) {
+    const src = new Float32Array(S * S); // source at (7 + dx, 7 + dy), shared bilinearly between pixels
+    const x = 7 + dx, y = 7 + dy, ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy;
+    src[iy * S + ix] += (1 - fx) * (1 - fy); src[iy * S + ix + 1] += fx * (1 - fy); src[(iy + 1) * S + ix] += (1 - fx) * fy; src[(iy + 1) * S + ix + 1] += fx * fy;
+    const out = shiftImage(src, S, dx, dy);
+    if (Number.isInteger(dx) && Number.isInteger(dy)) assert.equal(out[7 * S + 7], 1);
+    else assert.ok(out[7 * S + 7] > 0.24 && out[7 * S + 7] >= Math.max(...out.filter(Number.isFinite)), `peak back at the centre for ${dx},${dy}`);
+    assert.ok(Number.isNaN(out[(dy > 0 ? S - 1 : 0) * S + 7]), 'edge sampled from outside the picture is empty');
+  }
+});
+
+test('track: shift-and-stack makes a faint mover a dot that the plain stack smears out', () => {
+  const S = 31, c = 15, N = 24, t0 = 61000, rate = 2 * SCALE_ARCSEC, pa = 120; // 2 pixels per hour
+  let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const gauss = () => Math.sqrt(-2 * Math.log(rnd())) * Math.cos(2 * Math.PI * rnd());
+  const mjds = Array.from({ length: N }, (_, k) => t0 + (k - (N - 1) / 2) * 0.5 / 24);
+  const maps = mjds.map(m => {
+    const z = Float32Array.from({ length: S * S }, gauss);
+    const [dx, dy] = trackShift(rate, pa, m, t0), x = Math.round(c + dx), y = Math.round(c + dy);
+    z[y * S + x] += 1.5; // 1.5 x noise in each picture: invisible in any one of them
+    return z;
+  });
+  const plain = stackSN(maps, S).z, moved = stackSN(mjds.map((m, k) => shiftImage(maps[k], S, ...trackShift(rate, pa, m, t0))), S).z;
+  assert.ok(moved[c * S + c] > 5, `followed stack at the centre: ${moved[c * S + c]}`);
+  assert.ok(plain[c * S + c] < 3, `plain stack at the centre: ${plain[c * S + c]}`);
+  const sm = smooth3(moved, S);
+  assert.ok(Math.abs(sm[c * S + c] - moved[c * S + c]) < moved[c * S + c], 'smoothing keeps the dot');
+});
+
+test('track: default time span is the busiest stretch', () => {
+  const t = [100, 100.1, 100.2, 105, 105.05, 105.1, 105.15, 105.6, 200];
+  const b = busiestSpan(t, 24);
+  assert.equal(b.n, 5); assert.equal(b.lo, 105); assert.equal(b.hi, 105.6); assert.ok(Math.abs(b.t0 - 105.3) < 1e-9);
+  assert.equal(busiestSpan([], 24), null);
 });

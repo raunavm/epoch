@@ -120,7 +120,7 @@ export const CATS = {
 };
 
 const NAV = [
-  ['index.html', 'nav.home'], ['start.html', 'nav.start'], ['timemachine.html', 'nav.timemachine'],
+  ['index.html', 'nav.home'], ['start.html', 'nav.start'], ['results.html', 'nav.results'], ['timemachine.html', 'nav.timemachine'],
   ['objects.html', 'nav.evidence'], ['science.html', 'nav.science'], ['failed.html', 'nav.failed'],
   ['about.html', 'nav.about'],
 ];
