@@ -38,8 +38,11 @@ We list every approach that did not work, because a result is only believable if
 - A stale index file made an early run see only one week of data; caught when a bright asteroid was found in 18 pictures instead of 282.
 - Downloads with no time-out froze a run for 40 minutes; every read now times out.
 
-## 9. Results of the pre-registered tests
-(Filled in from data/findings/e1.json–e4.json as each test finishes, whatever the outcome.)
+## 9. Results of the tests we fixed in advance
+- **Sensitivity (planted sources, 20 random patches):** no method found half of the planted sources even at 20 times the single-picture noise, so our pre-registered comparison has no winner. See item 11.
+- **False changes (20 random patches):** viewing one detector at a time cut the changes a plain blink flags by a median of 93%. Our colour-aware view flagged 26% more changes than that simpler view.
+- **Real moving objects (known asteroids, 36 patches):** see item 14 — this did not work.
+- **WISE 0855 (combined along its path):** detected; see its result card.
 
 ## 10. A neighbouring star was silently dropped
 **What happened.** Our fitting code treated any catalogued star within 0.7 pixels of the target as "the target itself" and left it out. Around WISE 0855 a star of magnitude 16.3 sits 0.7 pixels from the brown dwarf's predicted position in the third sky survey, so its light was added to the brown dwarf's (a control at short wavelengths, where WISE 0855 is invisible, showed the leak).
@@ -56,3 +59,9 @@ We list every approach that did not work, because a result is only believable if
 ## 13. Measuring Barnard's Star's motion did not work
 **What happened.** Barnard's Star is bright enough to saturate SPHEREx's detector. With its saturated centre masked, our position fits rest on the star's outer light, and the motion we derive (about −5.0 ± 1.9 and +5.6 ± 1.5 arcseconds per year) disagrees with Gaia's (−0.80 and +10.36). The same method works for the fainter Epsilon Indi B, where it matches Gaia.
 **What we show instead.** The difference between the two sky surveys, where the star's light visibly shifts north as expected — as a picture, not as a measurement.
+
+
+## 14. Our change maps miss real asteroids
+**What happened.** In 36 patches of sky we checked every known asteroid brighter than magnitude 19 against our change maps. The colour-aware view caught 2 of 79 asteroid sightings and the one-detector view caught none.
+**Why.** Two reasons. Most of these asteroids (57 of 79) are fainter than a single SPHEREx picture can show, so no single-picture method can catch them — that is what combining pictures along a path is for. The brighter ones were erased by us: the archive marks pixels that disagree with other visits as "outliers", which is exactly what a moving object does, and our change maps removed those pixels. With that removal switched off, the brightest test asteroid (V = 14.6) was caught in all 8 of its pictures (a diagnostic, not a pre-registered result).
+**What this means.** Today, Orrery's change maps are a tool for seeing colour flicker and bright changes, not for finding moving asteroids. For movers, use the "combine along a path" view, and the survey difference for nearby stars. The outlier masking must be replaced before any search.
