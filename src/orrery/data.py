@@ -1,4 +1,5 @@
 """Stamp: the unit of data (docs/INTERFACES.md, "Stamp")."""
+import time
 from dataclasses import dataclass
 
 import numpy as np
@@ -73,9 +74,18 @@ class Frame:
     def __init__(self, key):
         self.key = key
         self.url = f"{BUCKET}/{key}"
-        self.hdul = fits.open(self.url, use_fsspec=True, lazy_load_hdus=True,
-                              fsspec_kwargs={"block_size": 2 ** 17, "cache_type": "bytes",
-                                             "client_kwargs": {"timeout": _timeout()}})
+        # fsspec reports any failed size lookup (throttling, timeouts) as FileNotFoundError; the files
+        # do exist (checked 2026-11-15), so retry with backoff before giving up.
+        for attempt in range(4):
+            try:
+                self.hdul = fits.open(self.url, use_fsspec=True, lazy_load_hdus=True,
+                                      fsspec_kwargs={"block_size": 2 ** 17, "cache_type": "bytes",
+                                                     "client_kwargs": {"timeout": _timeout()}})
+                break
+            except (FileNotFoundError, OSError):
+                if attempt == 3:
+                    raise
+                time.sleep(5 * 2 ** attempt)
         h = self.hdul["IMAGE"].header
         self.header = h
         self.wcs = WCS(h)

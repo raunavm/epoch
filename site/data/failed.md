@@ -82,5 +82,5 @@ We list every approach that did not work, because a result is only believable if
 
 ## 18. A blind asteroid test fell short of its own success level
 **What happened.** We drew 12 new faint asteroids at random and, before measuring, wrote down how clearly each should show up when its pictures are combined. We had required that at least 70% of those expected to show clearly reach 5σ; 3 of 5 did (60%). The brightness part of the test passed (0.92 times the prediction), and no empty path raised a false alarm (0 of 288).
-**Why (flagged before the run).** The prediction used the noise the fit reports; empty paths show the real noise is about 2.5 times larger. With the measured noise, prediction and measurement agree. About half of the listed pictures for some asteroids could not be downloaded from the public bucket.
+**Why (flagged before the run).** The prediction used the noise the fit reports; empty paths show the real noise is about 2.5 times larger. With the measured noise, prediction and measurement agree. For some asteroids about half of the pictures failed to download during the run; the files are on the public archive (checked afterwards), so the failures were temporary.
 **What we would do next.** Predict with the empty-path noise from the start, and test on a larger blind sample.
