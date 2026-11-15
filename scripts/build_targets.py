@@ -57,7 +57,7 @@ def add_e11(tid, card):
                         round(c["mean_ratio_spherex_over_jwst"], 2), round(c["mean_ratio_err"], 2), method="science.html#e11"))
         figs.append(dict(src="data/figs/e11_wise0855.png", href="science.html#e11",
                          alt="SPHEREx spectrum of WISE 0855 from 3.8 to 5 micrometres, following the JWST spectrum",
-                         caption=(f"SPHEREx spectrum ({t['n_pictures_used']} pictures; blue) next to JWST (Luhman et al. 2024; orange). "
+                         caption=(f"SPHEREx spectrum ({sum(b['n'] for b in t['bins'])} pictures at 3.8–5 µm; blue) next to JWST (Luhman et al. 2024; orange). "
                                   "The two reddest points are lower than JWST; we do not know why.")))
     elif tid == "epsindib":
         nums.append(num("Absorption bands found in its SPHEREx spectrum (water, methane, carbon monoxide)", len(t["bands_named"]), None,

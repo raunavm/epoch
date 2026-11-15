@@ -108,7 +108,7 @@
    "src": "data/figs/e11_wise0855.png",
    "href": "science.html#e11",
    "alt": "SPHEREx spectrum of WISE 0855 from 3.8 to 5 micrometres, following the JWST spectrum",
-   "caption": "SPHEREx spectrum (238 pictures; blue) next to JWST (Luhman et al. 2024; orange). The two reddest points are lower than JWST; we do not know why."
+   "caption": "SPHEREx spectrum (91 pictures at 3.8\u20135 \u00b5m; blue) next to JWST (Luhman et al. 2024; orange). The two reddest points are lower than JWST; we do not know why."
   }
  ],
  "generated_with": "scripts in this repository"

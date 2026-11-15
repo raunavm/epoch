@@ -1,6 +1,6 @@
 # Orrery site
 
-Static site: plain HTML, CSS and JavaScript modules. No build step, no framework, and no requests to outside services at runtime. It uses system fonts only.
+Static site: plain HTML, CSS and JavaScript modules. No build step and no framework; it uses system fonts only. Pixels come from NASA's public SPHEREx bucket on AWS. Two optional overlays, only when switched on, also call outside services: the Gaia DR3 overlay (VizieR `I/355/gaiadr3` on the CfA mirror, falling back to GAVO's `gaia.dr3lite` TAP) and the WISE comparison (AllWISE W2 HiPS tiles from NASA/IPAC IRSA's mirror of the CDS HiPS).
 
 ## Run
 
@@ -43,10 +43,13 @@ Every number on the landing page, the target cards and the findings is a button 
 3. It applies TAN-SIP world→pixel (`js/live/wcs.js`: inverse SIP, then Newton iterations on the forward SIP). It resamples bilinearly onto a north-up 6.15″ grid centred on the target and takes the wavelength from `wave_tables.json` (`js/live/grid.js`).
 4. When all frames are in, it runs the change model, revision 2 in `docs/INTERFACES.md` (`js/live/change.js`). The noise floor `f` is read from `data/f1_calibration.json` `{f}`; until that file exists the page uses 0.1 and marks it provisional. Live mode has no FLAGS plane, so single-pixel spikes are removed with a 3×3 median test. This step enables Corrected, Add (per-detector co-adds) and Subtract (earlier pictures minus later ones, split at the largest gap in time; made from the colour-aware pictures). The finding-1 headline comes only from `findings.json` f1; the live counts are labelled "this view (live)".
 5. Clicking a pixel gives quick aperture photometry for every frame, with a CSV download.
+6. `&gaia=1` (button "Show Gaia DR3 stars", `js/live/gaia.js`): Gaia DR3 stars moved from J2016.0 to each picture's date; arrows show 10 years of motion for stars faster than 0.3″/yr; click a circle for its Gaia id, G and motion.
+7. `&wise=1` (view "Compare with WISE", `js/live/wise.js`): AllWISE W2 (2010) resampled onto the same grid, beside and blinking with the SPHEREx detector-6 median; with `wise=1` only detector-6 pictures are loaded unless "Load all" is pressed.
+8. `&exact=1` keeps a typed position even when it lies on the path of a fast-moving challenge target (otherwise the page re-centres on the target's current position and says so).
 
-A new data release needs new index files in `data/index/<release>/`, written by `scripts/build_tiles.py --release <name>`, and a one-line change: point `INDEX` in `js/live/live.js` at `data/index/<name>/`. Live mode shows one release at a time.
+A new data release needs new index files in `data/index/<release>/`, written by `scripts/build_tiles.py --release <name>`, and a one-line change: set `RELEASE` in `js/live/live.js` to `<name>`. Live mode shows one release at a time.
 
-Tests (pure functions; the WCS test reads real headers from S3, set `OFFLINE=1` to skip it):
+Tests (pure functions; the WCS test reads real headers from S3, set `OFFLINE=1` to skip it; network tests also touch IRSA and VizieR):
 
 ```bash
 node --test site/tests/live.test.mjs
