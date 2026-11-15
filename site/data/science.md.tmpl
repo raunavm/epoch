@@ -151,6 +151,12 @@ For an asteroid with a known orbit, we predict where it is in every picture (JPL
 
 We also tried modelling every picture star by star, using ESA Gaia's catalogue (one brightness per star per picture), and treating whatever is left as change. Measured on the calibration patch, its noise allowance was small ([[e6_floor.f6|pct]] of a star's brightness), so we ran it through the same planted-source test. It found essentially nothing at its frozen alarm threshold, and on the 20 test patches it raised far more false alarms than allowed. The likely reason: infrared sources that Gaia does not list (Gaia sees visible light) stay in every picture. Details: `data/findings/e6.json`.
 
+## A per-star change test {#e7}
+
+A pre-registered test (E7) looked at stars one at a time: one smooth spectrum per detector fitted to every picture of a star, against the same spectrum allowed to brighten or fade between visits, with significance judged against ordinary stars. **Error calibration (Gate 0):** on three control patches only, per-picture error bars turned out 1.1–3 times too small, depending on the detector; after a per-detector correction frozen on those patches, the pulls of constant stars have a spread of 1.01 (2.24 before) — figure `e7/gate0_pulls.png`. **Result: no verdict.** The comparison set we fixed in advance held only 7 ordinary stars, so the smallest reachable p-value was 0.125 and our p < 0.01 rule could not be met — a design error on our part. RW Aurigae and R Draconis also saturate the detector: R Draconis left 3 usable pictures of 250, and RW Aurigae's static fit is poor, so a change cannot be separated from a bad fit. Details: `data/findings/e7.json`; [What failed #16](failed.html).
+
+![Gate 0: pulls of constant control stars before and after the frozen per-detector error correction](e7/gate0_pulls.png)
+
 ## Are the error bars right?
 
 **Test E5: error calibration for every stack.** Combining hundreds of pictures can make small, correlated errors look significant. For every stack quoted on this site, we combine the same pictures along 24 empty paths beside the real one. The spread of the 12 inner paths gives a scale factor for our error bars; the 12 outer paths check it: after rescaling, their spread must lie within 0.9–1.1. If it does not, we report the measured spread and use the larger scale.
