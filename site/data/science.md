@@ -149,6 +149,18 @@ The challenge asks for spectra. Every SPHEREx picture sees a source at one colou
 
 **Barnard's Star did not work this way.** The same method on Barnard's Star gives a north–south motion of 5.6 ± 1.5 ″/yr, far from Gaia's 10.4 (`data/findings/motion_barnard.json`). Likely cause (untested): it is a bright star (Gaia G = 8.2) that saturates SPHEREx's detector, so with its centre masked the fit rests on its outer light; and only two time windows are available. We make no numeric motion claim for it. Its motion is still plain to see in the tool: subtracting the later pictures (Mar–May 2026) from the earlier ones (Aug–Oct 2025) shows it as an orange–blue pair ([open it](../timemachine.html?ra=269.4463&dec=4.7677&fov=2&mode=subtract)). The tool splits the pictures at the largest gap in time, and this picture is made from the experimental colour-aware pictures. It is a picture, not a measurement.
 
+###### E15 {#e15-label}
+
+## Using 102 colours: telling cold brown dwarfs by their methane {#e15}
+
+The challenge asks how SPHEREx's many colours can help. Cold brown dwarfs (T and Y types) have methane, which absorbs light near 3.3 µm, inside SPHEREx's range. We built one simple test — light in the 3.2–3.4 µm window divided by light on either side — and set its dividing line on 25 brown dwarfs whose types are already published from spectra (`docs/protocols/E15.md`, written down before any candidate was measured). Leaving each one out in turn, it called 91% of the decisive cases correctly; both mistakes sit at the boundary between the warmest methane dwarfs and the coolest L dwarfs.
+
+![Methane test examples](figs/e15_examples.png "SPHEREx spectra: an L dwarf, a T dwarf, a Y dwarf and a candidate")
+
+We then measured 11 faint objects listed as probable cold brown dwarfs from their colours alone, with no published spectrum in the sources we checked (including the large SPHEREx brown-dwarf atlases SPIFF and SUDA). With errors measured honestly from empty sky beside each object (a check we added after the first results), two show a clear methane dip: CWISE J075648−600130 and, marginally, WISEA J190005−310810. That agrees with the types already guessed from their colours, so it is an independent check of those guesses, not news about what they are; the other nine are too faint for SPHEREx to decide.
+
+![Methane index against colour](figs/e15_methane.png "Methane absorption against colour for known brown dwarfs and candidates")
+
 ###### E12 {#e12-label}
 
 ## A distance from one year of pictures {#e12}
