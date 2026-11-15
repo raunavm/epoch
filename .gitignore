@@ -12,3 +12,6 @@ data/stamps/
 data/cache/
 data/sia_*.xml
 site/dev-fixtures/*.png
+data/efields/
+dist/frames/
+data/e2_d1_runs/
