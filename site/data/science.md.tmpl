@@ -190,7 +190,7 @@ The pixel model was written twice, independently (one with numpy, one with JAX, 
 
 - DR1 only. Later releases need only a new index (`scripts/build_tiles.py`).
 - Single-picture change detection needs bright changes, about 20 times the noise or more.
-- Single-picture change maps do not find faint moving asteroids (E3: 0/79 and 2/79 known-asteroid sightings); our masking of the archive's outlier flag erased the brighter ones.
+- Single-picture change maps do not find faint moving asteroids (E3: 0/79 and 2/79 known-asteroid sightings); our masking of the archive's outlier flag erased the brighter ones; a follow-up pre-registered test with the flag left in (E3b) caught 0 of 17 sightings on 10 new patches (`data/findings/e3b.json`).
 - The colour-aware view is experimental; it lost its pre-registered test.
 - Spectra on click in the browser use quick aperture sums, not the full model.
 - No search for unknown objects was run.
