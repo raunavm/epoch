@@ -108,9 +108,13 @@ for tid, name in (("rwaur", "RW Aurigae — a young variable star"), ("rdra", "R
     write(tid, dict(
         title=name,
         status="not measured yet",
-        plain_result=(f"Not measured yet. {f['n_frames']} SPHEREx pictures of this variable star are available in the Time Machine; "
-                      "measuring how its brightness changes needs one brightness per picture after removing its colour, which we have not done. "
-                      "The counts are for the whole patch of sky, not for the star itself."),
+        plain_result=(f"Not measured yet. {f['n_frames']} SPHEREx pictures of this variable star are available in the Time Machine. "
+                      + ("We tried a per-star test (one brightness per picture, colour removed, compared with ordinary stars), but this star "
+                         "saturates SPHEREx's detector in most pictures: our fit of its outer light is poor, so a change cannot be told apart from "
+                         "a bad fit (What failed #16). " if tid == "rwaur" else
+                         "We tried a per-star test, but this star saturates SPHEREx's detector in almost every picture (3 usable of 250), so it "
+                         "cannot be measured with our method (What failed #16). ")
+                      + "The counts below are for the whole patch of sky, not for the star itself."),
         numbers=[num("Pictures", f["n_frames"], None, kind="data"),
                  num("Flagged changes, plain blink", f["n_naive_all"], None),
                  num("Flagged changes, one detector at a time", f["n_naive_det"], None),
