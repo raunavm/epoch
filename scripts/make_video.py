@@ -49,79 +49,87 @@ def load(path, size):
     return Image.open(os.path.join(SITE, path)).convert("RGB").resize(size, Image.NEAREST)
 
 
-def seg_reveal(rev, frames_out, n_frames):
-    singles = rev["frames"]
-    stacks = rev["stack_pngs"]
-    N = rev["n_frames"]
+def seg_blink_vs_det(field_name, frames_out, n_frames):
+    """Change maps from the frozen change module on the cached field (E2 rule, k = 5): left, each picture minus the
+    previous picture in time (plain blink); right, minus the previous picture from the SAME detector. Flagged changes
+    (≥ 2 pixels beyond 5σ) are circled. Diverging colours, clipped at ±5σ."""
+    import sys as _s
+    _s.path.insert(0, "src")
+    from orrery.change import change_model, find_changes
+    z = np.load(f"data/cache/fields/{field_name}_S48.npz", allow_pickle=True)
+    f = json.load(open("data/findings/f1_calibration.json"))["f"]
+    out = change_model(z["v"], z["lam"], z["detector"], z["mjd"], f)
+    order = np.argsort(z["mjd"])
+    pairs = [(out["naive_all"][e], out["naive_det"][e]) for e in order if out["naive_all"][e] is not None and out["naive_det"][e] is not None]
+    def render(m):
+        rgb = np.zeros(m.shape + (3,))
+        x = np.clip(np.nan_to_num(m) / 5, -1, 1)
+        pos, neg = np.clip(x, 0, 1), np.clip(-x, 0, 1)
+        rgb += pos[..., None] * np.array([230, 159, 0]) + neg[..., None] * np.array([86, 180, 233])
+        im = Image.fromarray(rgb.astype(np.uint8)[::-1]).resize((420, 420), Image.NEAREST)
+        dd = ImageDraw.Draw(im)
+        for c in find_changes(m):
+            yx = np.array(c["pixels"] if isinstance(c, dict) and "pixels" in c else c, float).reshape(-1, 2) if not isinstance(c, dict) else None
+            if isinstance(c, dict):
+                cx, cy = c.get("x", c.get("cx")), c.get("y", c.get("cy"))
+            else:
+                cy, cx = yx[:, 0].mean(), yx[:, 1].mean()
+            X, Y = (cx + 0.5) * 420 / 48, (48 - cy - 0.5) * 420 / 48
+            dd.ellipse([X - 16, Y - 16, X + 16, Y + 16], outline=(255, 255, 255), width=2)
+        return im, len(find_changes(m))
+    tot_a = tot_d = 0
+    for k in range(n_frames):
+        ma, md = pairs[(k // 4) % len(pairs)]
+        ia, na = render(ma); idd, nd = render(md)
+        if k % 4 == 0:
+            tot_a += na; tot_d += nd
+        im, d = canvas()
+        im.paste(ia, (130, 110)); im.paste(idd, (730, 110))
+        d.text((130, 62), "Plain blink: what changed?", font=font(30), fill=FG)
+        d.text((730, 62), "One detector at a time", font=font(30), fill=FG)
+        d.text((130, 540), f"flagged so far: {tot_a}", font=font(24), fill=FG)
+        d.text((730, 540), f"flagged so far: {tot_d}", font=font(24), fill=FG)
+        tag(d, 400, 540, "DERIVED", (0, 158, 115)); tag(d, 1000, 540, "DERIVED", (0, 158, 115))
+        subtitle(d, "Plain blink: everything flickers" if k < n_frames / 2 else "Most of that flicker is colour, not change")
+        frames_out.append(im)
+
+
+def seg_reveal(rev, frames_out, n_frames, title):
+    singles, stacks, N = rev["frames"], rev["stack_pngs"], rev["n_frames"]
     for k in range(n_frames):
         t = k / n_frames
         im, d = canvas()
         si = singles[int(t * (len(singles) - 1))]
-        n_show = max(1, int(round(1 + t ** 1.6 * (N - 1))))
+        n_show = max(1, int(round(1 + t ** 1.4 * (N - 1))))
         st = [s for s in stacks if s["n"] <= n_show][-1]
         im.paste(load(si["single_png"], (420, 420)), (130, 110))
         im.paste(load(st["png"], (420, 420)), (730, 110))
-        f = font(30)
-        d.text((130, 62), "One picture", font=f, fill=FG)
-        d.text((730, 62), f"{st['n']} pictures combined", font=f, fill=FG)
-        tag(d, 130, 540, "DATA", (0, 158, 115))
-        tag(d, 730, 540, "DERIVED", (0, 158, 115))
-        subtitle(d, "Too faint for any single picture" if t < 0.5 else "Combine them along its path: there it is")
+        d.text((130, 62), "One picture", font=font(30), fill=FG)
+        d.text((730, 62), f"{st['n']} pictures along its path", font=font(30), fill=FG)
+        tag(d, 130, 540, "DATA", (0, 158, 115)); tag(d, 730, 540, "DERIVED", (0, 158, 115))
+        subtitle(d, title if t < 0.45 else "Combine pictures along its path: there it is")
         frames_out.append(im)
 
 
-def seg_blink(field, frames_out, n_frames):
-    fr = [f for f in field["frames"] if f.get("corr_png")]
-    lab = [f for f in fr if f.get("labels")]
-    seq = (lab if len(lab) >= 6 else fr)[:24]
+def seg_shift(shot, crop, frames_out, n_frames):
+    im0 = Image.open(shot).convert("RGB").crop(crop).resize((460, 460), Image.NEAREST)
     for k in range(n_frames):
-        f = seq[(k // 8) % len(seq)]
         im, d = canvas()
-        im.paste(load(f["img_png"], (420, 420)), (130, 110))
-        im.paste(load(f["corr_png"], (420, 420)), (730, 110))
-        sc = 420 / field["size_px"]
-        for L in f.get("labels", []):
-            if L.get("label") == "known asteroid":
-                x, y = 730 + (L["x"] + 0.5) * sc, 110 + (field["size_px"] - L["y"] - 0.5) * sc
-                d.ellipse([x - 18, y - 18, x + 18, y + 18], outline=ACC, width=3)
-        f30 = font(30)
-        d.text((130, 62), "Plain blink", font=f30, fill=FG)
-        d.text((730, 62), "Colour-corrected", font=f30, fill=FG)
-        d.text((130, 540), f"{f['date']}   {f['wl_um']:.2f} µm", font=font(22, False), fill=FG)
-        tag(d, 730, 540, "MODEL / RESIDUAL", (204, 121, 167))
-        subtitle(d, "Raw: colour shifts look like change" if k < n_frames / 2 else "Corrected: only real movers stay")
+        im.paste(im0, (410, 70))
+        d.text((410, 30), "Barnard's Star: survey 1 minus survey 2", font=font(28), fill=FG)
+        tag(d, 410, 540, "MODEL / RESIDUAL", (204, 121, 167))
+        subtitle(d, "Six months apart: the star has moved")
         frames_out.append(im)
 
 
-def seg_object(shot, frames_out, n_frames, line):
-    base = Image.open(shot).convert("RGB")
-    s = min(W / base.width, (H - 120) / base.height)
-    base = base.resize((int(base.width * s), int(base.height * s)))
+def seg_numbers(nums, frames_out, n_frames):
     for k in range(n_frames):
         im, d = canvas()
-        im.paste(base, ((W - base.width) // 2, 10))
-        subtitle(d, line)
-        frames_out.append(im)
-
-
-def seg_numbers(fnd, frames_out, n_frames):
-    lines = []
-    if "f2" in fnd:
-        g = fnd["f2"]["detail"]
-        lines.append((f"{10 ** (0.4 * g['depth_gain_mag']):.0f}×", "fainter than one picture can see"))
-    if "f1" in fnd:
-        lines.append((f"{fnd['f1']['number']}%", "of plain-blink 'changes' were only colour"))
-    if "f3" in fnd:
-        lines.append((f"{fnd['f3']['detail']['n']}", f"asteroid sizes, typical {fnd['f3']['number']}% from NEOWISE"))
-    if "f4" in fnd:
-        lines.append((f"V {float(fnd['f4']['number']):.1f}", "faintest planted test objects recovered (half the time)"))
-    for k in range(n_frames):
-        im, d = canvas()
-        shown = min(len(lines), 1 + int(k / n_frames * len(lines) * 1.3))
-        for i, (big, small) in enumerate(lines[:shown]):
-            y = 70 + i * 135
-            d.text((150, y), big, font=font(84), fill=ORG)
-            d.text((520, y + 26), small, font=font(36, False), fill=FG)
+        shown = min(len(nums), 1 + int(k / n_frames * len(nums) * 1.3))
+        for i, (big, small) in enumerate(nums[:shown]):
+            y = 50 + i * 140
+            d.text((120, y), big, font=font(80), fill=ORG)
+            d.text((560, y + 24), small, font=font(32, False), fill=FG)
         subtitle(d, "Measured, and checked against independent data")
         frames_out.append(im)
 
@@ -131,12 +139,12 @@ def seg_name(url, frames_out, n_frames):
         im, d = canvas()
         t = "Orrery"
         d.text(((W - d.textlength(t, font=font(120))) / 2, 170), t, font=font(120), fill=FG)
-        s = "everything that moves, in 102 colors"
-        d.text(((W - d.textlength(s, font=font(40, False))) / 2, 320), s, font=font(40, False), fill=ACC)
+        s = "At this spot in the sky, what really changed?"
+        d.text(((W - d.textlength(s, font=font(38, False))) / 2, 320), s, font=font(38, False), fill=ACC)
         d.text(((W - d.textlength(url, font=font(34))) / 2, 420), url, font=font(34), fill=FG)
         s2 = "NASA SPHEREx public data · Space Apps 2026"
         d.text(((W - d.textlength(s2, font=font(26, False))) / 2, 480), s2, font=font(26, False), fill=FG)
-        subtitle(d, "Try any patch of sky")
+        subtitle(d, "Try any spot in the sky")
         frames_out.append(im)
 
 
@@ -146,27 +154,37 @@ def srt_time(s):
 
 
 def main(a):
-    rev = json.load(open(f"{SITE}/reveal.json"))
     field = json.load(open(f"{SITE}/timemachine/{a.field}.json"))
-    fnd = json.load(open(f"{SITE}/findings.json"))
+    e4r = json.load(open(f"{SITE}/e4/reveal.json"))
+    hl = json.load(open(f"{SITE}/headline.json"))
+    e4 = json.load(open("data/findings/e4.json"))
+    mo = json.load(open("data/findings/motion_epsindib.json"))
+    meta = json.load(open(f"{SITE}/index/dr1/meta.json"))
+    pm = mo["proper_motion"]
+    nums = [(f"{hl['number']}%", "of plain-blink changes are only colour"),
+            (f"{e4['passes'][1]['significance']:.0f}σ", "coldest known brown dwarf, at Spitzer's brightness"),
+            (f"{pm['pmra']['spherex_mas_yr']/1000:.2f}″/yr", f"Eps Indi B's motion; Gaia says {pm['pmra']['gaia_mas_yr']/1000:.2f}"),
+            (f"{meta['n_frames']:,}", "SPHEREx pictures indexed, any spot in the sky")]
     os.makedirs("dist/frames", exist_ok=True)
+    for f in os.listdir("dist/frames"):
+        os.remove(os.path.join("dist/frames", f))
     frames = []
-    seg_reveal(rev, frames, 6 * FPS)
-    seg_blink(field, frames, 7 * FPS)
-    seg_object(a.object_shot, frames, 7 * FPS, "Every number: check it against NEOWISE and Gaia")
-    seg_numbers(fnd, frames, 6 * FPS)
+    seg_blink_vs_det(a.field, frames, 7 * FPS)
+    seg_reveal(e4r, frames, 6 * FPS, "The coldest known brown dwarf: faint in one picture")
+    seg_shift(a.shift_shot, tuple(int(x) for x in a.shift_crop.split(",")), frames, 6 * FPS)
+    seg_numbers(nums, frames, 7 * FPS)
     seg_name(a.url, frames, 4 * FPS - 6)  # finish safely under 30.0 s
     for i, im in enumerate(frames):
         im.save(f"dist/frames/{i:04d}.png")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(FPS), "-i", "dist/frames/%04d.png",
                     "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", "dist/orrery_demo.mp4"], check=True)
-    subs = [(0, 3, "Too faint for any single picture"), (3, 6, "Combine them along its path: there it is"),
-            (6, 9.5, "Raw: colour shifts look like change"), (9.5, 13, "Corrected: only real movers stay"),
-            (13, 20, "Every number: check it against NEOWISE and Gaia"), (20, 26, "Measured, and checked against independent data"),
-            (26, 29.7, "Try any patch of sky")]
+    subs = [(0, 3.5, "Plain blink: everything flickers"), (3.5, 7, "Most of that flicker is colour, not change"),
+            (7, 9.7, "The coldest known brown dwarf: faint in one picture"), (9.7, 13, "Combine pictures along its path: there it is"),
+            (13, 19, "Six months apart: the star has moved"), (19, 26, "Measured, and checked against independent data"),
+            (26, 29.7, "Try any spot in the sky")]
     with open("dist/orrery_demo.srt", "w") as f:
-        for i, (s, e, t) in enumerate(subs, 1):
-            f.write(f"{i}\n{srt_time(s)} --> {srt_time(e)}\n{t}\n\n")
+        for i, (s_, e_, t) in enumerate(subs, 1):
+            f.write(f"{i}\n{srt_time(s_)} --> {srt_time(e_)}\n{t}\n\n")
     dur = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", "dist/orrery_demo.mp4"]).decode())
     print("duration_s", dur)
     assert dur < 30.0, "video exceeds 30 s"
@@ -176,5 +194,6 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--url", default="Orrery · SPHEREx Space Apps 2026")
     ap.add_argument("--field", default="ecliptic_control")
-    ap.add_argument("--object-shot", default="dist/object_shot.png")
+    ap.add_argument("--shift-shot", default="dist/barnard_sub.png")
+    ap.add_argument("--shift-crop", default="123,908,543,1328", help="x0,y0,x1,y1 of the subtract image in the screenshot")
     main(ap.parse_args())
