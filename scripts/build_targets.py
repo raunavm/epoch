@@ -23,32 +23,37 @@ def write(tid, card):
     print(tid, "->", card["plain_result"][:120])
 
 
-# WISE 0855 — E4
+# WISE 0855 — E4 (wording narrowed per docs/REFEREE.md items 4–5)
 e4 = load("data/findings/e4.json")
 if e4:
     p = e4["passes"]
     p2 = p[1]
-    p3 = p[2].get("neighbour_restored") or p[2]  # pass 3 with the wrongly dropped Gaia neighbour put back (see deviations)
+    p3 = p[2].get("neighbour_restored") or p[2]
     sh = e4["centroid_shift_vs_prediction"][0]
-    sl = e4["slider_stack"]
+    ctrl = e4["control_short_wavelength"][1]["neighbour_restored"]
+    exp = e4["expected_flux_mJy"]
     write("wise0855", dict(
         title="WISE 0855−0714 — the coldest known brown dwarf",
-        plain_result=(f"Too faint for most single pictures, but where it should be at 4.4–5 µm SPHEREx measures "
-                      f"{p2['a_hat_mJy']:.2f} ± {p2['sigma_a_mJy']:.2f} mJy in its second sky survey — the brightness Spitzer measured "
-                      f"({e4['expected_flux_mJy']['IRAC_4p5']:.2f} mJy) — and it moved between surveys as predicted; standing still is ruled out."),
-        numbers=[num("Signal in survey 2, against 24 empty paths", round(p2["significance"], 1), unit="σ",
+        plain_result=(f"At 4.4–5 µm, combining SPHEREx pictures along its known path gives a clear signal where it should be: "
+                      f"{p2['a_hat_mJy']:.2f} ± {p2['sigma_a_mJy']:.2f} mJy in the Nov–Dec 2025 visits, between the brightness Spitzer "
+                      f"({exp['IRAC_4p5']:.2f} mJy) and WISE ({exp['WISE_W2']:.2f} mJy) measured in similar bands. Between visits it shifts the way "
+                      "its known motion predicts, and a source standing still fits the positions far worse. A statement about a known object, not a discovery."),
+        numbers=[num("Signal, Nov–Dec 2025 visits, against 24 empty paths", round(p2["significance"], 1), unit="σ",
                      nulls=p2.get("null_snrs"), nulls_note="same pictures, path shifted 6–9 px", method="science.html#e4"),
-                 num("Signal in survey 3 (a neighbour star restored to the model)", round(p3.get("significance", float("nan")), 1), unit="σ",
+                 num("Signal, Apr–May 2026 visits (a neighbouring star restored to the model)", round(p3.get("significance", float("nan")), 1), unit="σ",
                      method="science.html#e4"),
-                 num("Brightness at 4.4–5 µm, survey 2", round(p2["a_hat_mJy"], 3), round(p2["sigma_a_mJy"], 3), unit="mJy", kind="derived"),
-                 num("Shift between surveys vs prediction", f"{sh['measured_shift_arcsec'][0]:+.1f}″, {sh['measured_shift_arcsec'][1]:+.1f}″ "
-                     f"(predicted {sh['predicted_shift_arcsec'][0]:+.1f}″, {sh['predicted_shift_arcsec'][1]:+.1f}″)", None, unit=""),
-                 num("Chance it is a source that does not move", f"{sh['p_vs_stationary']:.0e}", None, unit="")],
+                 num("Brightness at 4.4–5 µm, Nov–Dec 2025", round(p2["a_hat_mJy"], 3), round(p2["sigma_a_mJy"], 3), unit="mJy"),
+                 num("Shift between visit windows: measured", f"{sh['measured_shift_arcsec'][0]:+.1f}″, {sh['measured_shift_arcsec'][1]:+.1f}″", None),
+                 num("Shift between visit windows: predicted", f"{sh['predicted_shift_arcsec'][0]:+.1f}″, {sh['predicted_shift_arcsec'][1]:+.1f}″", None, kind="model"),
+                 num("Match to prediction (p-value)", round(sh["p_vs_prediction"], 2), None),
+                 num("Same test for a source standing still (p-value)", f"{sh['p_vs_stationary']:.0e}", None)],
         evidence_links=[dict(text="All 46 pictures used (4.4–5 µm)", href="science.html#e4"),
                         dict(text="Astrometry: Luhman & Esplin 2016, AJ 152, 78", href="https://arxiv.org/abs/1605.06655")],
-        method_note=("Position predicted from proper motion and parallax (Luhman & Esplin 2016); each picture fitted with Gaia stars; "
-                     "pictures at 4.4–5 µm combined per survey; significance quoted against the same path shifted to 24 empty positions. "
-                     "A statement about a known object, not a discovery. Survey 1 has 3 usable pictures and is not informative."),
+        method_note=("Position from proper motion and parallax (Luhman & Esplin 2016); each picture fitted with Gaia stars; pictures at 4.4–5 µm "
+                     "combined per visit window; significance against the same path shifted to 24 empty positions. Caveats: a G = 16.3 star sits "
+                     "0.7–1.4 pixels away (our code first dropped it; restored — see What failed); at short wavelengths, where the brown dwarf is "
+                     f"invisible, the Nov–Dec 2025 control is {ctrl['a_hat_mJy']:+.3f} ± {ctrl['sigma_a_mJy']:.3f} mJy, not zero, likely the neighbour's "
+                     "model; the May 2025 window has only 3 usable pictures and is not informative."),
         method_anchor="science.html#e4", slider="e4/reveal.json"))
 
 # Motion measurements (Epsilon Indi B, Barnard's Star)
@@ -79,7 +84,7 @@ for tid, name in (("epsindib", "Epsilon Indi B — a pair of nearby brown dwarfs
         continue
     write(tid, dict(
         title=name,
-        plain_result=(f"From SPHEREx pictures alone we measured how fast it moves across the sky: "
+        plain_result=(f"From SPHEREx positions (with Gaia's distance held fixed) we measured how fast it moves across the sky: "
                       f"{pa['spherex_mas_yr']/1000:+.2f} ± {pa['err_mas_yr']/1000:.2f}″ and {pd_['spherex_mas_yr']/1000:+.2f} ± {pd_['err_mas_yr']/1000:.2f}″ per year "
                       f"(east–west, north–south). ESA's Gaia measured {pa['gaia_mas_yr']/1000:+.2f}″ and {pd_['gaia_mas_yr']/1000:+.2f}″."),
         numbers=[num("Motion east–west (SPHEREx)", round(pa["spherex_mas_yr"] / 1000, 3), round(pa["err_mas_yr"] / 1000, 3), unit="″/yr"),
@@ -90,28 +95,24 @@ for tid, name in (("epsindib", "Epsilon Indi B — a pair of nearby brown dwarfs
         evidence_links=[dict(text="Per-picture positions (data/findings/motion_%s.json)" % tid, href="science.html#motion"),
                         dict(text="Gaia DR3 (Vallenari et al. 2023)", href="https://www.cosmos.esa.int/web/gaia/dr3")],
         method_note=("Each picture is fitted with the star's position free, saturated pixels masked and Gaia neighbours modelled; "
-                     "the motion is a straight-line fit to SPHEREx positions alone with Gaia's parallax held fixed. "
+                     "the motion is a straight-line fit to SPHEREx positions with Gaia's parallax held fixed. "
                      + ("Positions sit a steady ~0.5″ south of Gaia's prediction in every survey; the pair is unresolved, so a shifted centre of light is possible — not explained here." if tid == "epsindib" else "")),
         method_anchor="science.html#motion"))
 
-# Variables: report what the change view shows, with honest scope
-for tid, name, kind in (("rwaur", "RW Aurigae — a young variable star", "variable"), ("rdra", "R Draconis — a pulsating giant star", "variable")):
+# Variables: neutral counts only (referee items on R Dra / RW Aur cards)
+for tid, name in (("rwaur", "RW Aurigae — a young variable star"), ("rdra", "R Draconis — a pulsating giant star")):
     f = load(f"data/findings/f1_{tid}.json")
     if not f:
         continue
     write(tid, dict(
         title=name,
-        plain_result=(f"{f['n_frames']} SPHEREx pictures over {f['n_passes']} visits. "
-                      + (f"The star really changes brightness, and the colour-aware view keeps flagging it: {f.get('corrected_matched_known', 0)} of the "
-                         f"{f['n_corrected']} remaining changes are at the star itself. " if f.get('corrected_matched_known', 0) > 0 else
-                         f"None of the {f['n_corrected']} remaining changes were matched to the star itself — likely because a star this bright "
-                         "saturates SPHEREx's detector at its centre, where pixels are excluded (not yet checked for this field). ")
-                      + "A light curve (one brightness per picture after removing the star's colour) is not measured yet."),
+        plain_result=(f"{f['n_frames']} SPHEREx pictures. This star really changes brightness, so every view should keep flagging it; "
+                      "measuring how much it changes needs one brightness per picture after removing its colour, which we have not done yet. "
+                      "Below are the raw counts of flagged changes in this patch for each view, without interpretation."),
         numbers=[num("Pictures", f["n_frames"], None, kind="data"),
-                 num("Changes in a time-ordered blink", f["n_naive_all"], None),
-                 num("Changes in a same-detector blink", f["n_naive_det"], None),
-                 num("Changes after the colour-aware view", f["n_corrected"], None),
-                 num("…of which at the star itself", f.get("corrected_matched_known", 0), None)],
+                 num("Flagged changes, plain blink", f["n_naive_all"], None),
+                 num("Flagged changes, one detector at a time", f["n_naive_det"], None),
+                 num("Flagged changes, colour-aware view (experimental)", f["n_corrected"], None)],
         evidence_links=[dict(text="Open the prepared field", href=f"timemachine.html?field={tid}")],
-        method_note="Counts use the frozen change model (revision 2). A variable star should keep showing up after correction; a still star should not.",
+        method_note="Counts use the same rule as the 20-patch test (groups of ≥ 2 pixels beyond 5σ).",
         method_anchor="science.html#which-change-is-real"))

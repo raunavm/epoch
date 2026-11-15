@@ -1,0 +1,111 @@
+{
+ "version": "B",
+ "field": "ecliptic_control",
+ "question": "At this spot in the sky, what really changed?",
+ "number": 93,
+ "unit": "%",
+ "err_low": 90,
+ "err_high": 96,
+ "kind": "derived",
+ "number_label": "of the changes a plain blink shows are only colour",
+ "sentence": "SPHEREx photographs each spot in a different infrared colour every time, so a plain blink flickers even when nothing moved. Watching one detector at a time removes a median 93% of those changes (20 random patches of sky; 95% range 90\u201396%; worst patch 22%).",
+ "modes": [
+  {
+   "id": "all",
+   "label": "Plain blink (every picture, in time order)"
+  },
+  {
+   "id": "det",
+   "label": "One detector at a time"
+  },
+  {
+   "id": "corr",
+   "label": "Colour-aware view (experimental)"
+  }
+ ],
+ "default_mode": "all",
+ "method": "science.html#which-change-is-real",
+ "evidence_note": "Per patch of sky: changes in a plain blink \u2192 changes when each detector is viewed on its own (data/findings/e2.json).",
+ "evidence": [
+  {
+   "text": "e2_00 (|b| 41\u00b0): 629 \u2192 57",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_01 (|b| 36\u00b0): 401 \u2192 43",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_02 (|b| 21\u00b0): 870 \u2192 27",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_03 (|b| 44\u00b0): 185 \u2192 25",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_04 (|b| -67\u00b0): 446 \u2192 36",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_05 (|b| 68\u00b0): 524 \u2192 41",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_06 (|b| 17\u00b0): 168 \u2192 40",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_07 (|b| -13\u00b0): 1208 \u2192 46",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_08 (|b| 23\u00b0): 1559 \u2192 47",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_09 (|b| 21\u00b0): 956 \u2192 31",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_10 (|b| 15\u00b0): 1430 \u2192 40",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_11 (|b| -3\u00b0): 659 \u2192 28",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_12 (|b| 79\u00b0): 216 \u2192 53",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_13 (|b| -61\u00b0): 55 \u2192 43",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_14 (|b| -41\u00b0): 195 \u2192 31",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_15 (|b| -32\u00b0): 1020 \u2192 58",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_16 (|b| -7\u00b0): 793 \u2192 34",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_17 (|b| 43\u00b0): 467 \u2192 45",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_18 (|b| 5\u00b0): 1808 \u2192 82",
+   "href": "science.html#which-change-is-real"
+  },
+  {
+   "text": "e2_19 (|b| 5\u00b0): 613 \u2192 33",
+   "href": "science.html#which-change-is-real"
+  }
+ ]
+}

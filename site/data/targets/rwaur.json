@@ -1,6 +1,6 @@
 {
  "title": "RW Aurigae \u2014 a young variable star",
- "plain_result": "225 SPHEREx pictures over 2 visits. The star really changes brightness, and the colour-aware view keeps flagging it: 11 of the 101 remaining changes are at the star itself. A light curve (one brightness per picture after removing the star's colour) is not measured yet.",
+ "plain_result": "225 SPHEREx pictures. This star really changes brightness, so every view should keep flagging it; measuring how much it changes needs one brightness per picture after removing its colour, which we have not done yet. Below are the raw counts of flagged changes in this patch for each view, without interpretation.",
  "numbers": [
   {
    "label": "Pictures",
@@ -10,29 +10,22 @@
    "unit": ""
   },
   {
-   "label": "Changes in a time-ordered blink",
+   "label": "Flagged changes, plain blink",
    "value": 1009,
    "err": null,
    "kind": "derived",
    "unit": ""
   },
   {
-   "label": "Changes in a same-detector blink",
+   "label": "Flagged changes, one detector at a time",
    "value": 54,
    "err": null,
    "kind": "derived",
    "unit": ""
   },
   {
-   "label": "Changes after the colour-aware view",
+   "label": "Flagged changes, colour-aware view (experimental)",
    "value": 101,
-   "err": null,
-   "kind": "derived",
-   "unit": ""
-  },
-  {
-   "label": "\u2026of which at the star itself",
-   "value": 11,
    "err": null,
    "kind": "derived",
    "unit": ""
@@ -44,6 +37,6 @@
    "href": "timemachine.html?field=rwaur"
   }
  ],
- "method_note": "Counts use the frozen change model (revision 2). A variable star should keep showing up after correction; a still star should not.",
+ "method_note": "Counts use the same rule as the 20-patch test (groups of \u2265 2 pixels beyond 5\u03c3).",
  "method_anchor": "science.html#which-change-is-real"
 }
