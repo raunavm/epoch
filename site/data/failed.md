@@ -3,7 +3,7 @@
 We list every approach that did not work, because a result is only believable if you can see what was tried and dropped. Each item says what happened and what we did about it.
 
 ## 1. Our first "corrected" view made things worse
-**What happened.** The first version of the colour-aware view, run on real pictures, flagged *more* changes than a plain blink (for example 53 against 46 around WISE 0855, and 591 against 277 in a crowded field).
+**What happened.** The first version of the colour-aware view, run on real pictures, flagged *more* changes than a plain blink in our first test fields.
 **Why.** SPHEREx's pixels are large compared with its sharpest images of stars. When pictures are lined up, bright stars land slightly differently on the pixels each time, and that leaves residues far larger than the background noise. Our outlier rejection also broke when a detector had only three or four pictures of a spot.
 **What we changed.** A noise allowance proportional to each star's brightness, measured on one calibration patch of sky and then frozen before any other patch was analysed; rejection of only the single worst picture at a time. Both views (plain and corrected) use the same noise rule, so the comparison stays fair.
 
@@ -12,7 +12,7 @@ We list every approach that did not work, because a result is only believable if
 **What we changed.** We withdrew the "removes 85%" headline and ran new, pre-registered tests: 20 random patches of sky, planted test sources at equal false-alarm rates, and recall of known asteroids (see the Science page). The headline is whatever those tests support.
 
 ## 3. Asteroid colours disagreed with Gaia — because asteroids spin
-**What happened.** Comparing SPHEREx colours taken on different days with ESA Gaia's spectra gave a slope three standard deviations off (6.8 ± 1.1 against 3.0 ± 0.1 % per 0.1 µm for asteroid 224 Oceana).
+**What happened.** Comparing SPHEREx colours taken on different days with ESA Gaia's spectra gave a three-standard-deviation disagreement in spectral slope for asteroid 224 Oceana.
 **Why.** An asteroid spins every few hours, so its brightness changes between visits; across visits that looks like colour.
 **What we changed.** Colours are compared only within one visit. Then they agree (χ²/dof 0.21 for Oceana).
 
@@ -26,30 +26,30 @@ We list every approach that did not work, because a result is only believable if
 **What we changed.** The difference is now part of the error (total ±11%); no water claim is made.
 
 ## 6. Our first faint asteroid was not really invisible
-**What happened.** The first object picked for the "too faint for any one picture" demonstration had three single pictures above 20 standard deviations — light from something it passed, not the asteroid.
+**What happened.** The first object picked for the "too faint for any one picture" demonstration had a few single pictures far above the detection level — light from something it passed, not the asteroid.
 **What we changed.** A quality rule (drop pictures whose fit near the object is poor), applied identically to single pictures and stacks, and a strict 5-standard-deviation definition of "detected".
 
 ## 7. Our error bars were too small
-**What happened.** Stacking along 24 empty paths beside an asteroid gave scatter 1.5–3 times larger than our error bars predicted.
+**What happened.** Stacking along 24 empty paths beside an asteroid gave scatter 1.5–2.5 times larger than our error bars predicted (asteroid stacks).
 **What we changed.** Every stacked significance on the site is quoted against those empty paths. The check that the correction itself is stable (estimate on 12 inner paths, verify on 12 outer paths) did not pass cleanly (0.77 instead of 0.9–1.1), so we use the larger, more conservative correction.
 
 ## 8. Engineering failures
 - NASA/IPAC's search services were down during the hackathon, so we built our own index of all 1,179,406 DR1 pictures from the public archive copy.
-- A stale index file made an early run see only one week of data; caught when a bright asteroid was found in 18 pictures instead of 282.
-- Downloads with no time-out froze a run for 40 minutes; every read now times out.
+- A stale index file made an early run see only one week of data; caught when a bright asteroid was found in far fewer pictures than expected.
+- Downloads with no time-out froze a run; every read now times out.
 
 ## 9. Results of the tests we fixed in advance
 - **Sensitivity (planted sources, 20 random patches):** no method found half of the planted sources even at 20 times the single-picture noise, so our pre-registered comparison has no winner. See item 11.
-- **False changes (20 random patches):** viewing one detector at a time cut the changes a plain blink flags by a median of 93%. Our colour-aware view flagged 26% more changes than that simpler view.
+- **False changes (20 random patches):** viewing one detector at a time cut the changes a plain blink flags by a median of 93%. Our colour-aware view flagged 26% more changes than that simpler view (95% interval 12–43%).
 - **Real moving objects (known asteroids, 36 patches):** see item 14 — this did not work.
 - **WISE 0855 (combined along its path):** detected; see its result card.
 
 ## 10. A neighbouring star was silently dropped
-**What happened.** Our fitting code treated any catalogued star within 0.7 pixels of the target as "the target itself" and left it out. Around WISE 0855 a star of magnitude 16.3 sits 0.7 pixels from the brown dwarf's predicted position in the third sky survey, so its light was added to the brown dwarf's (a control at short wavelengths, where WISE 0855 is invisible, showed the leak).
-**What we changed.** The star was put back for WISE 0855 (third-survey signal drops from 13.6 to 10.6 standard deviations against empty paths); both numbers are reported. The rule itself must be replaced by matching on catalogue identity, not distance, before any further runs.
+**What happened.** Our fitting code treated any catalogued star within 0.7 pixels of the target as "the target itself" and left it out. Around WISE 0855 a star of magnitude 16.3 sits 0.7 pixels from the brown dwarf's predicted position in the Apr–May 2026 visits, so its light was added to the brown dwarf's (a control at short wavelengths, where WISE 0855 is invisible, showed the leak).
+**What we changed.** The star was put back for WISE 0855 (the Apr–May 2026 signal drops from 13.6 to 10.6 standard deviations against empty paths); both numbers are reported. The rule itself must be replaced by matching on catalogue identity, not distance, before any further runs.
 
 ## 11. The colour-aware view did not beat a simple median
-**What happened.** In a test fixed in advance (planted sources in 20 random patches of sky, each method's alarm threshold set on a separate calibration patch), no method found half of the planted sources even at 20 times the single-picture noise, so the pre-registered comparison is a tie at "too faint for all". Our colour-aware view looked ahead at the brightest level, but only because one stray spike in the calibration patch set its threshold lower; at a common threshold a plain median of other pictures from the same detector found more, and on the test patches the colour-aware view raised about three times as many false alarms.
+**What happened.** In a test fixed in advance (planted sources in 20 random patches of sky, each method's alarm threshold set on a separate calibration patch), no method found half of the planted sources even at 20 times the single-picture noise, so the pre-registered comparison is a tie at "too faint for all". Our colour-aware view looked ahead at the brightest level, but only because one stray spike in the calibration patch set its threshold lower; at a common threshold a plain median of other pictures from the same detector found more, and on the test patches the colour-aware view raised more false alarms (0.014 against 0.005 per picture; the 95% intervals, 0.008–0.023 and 0.001–0.011, overlap).
 **What we changed.** The headline is no longer about the colour-aware view. It stays in the tool as an experimental option, labelled as such.
 
 ## 12. A clean-up rule that also removed faint real sources
@@ -62,7 +62,7 @@ We list every approach that did not work, because a result is only believable if
 
 
 ## 14. Our change maps miss real asteroids
-**What happened.** In 36 patches of sky we checked every known asteroid brighter than magnitude 19 against our change maps. The colour-aware view caught 2 of 79 asteroid sightings and the one-detector view caught none.
+**What happened.** In 36 patches of sky we checked every known asteroid brighter than magnitude 19 against our change maps. The colour-aware view caught 2 of 79 asteroid sightings (95% interval 0.7–8.8%) and the one-detector view caught none (0–4.6%).
 **Why.** Two reasons. Most of these asteroids (57 of 79) are fainter than a single SPHEREx picture can show, so no single-picture method can catch them — that is what combining pictures along a path is for. The brighter ones were erased by us: the archive marks pixels that disagree with other visits as "outliers", which is exactly what a moving object does, and our change maps removed those pixels. With that removal switched off, the brightest test asteroid (V = 14.6) was caught in all 8 of its pictures (a diagnostic, not a pre-registered result).
 **What this means.** Today, Orrery's change maps are a tool for seeing colour flicker and bright changes, not for finding moving asteroids. For movers, use the "combine along a path" view, and the survey difference for nearby stars. The outlier masking must be replaced before any search.
 

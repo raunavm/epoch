@@ -6,9 +6,9 @@ NASA's SPHEREx telescope photographs the whole sky in 102 colours of infrared li
 
 The difficulty is that SPHEREx photographs each spot in a different colour every time. A star that is brighter at one wavelength than another seems to flicker from picture to picture even when nothing moved, so a plain "blink" fills with false changes. Comparing each picture only with pictures from the same detector, which see similar colours, removes most of them: a median of 93% across 20 random patches of sky.
 
-Some objects are too faint for single pictures. Adding pictures along a known path brings them out: WISE 0855−0714, the coldest known brown dwarf, stands out at 16.5 times the spread of empty paths, between the brightnesses NASA's Spitzer and WISE measured in similar bands, and it moves between sky surveys as predicted.
+Some objects are too faint for single pictures. Adding pictures along a known path brings them out: WISE 0855−0714, the coldest known brown dwarf, stands out at 16.5 times the spread of empty paths, between the brightnesses NASA's Spitzer and WISE measured in similar bands, and it moves between visits months apart as predicted.
 
-We also built a cleverer, colour-aware view. In our own test, written down before we looked at the data, it did not find fainter changes than a simple median, so it is offered only as an experiment. Every test, including the ones that failed, is described below. Every number on this page comes from result files in the project repository, and each section says how to re-make it.
+We also built a cleverer, colour-aware view. In our own test, written down before we looked at the data, it did not find fainter changes than a simple median, so it is offered only as an experiment. Every test, including the ones that failed, is described below. Every result number on this page comes from result files in the project repository, and each section says how to re-make it.
 
 ---
 
@@ -57,7 +57,7 @@ The term f · |S_p| is a noise floor proportional to each star's brightness. SPH
 
 **Control patch.** On the patch on the ecliptic declared in advance (RA 180°, Dec 0°), the counts are 389 (plain blink), 52 (one detector at a time) and 57 (colour-aware).
 
-**What this number does and does not say.** It measures how much of a plain blink is colour flicker. Two checks on real changes: (1) planted test sources at 20 times the single-picture noise are caught about as often by the one-detector view as by a plain blink at the same alarm threshold (37%, 95% CI 31–42%, against 34%, CI 28–38%; `data/findings/e2_d1.json`, a secondary check requested by our referee); (2) known asteroids are almost never caught in single pictures by any of our views (one-detector 0 of 79 sightings, colour-aware 2 of 79; E3, `data/findings/e3.json`) — see [What failed #14](failed.html).
+**What this number does and does not say.** It measures how much of a plain blink is colour flicker. Two checks on real changes: (1) planted test sources at 20 times the single-picture noise are caught about as often by the one-detector view as by a plain blink at the same alarm threshold (37%, 95% CI 31–42%, against 34%, CI 28–38%; a secondary check, at the same alarm threshold; data/findings/e2_d1.json); (2) known asteroids are almost never caught in single pictures by any of our views (one-detector 0 of 79 sightings, colour-aware 2 of 79; E3, `data/findings/e3.json`) — see [What failed #14](failed.html).
 
 ![Changes per patch: plain blink, one detector at a time, colour-aware view](figs/fig_e2.png "Changes per patch for the plain blink (M1), one detector at a time (M2) and the colour-aware view (M4), sorted by Galactic latitude. Logarithmic scale.")
 
@@ -71,11 +71,11 @@ The term f · |S_p| is a noise floor proportional to each star's brightness. SPH
 
 **How.** Each method's threshold k was set on the calibration patch, with nothing planted, so that it gives one false change per 100 pictures, and then frozen. Artificial point sources were planted into the raw pictures of the 20 test patches (4,906 pictures), at 3, 5, 8, 12 and 20 times each picture's noise, at positions drawn with fixed seeds. A planted source counts as found if a change lies within 1.5 pixels of it.
 
-**Result: the pre-registered criterion was not met.** No method found half of the planted sources even at 20 times the single-picture noise, so the comparison is a tie at "too faint for all". The colour-aware view looked ahead at the brightest level, but only because one stray spike on the calibration patch set its threshold lower (k = 7.7 against 23.4 for the median). At a common threshold the plain median found more, and on the test patches with nothing planted the colour-aware view raised about three times as many false changes (0.014 per picture against 0.005 for the median). We therefore make no claim that the colour-aware view finds fainter changes; the headline uses the simpler one-detector view (Version B, chosen by the rule fixed in advance).
+**Result: the pre-registered criterion was not met.** No method found half of the planted sources even at 20 times the single-picture noise, so the comparison is a tie at "too faint for all". The colour-aware view looked ahead at the brightest level, but only because one stray spike on the calibration patch set its threshold lower (k = 7.7 against 23.4 for the median). At a common threshold the plain median found more, and on the test patches with nothing planted the colour-aware view raised more false alarms (0.014 per picture, 95% interval 0.008–0.023, against 0.005, 0.001–0.011; the intervals overlap). We therefore make no claim that the colour-aware view finds fainter changes; the headline uses the simpler one-detector view (Version B, chosen by the rule fixed in advance).
 
 **What we learned.** Catching a change in a single SPHEREx picture only works for bright changes, about 20 times the noise or more. A clean-up rule needed to stop isolated bad pixels from swamping every method also removed some faint real sources, equally for every method (see What failed). Fainter objects need many pictures combined along their path, which is what the next sections do.
 
-![Detection efficiency against planted brightness](figs/fig_e1.png "Fraction of planted sources found, per method, at thresholds set on the calibration patch. The colour-aware view's lead at 20× comes from its lower threshold, not from a better model: at a common threshold the median finds more, and the colour-aware view raises about three times the false alarms. Not an advantage.")
+![Detection efficiency against planted brightness](figs/fig_e1.png "Fraction of planted sources found, per method, at thresholds set on the calibration patch. The colour-aware view's lead at 20× comes from its lower threshold, not from a better model: at a common threshold the median finds more, and the colour-aware view raises more false alarms. Not an advantage.")
 
 ###### E4
 
@@ -85,7 +85,7 @@ The term f · |S_p| is a noise floor proportional to each star's brightness. SPH
 
 **Path.** Position, proper motion (-8.118, +0.680 ″/yr) and parallax (0.449″) from Luhman & Esplin (2016), who measured them with NASA's Spitzer and Hubble; the predicted position in 2025–26 is uncertain by about 0.08″, a small fraction of a pixel.
 
-**Measurement.** In each picture we fit a point source at the predicted position together with every Gaia star nearby and a background plane, using the telescope's own measured point-spread function. Pictures with central wavelength 4.4–5.0 µm (46 of them) are combined for each sky survey with equal weight per unit brightness:
+**Measurement.** In each picture we fit a point source at the predicted position together with every Gaia star nearby and a background plane, using the telescope's own measured point-spread function. Pictures with central wavelength 4.4–5.0 µm (46 of them) are combined for each set of visits (May 2025, Nov–Dec 2025, Apr–May 2026) with equal weight per unit brightness:
 
 ```
 â ± σ_â = Σ_e p_e A_e / s_e² / Σ_e p_e² / s_e²  ±  (Σ_e p_e² / s_e²)^(−1/2)        p_e = 1 mJy template, A_e, s_e = fitted amplitude and error
@@ -96,25 +96,25 @@ significance = (â/σ_â − mean of nulls) / spread of nulls
 
 **Results.**
 
-| Sky survey | Pictures | Brightness (mJy) | Significance against empty paths |
+| Visits | Pictures | Brightness (mJy) | Significance against empty paths |
 |---|---|---|---|
-| 2 (2025 Nov–Dec) | 22 | 0.50 ± 0.03 | 16.5σ |
-| 3 (2026 Apr–May), neighbour star restored | 21 | 0.52 ± 0.04 | 10.6σ |
-| 3, as first declared | 21 | 0.56 ± 0.03 | 13.6σ |
+| Nov–Dec 2025 visits | 22 | 0.50 ± 0.03 | 16.5σ |
+| Apr–May 2026 visits, neighbour star restored | 21 | 0.52 ± 0.04 | 10.6σ |
+| Apr–May 2026 visits, as first declared | 21 | 0.56 ± 0.03 | 13.6σ |
 
-Survey 1 (2025 May) has only 3 usable pictures, one of them badly fitted, and is not informative.
+The May 2025 visits have only 3 usable pictures, one of them badly fitted, and is not informative.
 
 **Brightness.** Spitzer measured 0.51 mJy at 4.5 µm (Luhman & Esplin 2016). Our value is a flat-weighted mean over the SPHEREx channels between 4.4 and 5.0 µm, not a synthetic Spitzer magnitude, so close agreement is expected but not exact.
 
-**A neighbour star.** Our fitting code treated any Gaia star within 0.7 pixels of the target as "the target itself" and left it out of the model. In survey 3 a star of Gaia magnitude 16.3 sits 0.67–0.71 pixels from WISE 0855's predicted position. A control at 0.75–3.5 µm, where WISE 0855 is invisible, showed the leak: it gave 0.10 mJy in survey 3. With the star put back into the model the control falls to -0.006 mJy and the 4.4–5 µm signal from 13.6σ to 10.6σ. We quote the lower number. In survey 2 the control gives -0.018 mJy.
+**A neighbour star.** Our fitting code treated any Gaia star within 0.7 pixels of the target as "the target itself" and left it out of the model. In the Apr–May 2026 visits a star of Gaia magnitude 16.3 sits 0.67–0.71 pixels from WISE 0855's predicted position. A control at 0.75–3.5 µm, where WISE 0855 is invisible, showed the leak: it gave 0.10 mJy in the Apr–May 2026 visits. With the star put back into the model the control falls to -0.006 mJy and the 4.4–5 µm signal from 13.6σ to 10.6σ. We quote the lower number. In the Nov–Dec 2025 visits the control gives -0.018 ± 0.003 mJy: small, but not zero.
 
-**Motion between surveys.** Measured shift from survey 2 to survey 3: -3.3″ east–west and +2.1″ north–south (errors 0.6″ and 1.1″), against a predicted -4.5″ and +0.6″. This is consistent with the prediction (p = 0.08), and a source that does not move is ruled out (p = 3 × 10⁻⁷). The neighbour star can still pull the measured centres slightly.
+**Motion between visits.** Measured shift from the Nov–Dec 2025 to the Apr–May 2026 visits: -3.3″ east–west and +2.1″ north–south (errors 0.6″ and 1.1″), against a predicted -4.5″ and +0.6″. This is consistent with the prediction (p = 0.08), and a source that does not move is ruled out (p = 3 × 10⁻⁷). The neighbour star can still pull the measured centres slightly.
 
-**What this is.** A measurement of a known object: a point source at the predicted position of WISE 0855−0714 in SPHEREx DR1 pictures at 4.4–5.0 µm, at Spitzer's brightness, moving as predicted. It is not a new object. The slider on WISE 0855's card combines 45 pictures from all surveys (neighbour restored, one poorly fitted picture dropped).
+**What this is.** A measurement of a known object: a point source at the predicted position of WISE 0855−0714 in SPHEREx DR1 pictures at 4.4–5.0 µm, at Spitzer's brightness, moving as predicted. It is not a new object. The slider on WISE 0855's card combines 45 pictures from all visits (neighbour restored, one poorly fitted picture dropped).
 
-![WISE 0855−0714, survey 2](e4/stack_pass2_neighbour_restored.png "Survey 2: pictures at 4.4–5 µm combined along WISE 0855's predicted path; it sits in the centre.")
+![WISE 0855−0714, Nov–Dec 2025](e4/stack_pass2_neighbour_restored.png "Nov–Dec 2025 visits: pictures at 4.4–5 µm combined along WISE 0855's predicted path; it sits in the centre.")
 
-![WISE 0855−0714, survey 3](e4/stack_pass3_neighbour_restored.png "Survey 3, with the neighbour star restored to the model.")
+![WISE 0855−0714, Apr–May 2026](e4/stack_pass3_neighbour_restored.png "Apr–May 2026 visits, with the neighbour star restored to the model.")
 
 ###### Motion
 
@@ -157,11 +157,11 @@ We also tried modelling every picture star by star, using ESA Gaia's catalogue (
 
 | Stack | Scale from inner paths | Outer-path spread after rescaling | Check |
 |---|---|---|---|
-| WISE 0855, survey 2 | 1.09 | 0.94 | passed |
-| WISE 0855, survey 3 | 1.34 | 0.95 | passed |
+| WISE 0855, Nov–Dec 2025 | 1.09 | 0.94 | passed |
+| WISE 0855, Apr–May 2026 | 1.34 | 0.95 | passed |
 | Asteroid 98397 (2000 UC3) | 1.54 | 0.77 | not passed; larger scale used |
 
-Before this test, our stacked error bars were 1.5–3 times too small (see What failed). Every stacked significance on the site is therefore quoted against empty paths.
+Before this test, our stacked error bars were 1.5–2.5 times too small for the asteroid stacks (see What failed). Every stacked significance on the site is therefore quoted against empty paths.
 
 ## Error budget
 
@@ -170,8 +170,8 @@ Before this test, our stacked error bars were 1.5–3 times too small (see What 
 | Statistical (pixel noise) | per measurement | from the variance image, propagated through the fit |
 | Point-spread-function model | 3% of flux | systematic floor added to every flux (SPHEREx Explanatory Supplement) |
 | Residues at bright stars after re-gridding | f = 0.151 of the static brightness | noise floor fixed on the calibration patch before any test |
-| Correlated errors in stacks | error bars 1.5–3 times too small before calibration | significance against 24 empty paths; E5 scale check |
-| Unmodelled neighbour stars | WISE 0855 survey 3: 13.6σ → 10.6σ | short-wavelength control; star restored; lower value quoted |
+| Correlated errors in stacks | error bars 1.5–2.5 times too small (asteroid stacks) before calibration | significance against 24 empty paths; E5 scale check |
+| Unmodelled neighbour stars | WISE 0855, Apr–May 2026: 13.6σ → 10.6σ | short-wavelength control; star restored; lower value quoted |
 | Predicted position of WISE 0855 | about 0.08″ | from the Luhman & Esplin (2016) errors |
 | SPHEREx band edges | flat mean over 4.4–5.0 µm channels | not converted to a Spitzer magnitude |
 | Position offset (Epsilon Indi B) | steady 0.5″ | cancels in the motion; cause unexplained |

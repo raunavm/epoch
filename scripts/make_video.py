@@ -164,8 +164,8 @@ def main(a):
     pm = mo["proper_motion"]
     nums = [(f"{hl['number']}%", "of a plain blink's changes vanish, one detector at a time"),
             (f"{e4['passes'][1]['significance']:.1f}σ", "coldest known brown dwarf, against empty paths"),
-            (f"{pm['pmra']['spherex_mas_yr']/1000:+.2f} ± {pm['pmra']['err_mas_yr']/1000:.2f}″/yr", f"Eps Indi B east–west; Gaia {pm['pmra']['gaia_mas_yr']/1000:+.2f}"),
-            (f"{meta['n_frames']:,}", "SPHEREx pictures indexed, any spot in the sky")]
+            (f"{pm['pmra']['spherex_mas_yr']/1000:+.2f} ± {pm['pmra']['err_mas_yr']/1000:.2f}″/yr", f"Eps Indi B east–west motion; Gaia {pm['pmra']['gaia_mas_yr']/1000:+.2f}"),
+            (f"{meta['n_frames']:,}", "SPHEREx pictures indexed")]
     os.makedirs("dist/frames", exist_ok=True)
     for f in os.listdir("dist/frames"):
         os.remove(os.path.join("dist/frames", f))
