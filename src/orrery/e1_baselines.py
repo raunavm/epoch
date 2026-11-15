@@ -46,7 +46,7 @@ def m5_map(frames_resampled, wl, det, mjd, sigma_e, f, k=K_NEIGHBOURS):
             dist[i] = np.inf                                   # leave the frame itself out
             idx = np.argpartition(dist, kk - 1, axis=0)[:kk]   # K nearest in wavelength, per pixel
             nb = np.take_along_axis(Vn, idx, axis=0)
-            ok = np.isfinite(nb).sum(0) >= MIN_REF
+            ok = (np.isfinite(nb).sum(0) >= MIN_REF) & ~bad[i]
             ref = np.nanmedian(np.where(ok, nb, 0.0), axis=0)
             sig = np.sqrt(sigma_e[e] ** 2 + (f * ref) ** 2)
             out[e] = np.where(ok, (V[i] - ref) / sig, np.nan)

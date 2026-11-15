@@ -15,8 +15,13 @@ import pandas as pd
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from astropy.coordinates import SkyCoord  # noqa: E402
-from build_field import _get, candidates, load_index, read_rows  # noqa: E402
-from orrery.data import Frame, Stamp, release_of, save_stamp  # noqa: E402
+import threading  # noqa: E402
+import requests  # noqa: E402
+from astropy.io import fits  # noqa: E402
+from astropy.io.fits.hdu.compressed._codecs import Rice1  # noqa: E402
+from astropy.wcs import WCS  # noqa: E402
+from build_field import candidates, load_index  # noqa: E402
+from orrery.data import BUCKET, Frame, Stamp, _calib, release_of, save_stamp  # noqa: E402
 
 ROOT = "data/efields"
 INDEX = "data/index/frames_dr1.parquet"
@@ -68,32 +73,82 @@ def draw_fields(df):
     return out
 
 
+_tls = threading.local()
+
+
+def _get(url, a, b):
+    """Byte range [a, b) over a per-thread keep-alive session (TLS handshake once per worker)."""
+    for i in range(4):
+        try:
+            if not hasattr(_tls, "s"):
+                _tls.s = requests.Session()
+            r = _tls.s.get(url, headers={"Range": f"bytes={a}-{b - 1}"}, timeout=60)
+            r.raise_for_status()
+            assert len(r.content) == b - a
+            return r.content
+        except Exception:
+            _tls.__dict__.pop("s", None)
+            if i == 3:
+                raise
+            time.sleep(2 * (i + 1))
+
+
+def _header(url, off, nbytes=34560):
+    """Parse the FITS header starting at byte `off`; returns (header, data offset)."""
+    buf = _get(url, off, off + nbytes)
+    for k in range(0, len(buf), 80):
+        if buf[k:k + 8] == b"END     ":
+            end = (k // 2880 + 1) * 2880
+            return fits.Header.fromstring(buf[:k + 80].decode("ascii")), off + end
+    return _header(url, off, 4 * nbytes)
+
+
+def _pad(n):
+    return (n + 2879) // 2880 * 2880
+
+
 def fast_stamp(key, ra0, dec0, half=HALF):
-    """Same content as orrery.data.Frame.stamp(x, y, half, with_zodi=False) but with 3 full-width row range reads
-    and clipped (not None) at the detector edge. None if the field centre is off the frame."""
-    fr = Frame(key)
-    try:
-        x, y = fr.world2pix(ra0, dec0)
-        x, y = float(x[0]), float(y[0])
-        if not (0 <= x <= 2039 and 0 <= y <= 2039):
-            return None
-        ix, iy = int(round(x)), int(round(y))
-        x0, y0, x1, y1 = max(0, ix - half), max(0, iy - half), min(2040, ix + half + 1), min(2040, iy + half + 1)
-        img, flg = read_rows(fr, y0, y1)
-        vh = fr.hdul["VARIANCE"]
-        assert vh.header["BITPIX"] == -32 and "BZERO" not in vh.header and "BSCALE" not in vh.header
-        var = np.frombuffer(_get(fr.url, vh._data_offset + y0 * 8160, vh._data_offset + y1 * 8160), ">f4").reshape(-1, 2040)
-        yy, xx = np.mgrid[y0:y1, x0:x1]
-        cw, cb = fr.wave_at(xx.astype(float), yy.astype(float))
-        return Stamp(obs_id=fr.obs_id, detector=fr.detector, release=release_of(key), url=fr.url, mjd=fr.mjd,
-                     x0=x0, y0=y0, image=np.ascontiguousarray(img[:, x0:x1]),
-                     variance=np.ascontiguousarray(var[:, x0:x1], np.float32),
-                     zodi=np.zeros((y1 - y0, x1 - x0), np.float32), flags=np.ascontiguousarray(flg[:, x0:x1]),
-                     cwave=cw.astype(np.float32), cband=cb.astype(np.float32), omega_arcsec2=fr.omega,
-                     epsf=fr.epsf_at(ix, iy), epsf_oversample=fr.epsf_ovs,
-                     wcs_header=fr.wcs.to_header(relax=True).tostring())
-    finally:
-        fr.close()
+    """Same content as orrery.data.Frame(key).stamp(x, y, half, with_zodi=False) (verified bit-identical), read with
+    6 keep-alive range requests, and clipped (not None) at the detector edge. None if the field centre is off the
+    frame. Layout (DR1 Level-2): PRIMARY, IMAGE f4 2040^2, FLAGS (RICE_1 tiles = rows), VARIANCE f4 2040^2, ..."""
+    url = f"{BUCKET}/{key}"
+    p, o = _header(url, 0)
+    h, img_off = _header(url, o)
+    assert h["EXTNAME"] == "IMAGE" and h["BITPIX"] == -32 and h["NAXIS1"] == 2040 and "BZERO" not in h
+    fr = Frame.__new__(Frame)                    # header-only Frame: reuse its epsf_at / wave_at
+    fr.key, fr.url, fr.header, fr.wcs = key, url, h, WCS(h)
+    fr.mjd, fr.obs_id, fr.detector, fr.omega = float(h["MJD-AVG"]), h["OBSID"], int(h["DETECTOR"]), float(h["OMEGA_MEDIAN"])
+    c = _calib(release_of(key), fr.detector)
+    fr.epsf_tab = {"XCENTER": c["xc"], "YCENTER": c["yc"], "EPSF": c["epsf"]}
+    fr.epsf_ovs, fr.wx, fr.wy, fr.wv = int(c["ovs"]), c["wx"], c["wy"], c["wv"]
+    x, y = fr.world2pix(ra0, dec0)
+    x, y = float(x[0]), float(y[0])
+    if not (0 <= x <= 2039 and 0 <= y <= 2039):
+        return None
+    ix, iy = int(round(x)), int(round(y))
+    x0, y0, x1, y1 = max(0, ix - half), max(0, iy - half), min(2040, ix + half + 1), min(2040, iy + half + 1)
+    img = np.frombuffer(_get(url, img_off + y0 * 8160, img_off + y1 * 8160), ">f4").reshape(-1, 2040)
+    fh, fl_off = _header(url, img_off + _pad(2040 * 2040 * 4))
+    assert fh["EXTNAME"] == "FLAGS" and fh["ZCMPTYPE"] == "RICE_1" and fh["ZTILE1"] == 2040 and fh["ZTILE2"] == 1
+    assert fh["NAXIS1"] == 8 and fh["NAXIS2"] == 2040 and fh.get("THEAP", 8 * 2040) == 8 * 2040
+    desc = np.frombuffer(_get(url, fl_off + 8 * y0, fl_off + 8 * y1), ">i4").reshape(-1, 2)
+    heap = fl_off + 8 * 2040
+    lo, hi = int(desc[:, 1].min()), int((desc[:, 1] + desc[:, 0]).max())
+    buf = _get(url, heap + lo, heap + hi)
+    codec = Rice1(blocksize=fh.get("ZVAL1", 32), bytepix=4, tilesize=2040)
+    flg = np.stack([codec.decode(np.frombuffer(buf[o_ - lo:o_ - lo + n], np.uint8)) for n, o_ in desc]).astype(np.int32)
+    vh, var_off = _header(url, fl_off + _pad(8 * 2040 + fh["PCOUNT"]))
+    assert vh["EXTNAME"] == "VARIANCE" and vh["BITPIX"] == -32 and "BZERO" not in vh and "BSCALE" not in vh
+    var = np.frombuffer(_get(url, var_off + y0 * 8160, var_off + y1 * 8160), ">f4").reshape(-1, 2040)
+    yy, xx = np.mgrid[y0:y1, x0:x1]
+    cw, cb = fr.wave_at(xx.astype(float), yy.astype(float))
+    return Stamp(obs_id=fr.obs_id, detector=fr.detector, release=release_of(key), url=url, mjd=fr.mjd,
+                 x0=x0, y0=y0, image=np.ascontiguousarray(img[:, x0:x1], np.float32),
+                 variance=np.ascontiguousarray(var[:, x0:x1], np.float32),
+                 zodi=np.zeros((y1 - y0, x1 - x0), np.float32), flags=np.ascontiguousarray(flg[:, x0:x1]),
+                 cwave=cw.astype(np.float32), cband=cb.astype(np.float32), omega_arcsec2=fr.omega,
+                 epsf=fr.epsf_at(ix, iy), epsf_oversample=fr.epsf_ovs,
+                 wcs_header=fr.wcs.to_header(relax=True).tostring())
 
 
 def fname(row):

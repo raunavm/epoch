@@ -1,8 +1,11 @@
-import { init, getJSON, h, t, fmt, unavailable, findingLine } from './core.js';
+import { init, getJSON, h, t, fmt, unavailable } from './core.js';
+import { findingLine } from './components/evidence.js';
 import { mountBlink } from './components/blink.js';
 import { mountLive, loadIndex, bytesPerFrame, mjdDate } from './live/live.js';
 import { parseRA, parseDec, gridSize } from './live/grid.js';
 import { TARGETS, propagate, J2000_MJD } from './live/targets.js';
+import { renderTargetCard, renderStrip } from './components/targets.js';
+import { checklist } from './components/checklist.js';
 
 await init();
 const $ = id => document.getElementById(id);
@@ -30,8 +33,8 @@ tgtSel.addEventListener('change', () => {
   if (v.startsWith('field:')) {
     const f = fieldIndex.find(x => `field:${x.field}` === v);
     raIn.value = f.ra.toFixed(6); decIn.value = f.dec.toFixed(6);
-  } else if (v) choosePreset(TARGETS.find(x => x.id === v));
-  if (v) start();
+    showField(f.field);
+  } else if (v) openTarget(TARGETS.find(x => x.id === v));
 });
 
 function choosePreset(tg) {
@@ -54,6 +57,7 @@ function start(mode = params.get('mode') || 'raw', all = params.get('all') === '
   live?.stop(); showcase?.stop();
   liveBox.hidden = false;
   $('showcase').hidden = true;
+  $('target-result').hidden = !preset;
   const pm = preset && refMjd ? { pmra: preset.pmra, pmdec: preset.pmdec, epochMjd: refMjd } : null;
   const state = { ra, dec, fov, mode, all };
   const sync = () => {
@@ -70,7 +74,7 @@ function start(mode = params.get('mode') || 'raw', all = params.get('all') === '
 // URL parameters: ?ra=&dec=&fov=&mode= (or ?target=barnard)
 const tp = TARGETS.find(x => x.id === params.get('target'));
 if (FOVS.includes(+params.get('fov'))) fovSel.value = params.get('fov');
-if (tp && !params.has('ra')) { tgtSel.value = tp.id; choosePreset(tp); start(); }
+if (tp && !params.has('ra')) { /* opened below, after the showcase fields are known */ }
 else if (params.has('ra') && params.has('dec')) {
   raIn.value = params.get('ra'); decIn.value = params.get('dec');
   if (tp) { tgtSel.value = tp.id; preset = tp; }
@@ -79,13 +83,36 @@ else if (params.has('ra') && params.has('dec')) {
 
 // ---------- ready-made showcase fields ----------
 const sel = $('field'), box = $('tm');
-if (!fieldIndex?.length) $('showcase').hidden = true;
+if (!fieldIndex?.length) { $('showcase').hidden = true; if (tp && !params.has('ra')) openTarget(tp); }
 else {
   for (const f of fieldIndex) sel.append(h('option', { value: f.field }, f.name));
   const want = params.get('field');
   if (fieldIndex.some(f => f.field === want)) sel.value = want;
   sel.addEventListener('change', loadField);
-  if (!live) loadField();
+  if (tp && !params.has('ra')) openTarget(tp);
+  else if (!live) loadField();
+}
+renderStrip($('strip'), getJSON, tp?.id);
+$('checklist').append(checklist());
+
+// A challenge target opens on its own measured result: result card + its prepared field (live stays one click away).
+function openTarget(tg) {
+  live?.stop(); live = null; liveBox.hidden = true;
+  tgtSel.value = tg.id; choosePreset(tg);
+  const card = $('target-result');
+  card.hidden = false;
+  card.after($('showcase')); // the target's prepared field right under its result
+  renderTargetCard(card, tg.id, getJSON);
+  const p = new URLSearchParams(location.search);
+  for (const k of ['ra', 'dec', 'mode', 'all']) p.delete(k);
+  p.set('target', tg.id); history.replaceState(null, '', `?${p}`);
+  if (fieldIndex?.some(f => f.field === tg.id)) showField(tg.id); else start();
+}
+
+function showField(id) {
+  live?.stop(); live = null; liveBox.hidden = true;
+  $('showcase').hidden = false;
+  sel.value = id; loadField();
 }
 
 async function loadField() {
@@ -100,5 +127,5 @@ const findings = await getJSON('findings.json');
 if (findings?.f1) {
   const sec = $('tm-finding');
   sec.hidden = false;
-  sec.querySelector('div').append(findingLine(findings.f1));
+  sec.querySelector('div').append(findingLine(findings.f1, 'f1'));
 }

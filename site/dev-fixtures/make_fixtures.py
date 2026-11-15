@@ -74,12 +74,15 @@ for k in range(8):
     tm_frames.append({
         "obs_id": f"FIXTURE_TM_{k}", "mjd": 60800 + 3.1 * k, "date": f"2026-03-{3 + 3 * k:02d}", "wl_um": wl,
         "img_png": png(f"png/tm/raw_{k}.png", raw), "corr_png": png(f"png/tm/corr_{k}.png", field(64, corr_src)),
-        "labels": [{"x": ast[0], "y": ast[1], "name": "FX-1 (synthetic)", "kind": "mover", "label": "known asteroid", "confidence": 0.9}]
-        + ([{"x": 50, "y": 12, "name": "", "kind": "glint", "label": "artifact", "confidence": 0.6}] if k == 3 else []),
+        "detector": 1 + k % 6, "s3_url": "https://example.invalid/fixture.fits",
+        "flags": {"SOURCE": 300 + k, "OUTLIER": k}, "meta": {"PSF_FWHM": 7.5, "L2DQAFLG": "Pass", "L2 N_OUTLIER": 1000 + k},
+        "labels": [{"x": 32, "y": 32, "name": "Fixture target", "kind": "star", "label": "target", "confidence": None, "change": False},
+                   {"x": ast[0], "y": ast[1], "name": "FX-1 (synthetic)", "kind": "mover", "label": "known asteroid", "confidence": 0.9, "change": True}]
+        + ([{"x": 50, "y": 12, "name": "", "kind": "glint", "label": "unexplained", "confidence": 0.6, "change": True}] if k == 3 else []),
     })
 dump("timemachine/index.json", [{"field": "fx-field", "name": "Synthetic field (fixture)", "ra": 270.0, "dec": 66.5}])
 dump("timemachine/fx-field.json", {"field": "fx-field", "name": "Synthetic field (fixture)", "ra": 270.0, "dec": 66.5,
-                                   "size_px": 64, "frames": tm_frames})
+                                   "size_px": 64, "frames": tm_frames, "gaia": [{"x": x, "y": y, "g": 15.0} for x, y, _ in stars[:6]]})
 
 # --- objects ---------------------------------------------------------------
 dump("objects.json", [
@@ -158,4 +161,15 @@ dump("about.json", {
     "data_sources": [{"text": "Fixture data source", "url": "https://example.invalid"}],
     "repo_url": "https://example.invalid/repo",
 })
+# --- one-question landing, target cards, what failed ---------------------------
+dump("headline.json", {"field": "fx-field", "question": "Fixture: at this spot in the sky, what really changed?", "number": 0.0, "err": 0.0,
+                       "unit": "%", "number_label": "fixture: share of plain-blink changes that are only colour", "kind": "derived",
+                       "sentence": "Fixture sentence: switch between raw and corrected to see which changes are real.", "version": "A"})
+for tid, name in [("barnard", "Barnard's Star"), ("wise0855", "WISE 0855")]:
+    dump(f"targets/{tid}.json", {"title": f"{name} (fixture)", "plain_result": "Fixture result sentence.",
+                                 "numbers": [{"label": "fixture motion", "value": 1.0, "err": 0.1, "unit": "″/yr", "kind": "derived"},
+                                             {"label": "fixture count", "value": 3, "err": None, "kind": "data"}],
+                                 "evidence_links": [{"text": "Science: which change is real", "href": "science.html#which-change-is-real"}],
+                                 "method_note": "Fixture method note."})
+(OUT / "failed.md").write_text("# What failed (fixture)\n\n## Fixture failure\nFixture paragraph.\n")
 print("fixtures written to", OUT)

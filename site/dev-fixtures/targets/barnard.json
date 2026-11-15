@@ -1,0 +1,26 @@
+{
+ "title": "Barnard's Star (fixture)",
+ "plain_result": "Fixture result sentence.",
+ "numbers": [
+  {
+   "label": "fixture motion",
+   "value": 1.0,
+   "err": 0.1,
+   "unit": "\u2033/yr",
+   "kind": "derived"
+  },
+  {
+   "label": "fixture count",
+   "value": 3,
+   "err": null,
+   "kind": "data"
+  }
+ ],
+ "evidence_links": [
+  {
+   "text": "Science: which change is real",
+   "href": "science.html#which-change-is-real"
+  }
+ ],
+ "method_note": "Fixture method note."
+}

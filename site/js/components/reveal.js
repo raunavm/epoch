@@ -1,6 +1,7 @@
 // Finding 2: combining frames along the orbit. Slider from 1 frame to all frames.
 import { h, put, t, asset, badge, fmt, fmtPM, wlColor, REDUCED_MOTION } from '../core.js';
 import { plot } from '../plot.js';
+import { evidenceNum } from './evidence.js';
 
 export function mountReveal(el, data, { compact = false, autoplay = false } = {}) {
   const frames = data.frames || [], stacks = [...(data.stack_pngs || [])].sort((a, b) => a.n - b.n);
@@ -58,19 +59,28 @@ export function mountReveal(el, data, { compact = false, autoplay = false } = {}
   }
 
   const gain = data.depth_gain_mag;
+  const gainLine = () => {
+    const [btn, panel] = evidenceNum(t('reveal.gain_mag', { g: fmtPM(gain, data.depth_gain_err) }), evidenceFor(data));
+    return h('div', {}, h('p', { class: 'gain' }, t('reveal.gain', { x: fmt(10 ** (0.4 * gain), 2), N }), ' ', btn, ' ', badge('derived')), panel);
+  };
   put(el,
     h('div', { class: 'reveal' + (compact ? ' compact' : '') },
       h('figure', { class: 'imgpanel' }, h('div', { class: 'imgwrap' }, img, imgBadge), cap, snr),
       h('figure', { class: 'specpanel' }, specBox)),
     h('div', { class: 'reveal-controls' },
       h('label', { for: slider.id }, t('reveal.slider')), slider, play),
-    Number.isFinite(gain) ? h('p', { class: 'gain' },
-      t('reveal.gain', { x: fmt(10 ** (0.4 * gain), 2), N }), ' ',
-      h('span', { class: 'muted' }, t('reveal.gain_mag', { g: fmtPM(gain, data.depth_gain_err) })), ' ', badge('derived')) : null,
+    Number.isFinite(gain) ? gainLine() : null,
   );
   render();
   if (autoplay && !REDUCED_MOTION && N > 1) play.click();
   return { stop };
+}
+
+function evidenceFor(data) {
+  return {
+    frames: (data.frames || []).map(f => ({ ...f, date: f.date || (f.mjd ? new Date((f.mjd - 40587) * 864e5).toISOString().slice(0, 10) : null) })),
+    nulls: data.null_snrs, nullsNote: t('ev.reveal_nulls'), method: 'science.html#stacking-along-an-orbit',
+  };
 }
 
 function pad(v) {

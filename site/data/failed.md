@@ -40,3 +40,7 @@ We list every approach that did not work, because a result is only believable if
 
 ## 9. Results of the pre-registered tests
 (Filled in from data/findings/e1.json–e4.json as each test finishes, whatever the outcome.)
+
+## 10. A neighbouring star was silently dropped
+**What happened.** Our fitting code treated any catalogued star within 0.7 pixels of the target as "the target itself" and left it out. Around WISE 0855 a star of magnitude 16.3 sits 0.7 pixels from the brown dwarf's predicted position in the third sky survey, so its light was added to the brown dwarf's (a control at short wavelengths, where WISE 0855 is invisible, showed the leak).
+**What we changed.** The star was put back for WISE 0855 (third-survey signal drops from 13.6 to 10.6 standard deviations against empty paths); both numbers are reported. The rule itself must be replaced by matching on catalogue identity, not distance, before any further runs.

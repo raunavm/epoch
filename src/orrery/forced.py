@@ -80,8 +80,10 @@ def measure_frame(key, eph_row, half=15, edge=18, refine=True, stamp_dir=None, g
             gx, gy = gx - st.x0, gy - st.y0
             H, W = st.image.shape
             for a, b in zip(gx, gy):
-                # keep stars whose ePSF box touches the stamp, but not stars coincident with the target
-                if -3 <= a <= W + 2 and -3 <= b <= H + 2 and np.hypot(a - xs, b - ys) > 0.7:
+                # keep every Gaia star whose ePSF box touches the stamp. Moving targets (asteroids, brown dwarfs not in
+                # Gaia) are never Gaia sources, so a star near the target is a real neighbour and must be modelled;
+                # an exactly coincident star shows up as a large, honest flux error (degenerate columns), not as leaked light.
+                if -3 <= a <= W + 2 and -3 <= b <= H + 2:
                     star_xy.append((float(a), float(b)))
         star_xy = np.array(star_xy).reshape(-1, 2)
         r0 = fit_stamp(st.image, st.variance, st.flags, st.epsf, xs, ys, star_xy, BAD_BITS, st.epsf_oversample)

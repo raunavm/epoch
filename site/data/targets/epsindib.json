@@ -1,0 +1,53 @@
+{
+ "title": "Epsilon Indi B \u2014 a pair of nearby brown dwarfs",
+ "plain_result": "From SPHEREx pictures alone we measured how fast it moves across the sky: +3.96 \u00b1 0.07\u2033 and -2.43 \u00b1 0.07\u2033 per year (east\u2013west, north\u2013south). ESA's Gaia measured +3.98\u2033 and -2.47\u2033.",
+ "numbers": [
+  {
+   "label": "Motion east\u2013west (SPHEREx)",
+   "value": 3.963,
+   "err": 0.074,
+   "kind": "derived",
+   "unit": "\u2033/yr"
+  },
+  {
+   "label": "Motion east\u2013west (Gaia DR3)",
+   "value": 3.982,
+   "err": null,
+   "kind": "data",
+   "unit": "\u2033/yr"
+  },
+  {
+   "label": "Motion north\u2013south (SPHEREx)",
+   "value": -2.433,
+   "err": 0.074,
+   "kind": "derived",
+   "unit": "\u2033/yr"
+  },
+  {
+   "label": "Motion north\u2013south (Gaia DR3)",
+   "value": -2.467,
+   "err": null,
+   "kind": "data",
+   "unit": "\u2033/yr"
+  },
+  {
+   "label": "Pictures used",
+   "value": 140,
+   "err": null,
+   "kind": "data",
+   "unit": ""
+  }
+ ],
+ "evidence_links": [
+  {
+   "text": "Per-picture positions (data/findings/motion_epsindib.json)",
+   "href": "science.html#motion"
+  },
+  {
+   "text": "Gaia DR3 (Vallenari et al. 2023)",
+   "href": "https://www.cosmos.esa.int/web/gaia/dr3"
+  }
+ ],
+ "method_note": "Each picture is fitted with the star's position free, saturated pixels masked and Gaia neighbours modelled; the motion is a straight-line fit to SPHEREx positions alone with Gaia's parallax held fixed. Positions sit a steady ~0.5\u2033 south of Gaia's prediction in every survey; the pair is unresolved, so a shifted centre of light is possible \u2014 not explained here.",
+ "method_anchor": "science.html#motion"
+}

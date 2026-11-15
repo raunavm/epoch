@@ -1,5 +1,6 @@
 // Live mode: any RA/Dec -> SPHEREx DR1 frames read straight from the public S3 bucket in the browser.
-import { h, put, t, fmt, badge, wlColor, REDUCED_MOTION, getJSON, findingLine } from '../core.js';
+import { h, put, t, fmt, badge, wlColor, REDUCED_MOTION, getJSON } from '../core.js';
+import { findingLine, evidenceNum } from '../components/evidence.js';
 import { plot, s as svg } from '../plot.js';
 import { findFrames, spreadInTime } from './index.js';
 import { readHeader, readRows } from './fits.js';
@@ -257,10 +258,15 @@ export function mountLive(el, target, onState) {
     st.cm = changeModel(st.frames.map(f => ({ v: f.v, lam: f.lam, det: f.det, mjd: f.mjd })), S, fFloor);
     status.textContent = t('live.done', { n: st.frames.length, failed, mb: fmt(st.bytes / 1e6, 3), first: fmt(first, 2), total: fmt(total, 2) });
     const headline = (await getJSON('findings.json'))?.f1;
+    const liveEv = evidenceNum(t('live.changes_ev', { n: st.frames.length }), {
+      frames: st.frames.map(f => ({ obs_id: f.obs_id, date: f.date, wl_um: f.wl, detector: f.det, s3_url: f.url })),
+      method: 'science.html#which-change-is-real',
+    });
     put(findingBox,
       h('h3', {}, t('live.changes_h')),
-      headline ? findingLine(headline) : null,
-      h('p', {}, h('strong', {}, t('live.changes_view')), ' ', t('live.changes', { all: st.cm.nNaiveAll, det: st.cm.nNaiveDet, corr: st.cm.nCorr }), ' ', badge('derived')),
+      headline ? findingLine(headline, 'f1') : null,
+      h('p', {}, h('strong', {}, t('live.changes_view')), ' ', t('live.changes', { all: st.cm.nNaiveAll, det: st.cm.nNaiveDet, corr: st.cm.nCorr }), ' ', badge('derived'), ' ', liveEv[0]),
+      liveEv[1],
       h('p', { class: 'muted small' }, t('live.changes_method', { f: fFloor }), fProvisional ? [' ', h('strong', {}, t('live.provisional', { f: fFloor }))] : null));
     if (st.sel) spectrum();
     draw();

@@ -1,27 +1,9 @@
 [
  {
-  "field": "wise0855",
-  "name": "WISE 0855\u22120714",
-  "ra": 133.760249,
-  "dec": -7.242245
- },
- {
-  "field": "barnard",
-  "name": "Barnard's Star",
-  "ra": 269.446191,
-  "dec": 4.767694
- },
- {
-  "field": "epsindib",
-  "name": "Epsilon Indi B (Ba+Bb, unresolved)",
-  "ra": 331.096197,
-  "dec": -56.800583
- },
- {
-  "field": "rwaur",
-  "name": "RW Aurigae",
-  "ra": 76.956589,
-  "dec": 30.401293
+  "field": "ecliptic_control",
+  "name": "Control field on the ecliptic (RA 180, Dec 0)",
+  "ra": 180.0,
+  "dec": 0.0
  },
  {
   "field": "rdra",
@@ -30,9 +12,57 @@
   "dec": 66.755023
  },
  {
-  "field": "ecliptic_control",
-  "name": "Control field on the ecliptic (RA 180, Dec 0)",
-  "ra": 180.0,
-  "dec": 0.0
+  "field": "barnard",
+  "name": "Barnard's Star",
+  "ra": 269.446191,
+  "dec": 4.767694
+ },
+ {
+  "field": "wise0855",
+  "name": "WISE 0855\u22120714",
+  "ra": 133.760249,
+  "dec": -7.242245
+ },
+ {
+  "field": "rwaur",
+  "name": "RW Aurigae",
+  "ra": 76.956589,
+  "dec": 30.401293
+ },
+ {
+  "field": "epsindib",
+  "name": "Epsilon Indi B (Ba+Bb, unresolved)",
+  "ra": 331.096197,
+  "dec": -56.800583
+ },
+ {
+  "field": "e3_ecl01",
+  "name": "E3 ecliptic field 01 (lon 86.70, lat -0.43)",
+  "ra": 86.414521,
+  "dec": 22.971956
+ },
+ {
+  "field": "e3_ecl00",
+  "name": "E3 ecliptic field 00 (lon 70.40, lat -0.33)",
+  "ra": 68.839988,
+  "dec": 21.684231
+ },
+ {
+  "field": "e3_ecl02",
+  "name": "E3 ecliptic field 02 (lon 140.15, lat -1.48)",
+  "ra": 142.079011,
+  "dec": 13.362679
+ },
+ {
+  "field": "e3_ecl04",
+  "name": "E3 ecliptic field 04 (lon 55.38, lat -0.18)",
+  "ra": 53.086886,
+  "dec": 18.928244
+ },
+ {
+  "field": "e3_ecl03",
+  "name": "E3 ecliptic field 03 (lon 305.13, lat -1.00)",
+  "ra": 307.74118,
+  "dec": -19.95707
  }
 ]

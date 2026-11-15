@@ -11,7 +11,7 @@ predicted position. Pairs without an M2 map (first frame of a detector) are excl
 methods are scored on identical pairs (count recorded).
 Usage: .venv/bin/python scripts/e3_recall.py            (fields from data/findings/e3_fields.json + 6 existing + E2)
 """
-import glob, json, os, sys
+import json, os, sys
 
 import numpy as np
 from scipy import ndimage
@@ -158,9 +158,8 @@ def main():
     f = json.load(open("data/findings/f1_calibration.json"))["f"]
     e3f = json.load(open("data/findings/e3_fields.json"))["fields"]
     groups = dict(existing=EXISTING, ecliptic=[x["field"] for x in e3f])
-    # E2 fields: added once their READY files exist (data/efields/e2_*); loader in load_e2 if present
-    e2 = sorted(os.path.basename(p)[:-len("_READY")] for p in glob.glob("data/efields/e2_*_READY"))
-    groups["e2"] = e2
+    # E2 fields (data/efields/e2_fields.json); a field without data/efields/<field>/READY is listed as missing
+    groups["e2"] = [x["field"] for x in json.load(open("data/efields/e2_fields.json"))["fields"]]
     recs, rows, cache, missing = [], [], {}, []
     for gname, names in groups.items():
         for nm in names:
@@ -193,7 +192,32 @@ def main():
 
 
 def load_e2(name):
-    raise FileNotFoundError(f"E2 loader not implemented yet for {name} (data/efields format pending)")
+    """E2 field from data/efields/<name> (README there): native cutouts resampled with scripts/e2_counts.resample
+    (= build_field.cut); v_raw is the same bilinear resample without the flag mask. Frames sorted (mjd, detector)."""
+    from astropy.io import fits
+    from astropy.wcs import WCS
+    from orrery.change import bilinear, grid_world
+    from orrery.data import load_stamp
+    import e2_counts
+    root = f"data/efields/{name}"
+    if not os.path.exists(f"{root}/READY"):
+        raise FileNotFoundError(f"{root}/READY")
+    fj = json.load(open(f"{root}/field.json"))
+    gra, gdec = grid_world(S, fj["ra"], fj["dec"])
+    rows = []
+    for fl in fj["frame_list"]:
+        st = load_stamp(f"{root}/{fl['file']}")
+        rr = e2_counts.resample(st, gra, gdec)
+        if rr is None:
+            continue
+        x, y = WCS(fits.Header.fromstring(st.wcs_header)).all_world2pix(gra.ravel(), gdec.ravel(), 0)
+        v_raw = bilinear(st.image, x.reshape(S, S) - st.x0, y.reshape(S, S) - st.y0).astype(np.float32)
+        rows.append((st.mjd, st.detector, st.obs_id, rr[0], rr[1], v_raw))
+    rows.sort(key=lambda t: (t[0], t[1]))
+    d = dict(mjd=np.array([t[0] for t in rows]), detector=np.array([t[1] for t in rows]),
+             obs_id=np.array([t[2] for t in rows]), v=np.array([t[3] for t in rows]),
+             lam=np.array([t[4] for t in rows]), v_raw=np.array([t[5] for t in rows]))
+    return d, fj["ra"], fj["dec"], f"{root} (scripts/e2_counts.resample)"
 
 
 if __name__ == "__main__":

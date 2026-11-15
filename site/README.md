@@ -21,14 +21,16 @@ If a file is missing or malformed, the part of the page that needs it shows "Not
 
 | Page | Reads |
 |---|---|
-| `index.html` | `reveal.json` |
-| `start.html` | `findings.json`, plus the files of each finding's demo (`reveal.json`, `timemachine/index.json` and its first field, `objects.json`, `injections.json`) |
-| `timemachine.html` | live: `index/dr1/meta.json`, `index/dr1/<b>_<r>.json`, `index/dr1/wave_tables.json` + S3 pixels; showcase: `timemachine/index.json`, `timemachine/<field>.json`, `findings.json` (f1) |
-| `objects.html` | `objects.json` |
+| `index.html` | `headline.json` `{field, question, number, err?, unit?, number_label, sentence, kind?, version, nulls?, method?}`, `timemachine/<field>.json`, `reveal.json` (below the fold) |
+| `start.html` | `findings.json` (f1–f3; f4 is no longer on the main path), plus each step's demo data |
+| `timemachine.html` | live: `index/dr1/*` + S3 pixels; `?target=<id>`: `targets/<id>.json` `{title, plain_result, numbers:[{label, value, err, unit?, kind, nulls?, method?}], evidence_links:[{text, href}], method_note}` and `timemachine/<id>.json`; prepared fields: `timemachine/index.json`, `timemachine/<field>.json` (optional `gaia: [{x, y, g}]`, per-frame `flags`, `meta`, `s3_url`); `findings.json` (f1) |
+| `objects.html` ("Evidence") | `objects.json` |
 | `object.html?id=<id>` | `objects/<id>.json` (`id` is restricted to `[A-Za-z0-9_.-]`) |
-| `explorer.html` | `injections.json`, `limits.json` |
-| `science.html` | `science.md` (rendered by `js/markdown.js`, which escapes all text) |
+| `science.html`, `failed.html` | `science.md`, `failed.md` (rendered by `js/markdown.js`, which escapes all text) |
 | `about.html` | `about.json` |
+| `explorer.html` (not linked) | `injections.json` |
+
+Every number on the landing page, the target cards and the findings is a button that opens its evidence (`js/components/evidence.js`): the pictures behind it with links to the original S3 files, any null tests, and the method section on `science.html`.
 
 `data/i18n/en.json` and `data/i18n/es.json` hold every UI string. These two files belong to the site, not the pipeline: **`build_site_data.py` must not delete `data/i18n/`.** To add a language, add `data/i18n/<code>.json` and an entry in `LANGS` in `js/core.js`. The chosen language is kept in `localStorage`, and `?lang=es` also works.
 

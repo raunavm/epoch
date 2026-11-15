@@ -1,0 +1,49 @@
+{
+ "title": "R Draconis \u2014 a pulsating giant star",
+ "plain_result": "1635 SPHEREx pictures over 2 visits. None of the 2180 remaining changes were matched to the star itself \u2014 likely because a star this bright saturates SPHEREx's detector at its centre, where pixels are excluded (not yet checked for this field). A light curve (one brightness per picture after removing the star's colour) is not measured yet.",
+ "numbers": [
+  {
+   "label": "Pictures",
+   "value": 1635,
+   "err": null,
+   "kind": "data",
+   "unit": ""
+  },
+  {
+   "label": "Changes in a time-ordered blink",
+   "value": 419,
+   "err": null,
+   "kind": "derived",
+   "unit": ""
+  },
+  {
+   "label": "Changes in a same-detector blink",
+   "value": 123,
+   "err": null,
+   "kind": "derived",
+   "unit": ""
+  },
+  {
+   "label": "Changes after the colour-aware view",
+   "value": 2180,
+   "err": null,
+   "kind": "derived",
+   "unit": ""
+  },
+  {
+   "label": "\u2026of which at the star itself",
+   "value": 0,
+   "err": null,
+   "kind": "derived",
+   "unit": ""
+  }
+ ],
+ "evidence_links": [
+  {
+   "text": "Open the prepared field",
+   "href": "timemachine.html?field=rdra"
+  }
+ ],
+ "method_note": "Counts use the frozen change model (revision 2). A variable star should keep showing up after correction; a still star should not.",
+ "method_anchor": "science.html#which-change-is-real"
+}

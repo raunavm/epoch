@@ -1,0 +1,83 @@
+{
+ "title": "WISE 0855\u22120714 \u2014 the coldest known brown dwarf",
+ "plain_result": "Too faint for most single pictures, but where it should be at 4.4\u20135 \u00b5m SPHEREx measures 0.50 \u00b1 0.03 mJy in its second sky survey \u2014 the brightness Spitzer measured (0.51 mJy) \u2014 and it moved between surveys as predicted; standing still is ruled out.",
+ "numbers": [
+  {
+   "label": "Signal in survey 2, against 24 empty paths",
+   "value": 16.5,
+   "err": null,
+   "kind": "derived",
+   "unit": "\u03c3",
+   "nulls": [
+    -1.101,
+    -0.634,
+    1.125,
+    -0.851,
+    2.78,
+    -0.833,
+    -0.724,
+    -0.226,
+    -0.491,
+    -0.587,
+    -0.567,
+    -0.42,
+    -0.012,
+    -0.395,
+    -0.28,
+    1.742,
+    0.8,
+    0.21,
+    0.083,
+    0.182,
+    2.757,
+    -0.367,
+    -0.905,
+    -0.275
+   ],
+   "nulls_note": "same pictures, path shifted 6\u20139 px",
+   "method": "science.html#e4"
+  },
+  {
+   "label": "Signal in survey 3 (a neighbour star restored to the model)",
+   "value": 10.6,
+   "err": null,
+   "kind": "derived",
+   "unit": "\u03c3",
+   "method": "science.html#e4"
+  },
+  {
+   "label": "Brightness at 4.4\u20135 \u00b5m, survey 2",
+   "value": 0.504,
+   "err": 0.029,
+   "kind": "derived",
+   "unit": "mJy"
+  },
+  {
+   "label": "Shift between surveys vs prediction",
+   "value": "-3.3\u2033, +2.1\u2033 (predicted -4.5\u2033, +0.6\u2033)",
+   "err": null,
+   "kind": "derived",
+   "unit": ""
+  },
+  {
+   "label": "Chance it is a source that does not move",
+   "value": "3e-07",
+   "err": null,
+   "kind": "derived",
+   "unit": ""
+  }
+ ],
+ "evidence_links": [
+  {
+   "text": "All 46 pictures used (4.4\u20135 \u00b5m)",
+   "href": "science.html#e4"
+  },
+  {
+   "text": "Astrometry: Luhman & Esplin 2016, AJ 152, 78",
+   "href": "https://arxiv.org/abs/1605.06655"
+  }
+ ],
+ "method_note": "Position predicted from proper motion and parallax (Luhman & Esplin 2016); each picture fitted with Gaia stars; pictures at 4.4\u20135 \u00b5m combined per survey; significance quoted against the same path shifted to 24 empty positions. A statement about a known object, not a discovery. Survey 1 has 3 usable pictures and is not informative.",
+ "method_anchor": "science.html#e4",
+ "slider": "e4/reveal.json"
+}

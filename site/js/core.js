@@ -36,7 +36,9 @@ export function asset(p) {
 export function safeUrl(u) { return /^https?:\/\//.test(u || '') ? u : null; }
 // Keep the fixture flag on internal links.
 export function link(href) {
-  return FIXTURES ? href + (href.includes('?') ? '&' : '?') + 'fixtures=1' : href;
+  if (!FIXTURES) return href;
+  const [path, hash = ''] = href.split('#');
+  return path + (path.includes('?') ? '&' : '?') + 'fixtures=1' + (hash ? `#${hash}` : '');
 }
 
 export function t(key, vars) {
@@ -99,6 +101,8 @@ export const wlColor = wl => viridis((wl - WL_MIN) / (WL_MAX - WL_MIN));
 
 // Okabe-Ito categories, each with a distinct marker shape.
 export const CATS = {
+  'target': { color: '#FFFFFF', shape: 'cross', key: 'cat.target' },
+  'known star': { color: '#009E73', shape: 'ring', key: 'cat.known_star' },
   'known asteroid': { color: '#56B4E9', shape: 'circle', key: 'cat.asteroid' },
   'variable star': { color: '#E69F00', shape: 'diamond', key: 'cat.variable' },
   'artifact': { color: '#CC79A7', shape: 'square', key: 'cat.artifact' },
@@ -107,7 +111,7 @@ export const CATS = {
 
 const NAV = [
   ['index.html', 'nav.home'], ['start.html', 'nav.start'], ['timemachine.html', 'nav.timemachine'],
-  ['objects.html', 'nav.objects'], ['explorer.html', 'nav.explorer'], ['science.html', 'nav.science'],
+  ['objects.html', 'nav.evidence'], ['science.html', 'nav.science'], ['failed.html', 'nav.failed'],
   ['about.html', 'nav.about'],
 ];
 
@@ -154,17 +158,4 @@ export async function init() {
     h('p', {}, t('footer.tagline')),
     h('label', { for: 'lang' }, t('common.language') + ' '), sel,
   );
-}
-
-// One finding from findings.json: {sentence, number, err, unit?, label?, detail?}.
-// For f1, detail.all_fields adds one line about all test fields (the headline is the control field).
-export function findingLine(f) {
-  const main = h('p', { class: 'finding' }, f.sentence || '', ' ',
-    f.number != null ? h('strong', { class: 'num' }, fmtPM(f.number, f.err), f.unit ? ` ${f.unit}` : '') : null, ' ',
-    badge(f.label || 'derived'));
-  const a = f.detail?.all_fields;
-  if (!a || a.fraction_removed == null) return main;
-  return h('div', {}, main, h('p', { class: 'muted small' },
-    t('finding.all_fields', { n: f.detail.per_field?.length ?? '', pct: fmt(100 * a.fraction_removed, 2), naive: a.n_naive, corr: a.n_corrected }),
-    a.note ? ` (${a.note})` : '', ' ', badge('derived')));
 }

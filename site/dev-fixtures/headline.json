@@ -1,0 +1,11 @@
+{
+ "field": "fx-field",
+ "question": "Fixture: at this spot in the sky, what really changed?",
+ "number": 0.0,
+ "err": 0.0,
+ "unit": "%",
+ "number_label": "fixture: share of plain-blink changes that are only colour",
+ "kind": "derived",
+ "sentence": "Fixture sentence: switch between raw and corrected to see which changes are real.",
+ "version": "A"
+}

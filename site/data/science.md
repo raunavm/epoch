@@ -6,7 +6,7 @@ NASA's SPHEREx telescope photographs the whole sky in 102 colours of infrared li
 
 Orrery predicts what each picture should look like in its own colour, then shows only what is left over. On a test patch of sky chosen in advance, this removed 85% of the apparent changes that a plain blink shows.
 
-Orrery can also add up many pictures along the known path of an asteroid. One asteroid that sits in the noise in a typical single picture (median 1.5 times the noise level) stands out at 22 times the noise when 125 pictures are combined.
+Orrery can also add up many pictures along the known path of an asteroid. One asteroid that sits in the noise in a typical single picture (median 0.24 times the noise level) stands out at 6.2 times the noise when 295 pictures are combined.
 
 Every number on this page comes from files in the project repository, and each section says how to re-make it.
 
@@ -34,11 +34,11 @@ We wrote this model twice, independently (one with numpy, one with JAX, differen
 
 ## Sizes and colours
 
-**Sizes.** An asteroid's brightness at 3–5 µm is mostly its own heat. We fit the near-Earth asteroid thermal model (NEATM; Harris 1998) to those pictures, with the beaming parameter η given a prior of 0.95 ± 0.20 as in Masiero et al. (2021), and with uncertainties from repeated random draws. Across the 2 asteroids with an independent reference size, our median size ratio to the reference is 1.03, with a robust scatter of 15%. 100% of them agree with the reference within 20%. The spread of differences divided by their stated errors is 0.60 (1.0 would mean the errors are exactly right). These are model estimates with an assumed η, not survey diameters; Masiero et al. (2021) give about 30% as the floor for this kind of estimate.
+**Sizes.** An asteroid's brightness at 3–5 µm is mostly its own heat. We fit the near-Earth asteroid thermal model (NEATM; Harris 1998) to those pictures, with the beaming parameter η given a prior of 0.95 ± 0.20 as in Masiero et al. (2021), and with uncertainties from repeated random draws. Across the 5 asteroids with an independent reference size, our median size ratio to the reference is 1.143, with a robust scatter of 0.90%. 80% of them agree with the reference within 20%. The spread of differences divided by their stated errors is 0.60 (1.0 would mean the errors are exactly right). These are model estimates with an assumed η, not survey diameters; Masiero et al. (2021) give about 30% as the floor for this kind of estimate.
 
 ![Our sizes against reference sizes](figs/fig_sizes.png "Sizes from SPHEREx against NEOWISE, IRAS or AKARI. Line: equal sizes.")
 
-**Colours.** We compare the shape of our reflectance spectrum with Gaia DR3 over 0.74–1.03 µm, using only pictures from one visit. Across 2 asteroids the median χ² per degree of freedom is 0.59. Comparing across visits failed (for 224 Oceana the spectral slope disagreed with Gaia well beyond the errors, docs/CLAIMS.md C4), because asteroids rotate and change brightness between visits, so we compare within visits only.
+**Colours.** We compare the shape of our reflectance spectrum with Gaia DR3 over 0.74–1.03 µm, using only pictures from one visit. Across 5 asteroids the median χ² per degree of freedom is 2.0. Comparing across visits failed (for 224 Oceana the spectral slope disagreed with Gaia well beyond the errors, docs/CLAIMS.md C4), because asteroids rotate and change brightness between visits, so we compare within visits only.
 
 ![Within-visit comparison with Gaia](figs/fig_gaia.png "Reflectance from SPHEREx (one visit) against Gaia DR3.")
 
@@ -53,9 +53,9 @@ stack(p)  = Σ_e w_e · expected_e · residual_e(p) / Σ_e w_e · expected_e²  
 â ± σ_â    = Σ_e expected_e·A_e/σ_e² / Σ_e expected_e²/σ_e²  ±  (Σ_e expected_e²/σ_e²)^(-1/2)
 ```
 
-**Result.** Asteroid 11874: median single-picture signal-to-noise 1.5, stack signal-to-noise 22 from 125 pictures. The gain in depth is 3.0 magnitudes, against 3.0 expected for perfect noise-limited adding. The brightest single picture reached 51 times the noise; a value above 5 means at least one picture shows something at the predicted spot, and we have not yet checked each such picture by eye.
+**Result.** Asteroid 98397 (2000 UC3): median single-picture signal-to-noise 0.24, stack signal-to-noise 6.2 from 295 pictures. The gain in depth is 3.7 magnitudes, against 3.7 expected for perfect noise-limited adding. The brightest single picture reached 4.3 times the noise; a value above 5 means at least one picture shows something at the predicted spot, and we have not yet checked each such picture by eye.
 
-**Null test.** The same pictures stacked on paths shifted 6–9 pixels off the orbit, in 8 directions, give 0.59 ± 3.0.
+**Null test.** The same pictures stacked on paths shifted 6–9 pixels off the orbit, in 8 directions, give 0 ± 1.0.
 
 ![Single pictures against the stack](figs/fig_reveal.png "Left: single pictures. Right: the stack along the orbit.")
 
@@ -89,6 +89,7 @@ fraction removed = 1 − N_changes(corrected) / N_changes(plain blink)
 
 We plant artificial asteroids, using each picture's own point-spread function, at 8 positions 7.5 pixels off a real asteroid's track (real stars, real noise, real artefacts), refit the scene exactly as for real objects, and stack. "Recovered" means stack signal-to-noise ≥ 5. Brightness comes from reflected light (and heat where relevant) for a grid of sizes, distances and albedos, in an opposition-like geometry (distance from Earth = distance from Sun − 1 au, phase 0°); that geometry is a model, not a real orbit.
 
+Half of the planted objects are recovered down to V = 21 in a stack of 321 pictures. The same stacks with nothing planted give 0 ± 1.9.
 
 ![Recovery of planted objects](figs/fig_injections.png "Fraction recovered against brightness, for three albedos.")
 
@@ -114,7 +115,7 @@ These are limits on what this stack could have seen. They are not a search for P
 - Sizes rest on an assumed η; they are model estimates, not survey diameters.
 - No water (3 µm) claim, no taxonomy claim.
 - The change model has no ablation of the noise floor yet.
-- The asteroid samples for sizes and colours are small (2 objects with reference sizes).
+- The asteroid samples for sizes and colours are small (5 objects with reference sizes).
 - No search for unknown objects was run. Nothing here is a detection of Planet X.
 
 ## What we tried that failed

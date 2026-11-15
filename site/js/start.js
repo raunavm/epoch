@@ -1,15 +1,16 @@
 // Guided path through the findings. A finding missing from findings.json is omitted.
-import { init, getJSON, h, t, link, badge, fmtPM, unavailable, findingLine } from './core.js';
+import { init, getJSON, h, t, link, badge, fmtPM, unavailable } from './core.js';
+import { findingLine } from './components/evidence.js';
 import { mountReveal } from './components/reveal.js';
 import { mountBlink } from './components/blink.js';
-import { mountInjections, sizeText } from './components/injgrid.js';
+import { sizeText } from './components/injgrid.js';
 
 await init();
 const box = document.getElementById('tour');
 const findings = await getJSON('findings.json');
-const DEFAULT = { f1: 'timemachine', f2: 'reveal', f3: 'object', f4: 'explorer' };
+const DEFAULT = { f1: 'timemachine', f2: 'reveal', f3: 'object' }; // f4 (planted objects) is not on the main path
 const steps = Object.keys(DEFAULT).filter(k => findings?.[k]).map(k => ({ key: k, f: findings[k], kind: findings[k].interaction || DEFAULT[k] }));
-const PAGE = { timemachine: 'timemachine.html', reveal: 'index.html', object: 'objects.html', explorer: 'explorer.html' };
+const PAGE = { timemachine: 'timemachine.html', reveal: 'index.html#faint', object: 'objects.html' };
 
 const MINI = {
   async reveal(el) { const d = await getJSON('reveal.json'); return d?.frames?.length ? mountReveal(el, d, { compact: true, autoplay: true }) : el.replaceChildren(unavailable(t('what.reveal'))); },
@@ -18,7 +19,6 @@ const MINI = {
     const f = idx?.[0] ? await getJSON(`timemachine/${String(idx[0].field).replace(/[^\w.-]/g, '')}.json`) : null;
     return f?.frames?.length ? mountBlink(el, f, { compact: true }) : el.replaceChildren(unavailable(t('what.field')));
   },
-  async explorer(el) { const d = await getJSON('injections.json'); return d?.cells?.length ? mountInjections(el, d, { compact: true }) : el.replaceChildren(unavailable(t('what.injections'))); },
   async object(el) {
     const rows = await getJSON('objects.json');
     const r = rows?.find(o => o.D_km != null && o.D_truth_km != null) || rows?.[0];
@@ -51,14 +51,14 @@ async function go(k, focus = true) {
   const title = h('h2', { tabindex: '-1' }, s.f.title || t(`start.title_${s.kind}`));
   box.replaceChildren(
     h('p', { class: 'muted' }, t('start.progress', { k: k + 1, n: steps.length })),
-    title, findingLine(s.f),
+    title, findingLine(s.f, s.key),
     h('div', { class: 'tour-nav' },
       h('button', { type: 'button', class: 'btn', disabled: k === 0, onclick: () => go(cur - 1) }, '← ', t('start.back')),
       h('ol', { class: 'dots', 'aria-label': t('start.dots') }, steps.map((_, j) => h('li', {},
         h('button', { type: 'button', class: 'dot', 'aria-label': t('start.progress', { k: j + 1, n: steps.length }), 'aria-current': j === k ? 'step' : null, onclick: () => go(j) })))),
       k < steps.length - 1
         ? h('button', { type: 'button', class: 'btn primary', onclick: () => go(cur + 1) }, t('start.next'), ' →')
-        : h('a', { class: 'btn primary', href: link('timemachine.html?target=barnard') }, t('home.cta'))),
+        : h('a', { class: 'btn primary', href: link('timemachine.html') }, t('home.cta2'))),
     mini,
     h('p', {}, h('a', { href: link(PAGE[s.kind] || 'index.html') }, t('start.open_full'))),
   );

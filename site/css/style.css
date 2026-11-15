@@ -213,3 +213,56 @@ th[aria-sort="descending"] .sort::after { content: " ▼"; }
 .hero .cta { margin: 0.4em 0 0.8em; }
 .hero .lede { margin-bottom: 0.4em; }
 .reveal .imgpanel { max-width: 300px; }
+.key-ring { border-radius: 50%; border-style: dashed; }
+.key-cross { border: 0; background: linear-gradient(var(--c), var(--c)) center/2px 100% no-repeat, linear-gradient(var(--c), var(--c)) center/100% 2px no-repeat; }
+.flags summary { cursor: pointer; color: var(--muted); }
+.flags dt.flag-h { grid-column: 1 / -1; }
+.facts dd { overflow-wrap: anywhere; }
+
+/* Evidence panels: every number opens its evidence */
+.evnum { font: inherit; color: inherit; background: none; border: 0; padding: 0 2px; cursor: pointer; border-bottom: 2px dotted var(--accent); }
+.evnum:hover { color: var(--accent); }
+.evnum[aria-expanded="true"] { border-bottom-style: solid; }
+.evidence { margin: 8px 0; padding: 10px 14px; border-left: 3px solid var(--accent); background: var(--panel2); border-radius: 0 8px 8px 0; font-size: 0.95rem; }
+.evidence[hidden] { display: none; }
+.evidence h4 { margin: 0.4em 0 0.2em; font-size: 0.95rem; }
+.ev-frames { max-height: 220px; overflow: auto; margin: 0; padding-left: 2.2em; font-size: 0.85rem; }
+
+/* Landing: one question, one interaction, one number */
+.hero2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); grid-template-areas: "q field" "s field" "n field" "c field" "x field"; grid-template-rows: auto auto auto auto 1fr; gap: 0 32px; align-items: start; }
+.hero2 h1 { grid-area: q; font-size: clamp(1.8rem, 4.2vw, 3rem); }
+.hero2 #headline-sentence { grid-area: s; }
+.hero2 .hero-field { grid-area: field; margin-top: 1.2em; padding: 12px; }
+.hero2 .headline-number { grid-area: n; }
+.hero2 .cta { grid-area: c; }
+.hero-field .tm-views { max-width: none; grid-template-columns: 1fr; }
+.hero-field .segmented.big { margin-top: 0; }
+.hero-field .hint { font-size: 0.9rem; margin: 4px 0 8px; }
+.field-name { margin: 0 0 6px; color: var(--muted); font-size: 0.9rem; }
+.figure-line { margin: 0.4em 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+.big-figure { font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.05; }
+.figure-label { font-size: 1.05rem; color: var(--muted); max-width: 26em; }
+.below-fold { margin-top: 3em; border-top: 1px solid var(--line); }
+@media (max-width: 860px) {
+  .hero2 { grid-template-columns: 1fr; grid-template-areas: "q" "n" "field" "c" "s"; grid-template-rows: none; }
+  .hero2 h1 { margin-bottom: 0.1em; }
+  .hero2 .hero-field { margin-top: 0.3em; }
+  .hero-field .imgwrap { max-width: 250px; margin: 0 auto; }
+  .hero-field .hint { display: none; }
+  .big-figure { font-size: 2.2rem; }
+  .figure-line { margin: 0.2em 0; }
+}
+
+/* Time machine: target result card, strip of five, checklist */
+.result-card h2 { margin-top: 0.2em; }
+.eyebrow { margin: 0; color: var(--accent); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.plain-result { font-size: 1.15rem; max-width: 44em; }
+.result-numbers dd { font-size: 1.1rem; }
+.strip { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.strip-card { display: flex; flex-direction: column; gap: 4px; height: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); text-decoration: none; }
+.strip-card:hover, .strip-card[aria-current="true"] { border-color: var(--accent); }
+.strip-card span { color: var(--muted); }
+.checklist ul { list-style: none; padding: 0; }
+.checklist li { margin: 0.5em 0; }
+.tick { color: #009E73; font-weight: 800; }
+.checklist pre { margin: 6px 0 0; }

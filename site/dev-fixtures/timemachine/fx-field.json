@@ -12,14 +12,35 @@
    "wl_um": 0.8,
    "img_png": "png/tm/raw_0.png",
    "corr_png": "png/tm/corr_0.png",
+   "detector": 1,
+   "s3_url": "https://example.invalid/fixture.fits",
+   "flags": {
+    "SOURCE": 300,
+    "OUTLIER": 0
+   },
+   "meta": {
+    "PSF_FWHM": 7.5,
+    "L2DQAFLG": "Pass",
+    "L2 N_OUTLIER": 1000
+   },
    "labels": [
+    {
+     "x": 32,
+     "y": 32,
+     "name": "Fixture target",
+     "kind": "star",
+     "label": "target",
+     "confidence": null,
+     "change": false
+    },
     {
      "x": 10,
      "y": 40,
      "name": "FX-1 (synthetic)",
      "kind": "mover",
      "label": "known asteroid",
-     "confidence": 0.9
+     "confidence": 0.9,
+     "change": true
     }
    ]
   },
@@ -30,14 +51,35 @@
    "wl_um": 1.3,
    "img_png": "png/tm/raw_1.png",
    "corr_png": "png/tm/corr_1.png",
+   "detector": 2,
+   "s3_url": "https://example.invalid/fixture.fits",
+   "flags": {
+    "SOURCE": 301,
+    "OUTLIER": 1
+   },
+   "meta": {
+    "PSF_FWHM": 7.5,
+    "L2DQAFLG": "Pass",
+    "L2 N_OUTLIER": 1001
+   },
    "labels": [
+    {
+     "x": 32,
+     "y": 32,
+     "name": "Fixture target",
+     "kind": "star",
+     "label": "target",
+     "confidence": null,
+     "change": false
+    },
     {
      "x": 16,
      "y": 37,
      "name": "FX-1 (synthetic)",
      "kind": "mover",
      "label": "known asteroid",
-     "confidence": 0.9
+     "confidence": 0.9,
+     "change": true
     }
    ]
   },
@@ -48,14 +90,35 @@
    "wl_um": 1.8,
    "img_png": "png/tm/raw_2.png",
    "corr_png": "png/tm/corr_2.png",
+   "detector": 3,
+   "s3_url": "https://example.invalid/fixture.fits",
+   "flags": {
+    "SOURCE": 302,
+    "OUTLIER": 2
+   },
+   "meta": {
+    "PSF_FWHM": 7.5,
+    "L2DQAFLG": "Pass",
+    "L2 N_OUTLIER": 1002
+   },
    "labels": [
+    {
+     "x": 32,
+     "y": 32,
+     "name": "Fixture target",
+     "kind": "star",
+     "label": "target",
+     "confidence": null,
+     "change": false
+    },
     {
      "x": 22,
      "y": 34,
      "name": "FX-1 (synthetic)",
      "kind": "mover",
      "label": "known asteroid",
-     "confidence": 0.9
+     "confidence": 0.9,
+     "change": true
     }
    ]
   },
@@ -66,22 +129,44 @@
    "wl_um": 2.3,
    "img_png": "png/tm/raw_3.png",
    "corr_png": "png/tm/corr_3.png",
+   "detector": 4,
+   "s3_url": "https://example.invalid/fixture.fits",
+   "flags": {
+    "SOURCE": 303,
+    "OUTLIER": 3
+   },
+   "meta": {
+    "PSF_FWHM": 7.5,
+    "L2DQAFLG": "Pass",
+    "L2 N_OUTLIER": 1003
+   },
    "labels": [
+    {
+     "x": 32,
+     "y": 32,
+     "name": "Fixture target",
+     "kind": "star",
+     "label": "target",
+     "confidence": null,
+     "change": false
+    },
     {
      "x": 28,
      "y": 31,
      "name": "FX-1 (synthetic)",
      "kind": "mover",
      "label": "known asteroid",
-     "confidence": 0.9
+     "confidence": 0.9,
+     "change": true
     },
     {
      "x": 50,
      "y": 12,
      "name": "",
      "kind": "glint",
-     "label": "artifact",
-     "confidence": 0.6
+     "label": "unexplained",
+     "confidence": 0.6,
+     "change": true
     }
    ]
   },
@@ -92,14 +177,35 @@
    "wl_um": 2.8,
    "img_png": "png/tm/raw_4.png",
    "corr_png": "png/tm/corr_4.png",
+   "detector": 5,
+   "s3_url": "https://example.invalid/fixture.fits",
+   "flags": {
+    "SOURCE": 304,
+    "OUTLIER": 4
+   },
+   "meta": {
+    "PSF_FWHM": 7.5,
+    "L2DQAFLG": "Pass",
+    "L2 N_OUTLIER": 1004
+   },
    "labels": [
+    {
+     "x": 32,
+     "y": 32,
+     "name": "Fixture target",
+     "kind": "star",
+     "label": "target",
+     "confidence": null,
+     "change": false
+    },
     {
      "x": 34,
      "y": 28,
      "name": "FX-1 (synthetic)",
      "kind": "mover",
      "label": "known asteroid",
-     "confidence": 0.9
+     "confidence": 0.9,
+     "change": true
     }
    ]
   },
@@ -110,14 +216,35 @@
    "wl_um": 3.3,
    "img_png": "png/tm/raw_5.png",
    "corr_png": "png/tm/corr_5.png",
+   "detector": 6,
+   "s3_url": "https://example.invalid/fixture.fits",
+   "flags": {
+    "SOURCE": 305,
+    "OUTLIER": 5
+   },
+   "meta": {
+    "PSF_FWHM": 7.5,
+    "L2DQAFLG": "Pass",
+    "L2 N_OUTLIER": 1005
+   },
    "labels": [
+    {
+     "x": 32,
+     "y": 32,
+     "name": "Fixture target",
+     "kind": "star",
+     "label": "target",
+     "confidence": null,
+     "change": false
+    },
     {
      "x": 40,
      "y": 25,
      "name": "FX-1 (synthetic)",
      "kind": "mover",
      "label": "known asteroid",
-     "confidence": 0.9
+     "confidence": 0.9,
+     "change": true
     }
    ]
   },
@@ -128,14 +255,35 @@
    "wl_um": 3.8,
    "img_png": "png/tm/raw_6.png",
    "corr_png": "png/tm/corr_6.png",
+   "detector": 1,
+   "s3_url": "https://example.invalid/fixture.fits",
+   "flags": {
+    "SOURCE": 306,
+    "OUTLIER": 6
+   },
+   "meta": {
+    "PSF_FWHM": 7.5,
+    "L2DQAFLG": "Pass",
+    "L2 N_OUTLIER": 1006
+   },
    "labels": [
+    {
+     "x": 32,
+     "y": 32,
+     "name": "Fixture target",
+     "kind": "star",
+     "label": "target",
+     "confidence": null,
+     "change": false
+    },
     {
      "x": 46,
      "y": 22,
      "name": "FX-1 (synthetic)",
      "kind": "mover",
      "label": "known asteroid",
-     "confidence": 0.9
+     "confidence": 0.9,
+     "change": true
     }
    ]
   },
@@ -146,16 +294,69 @@
    "wl_um": 4.3,
    "img_png": "png/tm/raw_7.png",
    "corr_png": "png/tm/corr_7.png",
+   "detector": 2,
+   "s3_url": "https://example.invalid/fixture.fits",
+   "flags": {
+    "SOURCE": 307,
+    "OUTLIER": 7
+   },
+   "meta": {
+    "PSF_FWHM": 7.5,
+    "L2DQAFLG": "Pass",
+    "L2 N_OUTLIER": 1007
+   },
    "labels": [
+    {
+     "x": 32,
+     "y": 32,
+     "name": "Fixture target",
+     "kind": "star",
+     "label": "target",
+     "confidence": null,
+     "change": false
+    },
     {
      "x": 52,
      "y": 19,
      "name": "FX-1 (synthetic)",
      "kind": "mover",
      "label": "known asteroid",
-     "confidence": 0.9
+     "confidence": 0.9,
+     "change": true
     }
    ]
+  }
+ ],
+ "gaia": [
+  {
+   "x": 53.11272650151438,
+   "y": 27.49005138549082,
+   "g": 15.0
+  },
+  {
+   "x": 50.70132667149443,
+   "y": 56.416045181471894,
+   "g": 15.0
+  },
+  {
+   "x": 57.02716300006597,
+   "y": 33.84231240765204,
+   "g": 15.0
+  },
+  {
+   "x": 38.75327542588915,
+   "y": 57.63322176099237,
+   "g": 15.0
+  },
+  {
+   "x": 26.136333019698014,
+   "y": 49.418594572584716,
+   "g": 15.0
+  },
+  {
+   "x": 39.90195912472328,
+   "y": 58.78687703618647,
+   "g": 15.0
   }
  ]
 }

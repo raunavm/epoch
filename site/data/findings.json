@@ -131,7 +131,7 @@
   "unit": "mag",
   "number": 20.51,
   "err": null,
-  "sentence": "Planted test objects in real SPHEREx pictures are recovered half the time down to visual magnitude 20.51 when 321 pictures are combined.",
+  "sentence": "Planted test objects in real SPHEREx pictures are recovered half the time down to visual magnitude 20.5 when 321 pictures are combined.",
   "detail": {
    "track": "80253",
    "n_frames": 321,

@@ -128,7 +128,7 @@
    "pV": 0.05,
    "V": 20.24,
    "n_frames": 321,
-   "recovered_frac": 1.0,
+   "recovered_frac": 0.5,
    "snr_median": 13.19,
    "example_png": "injections/inj_0.05_2.5_2.png"
   },
@@ -218,7 +218,7 @@
    "pV": 0.05,
    "V": 20.77,
    "n_frames": 321,
-   "recovered_frac": 0.16666666666666666,
+   "recovered_frac": 0.0,
    "snr_median": 8.16,
    "example_png": "injections/inj_0.05_4_5.png"
   },
@@ -1008,7 +1008,7 @@
    "pV": 0.25,
    "V": 20.2,
    "n_frames": 321,
-   "recovered_frac": 1.0,
+   "recovered_frac": 0.5,
    "snr_median": 13.29,
    "example_png": "injections/inj_0.25_100_2400.png"
   },
@@ -1048,7 +1048,7 @@
    "pV": 0.25,
    "V": 20.57,
    "n_frames": 321,
-   "recovered_frac": 0.5,
+   "recovered_frac": 0.0,
    "snr_median": 9.7,
    "example_png": "injections/inj_0.25_250_12742.png"
   },
@@ -1078,7 +1078,7 @@
    "pV": 0.25,
    "V": 20.63,
    "n_frames": 321,
-   "recovered_frac": 0.5,
+   "recovered_frac": 0.0,
    "snr_median": 9.17,
    "example_png": "injections/inj_0.25_500_49528.png"
   },
@@ -1148,7 +1148,7 @@
    "pV": 0.6,
    "V": 20.55,
    "n_frames": 321,
-   "recovered_frac": 0.5,
+   "recovered_frac": 0.0,
    "snr_median": 9.86,
    "example_png": "injections/inj_0.6_2.5_0.5.png"
   },
@@ -1238,7 +1238,7 @@
    "pV": 0.6,
    "V": 20.06,
    "n_frames": 321,
-   "recovered_frac": 1.0,
+   "recovered_frac": 0.8333333333333334,
    "snr_median": 14.97,
    "example_png": "injections/inj_0.6_4_2.png"
   },
@@ -1478,7 +1478,7 @@
    "pV": 0.6,
    "V": 20.73,
    "n_frames": 321,
-   "recovered_frac": 0.3333333333333333,
+   "recovered_frac": 0.0,
    "snr_median": 8.44,
    "example_png": "injections/inj_0.6_50_300.png"
   },
@@ -1648,21 +1648,27 @@
   0.66,
   0.59,
   0.32,
-  -0.26,
-  -2.75,
-  -2.71,
-  -0.19,
-  -1.26,
-  -3.42,
-  -2.37,
-  2.17,
-  3.51,
-  1.26,
-  1.26,
-  -0.58
+  -0.15,
+  -0.03,
+  0.43,
+  3.99,
+  -0.9,
+  -3.48,
+  1.89,
+  0.87,
+  0.88,
+  -2.81,
+  3.7,
+  -3.82
  ],
- "threshold_nominal_snr": 9.66,
- "V50_stack": 20.51,
+ "threshold_nominal_snr": 12.5,
+ "e5_check": {
+  "scale_inner": 1.873,
+  "outer_spread_after_rescale": 1.35,
+  "passed": false,
+  "scale_used": 2.528
+ },
+ "V50_stack": 20.28,
  "method": "scripts/build_injections.py",
  "geometry": "\u0394 = r \u2212 1 au, phase 0 (MODEL)"
 }
