@@ -56,7 +56,7 @@
    "href": "https://www.cosmos.esa.int/web/gaia/dr3"
   }
  ],
- "method_note": "Each picture is fitted with the star's position free, saturated pixels masked and Gaia neighbours modelled; the motion is a straight-line fit to SPHEREx positions with Gaia's parallax held fixed. This fit was not written down in advance. Positions sit a steady ~0.5\u2033 south of Gaia's prediction in every survey; the pair is unresolved, so a shifted centre of light is possible \u2014 not explained here.",
+ "method_note": "Each picture is fitted with the star's position free, saturated pixels masked and Gaia neighbours modelled; the motion is a straight-line fit to SPHEREx positions with Gaia's parallax held fixed. This fit was not written down in advance. Positions sit a steady ~0.5\u2033 south and ~0.2\u2033 east of Gaia's prediction in every window. Gaia's entry is Ba alone and its motion includes its orbit; from the pair's published orbit (Chen et al. 2022) the centre of Ba+Bb's infrared light should sit 0.50\u20130.56\u2033 south and 0.13\u20130.19\u2033 east \u2014 a check we made after the measurement (Science page).",
  "method_anchor": "science.html#motion",
  "figures": [
   {

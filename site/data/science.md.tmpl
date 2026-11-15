@@ -6,7 +6,7 @@ NASA's SPHEREx telescope photographs the whole sky in 102 colours of infrared li
 
 The difficulty is that SPHEREx photographs each spot in a different colour every time. A star that is brighter at one wavelength than another seems to flicker from picture to picture even when nothing moved, so a plain "blink" fills with false changes. Comparing each picture only with pictures from the same detector, which all fall in one band of colours, removes most of them: a median of [[headline.number]]% across [[e2.summary.ratio_corr_over_naive_all.n_fields]] random patches of sky.
 
-Some objects are too faint for most single pictures. Adding pictures along a known path brings them out: WISE 0855−0714, the coldest known brown dwarf, stands out at [[e4.passes.1.significance|f1]] times the spread of empty paths, between the brightnesses NASA's Spitzer and WISE measured in broader bands, and it moves between visits months apart as predicted.
+Some objects are too faint for most single pictures. Adding pictures along a known path brings them out: WISE 0855−0714, the coldest known brown dwarf, stands out at [[e4.passes.1.significance|f1]] times the spread of empty paths, its SPHEREx spectrum matches JWST's within a few per cent, and it moves between visits months apart as predicted.
 
 We also built a cleverer, colour-aware view. In our own test, written down before we looked at the data, it did not find fainter changes than a simple median, so it is offered only as an experiment. Every test, including the ones that failed, is described below, and each section says whether it was written down in advance. Every result number on this page comes from result files in the project repository, and each section says how to re-make it.
 
@@ -110,7 +110,7 @@ The May 2025 visits have only [[e4.passes.0.n_frames]] usable pictures, one of t
 
 **Motion between visits.** Measured shift from the Nov–Dec 2025 to the Apr–May 2026 visits: [[e4.centroid_shift_vs_prediction.0.measured_shift_arcsec.0|f1]]″ east–west and +[[e4.centroid_shift_vs_prediction.0.measured_shift_arcsec.1|f1]]″ north–south (errors [[e4.centroid_shift_vs_prediction.0.err_arcsec.0|f1]]″ and [[e4.centroid_shift_vs_prediction.0.err_arcsec.1|f1]]″), against a predicted [[e4.centroid_shift_vs_prediction.0.predicted_shift_arcsec.0|f1]]″ and +[[e4.centroid_shift_vs_prediction.0.predicted_shift_arcsec.1|f1]]″. This is consistent with the prediction (p = [[e4.centroid_shift_vs_prediction.0.p_vs_prediction|f2]]), and a source that does not move is ruled out (p = 3 × 10⁻⁷). The neighbour star can still pull the measured centres slightly.
 
-**What this is.** A measurement of a known object: a point source at the predicted position of WISE 0855−0714 in SPHEREx DR1 pictures at 4.4–5.0 µm, at a brightness between Spitzer's and WISE's, moving as predicted. It is not a new object.
+**What this is.** A measurement of a known object: a point source at the predicted position of WISE 0855−0714 in SPHEREx DR1 pictures at 4.4–5.0 µm, at a brightness consistent with Spitzer (0.48–0.54 mJy) and WISE (0.41–0.50 mJy) in broader bands, moving as predicted. It is not a new object.
 
 **The slider.** The slider on WISE 0855's card combines the [[e4.slider_stack.n_frames]] pictures of the Nov–Dec 2025 visits only, in order of their expected signal-to-noise (measured brightness never chooses the order). Each step is measured against the same pictures combined along the same 24 empty paths (the spread is never taken below 1), so the number can fall as well as rise when a noisier picture is added. The last step is the [[e4.passes.1.significance|f1]]σ in the table above. Single pictures are only rescaled by the spread of single pictures on the empty paths.
 
@@ -126,7 +126,7 @@ The challenge asks for spectra. Every SPHEREx picture sees a source at one colou
 
 ![SPHEREx spectrum of WISE 0855 next to JWST](figs/e11_wise0855.png "WISE 0855−0714: SPHEREx (blue) and JWST (orange)")
 
-**WISE 0855−0714.** From [[e11.targets.wise0855.n_pictures_used]] pictures, 3.8–5 µm in 0.1 µm steps with errors from 24 empty paths: over the [[e11.targets.wise0855.jwst.comparison.PRISM.n_bins_detected]] steps where it is detected, SPHEREx gives [[e11.targets.wise0855.jwst.comparison.PRISM.mean_ratio_spherex_over_jwst|f2]] ± [[e11.targets.wise0855.jwst.comparison.PRISM.mean_ratio_err|f2]] times the JWST NIRSpec spectrum of Luhman et al. (2024), averaged in the same steps. The two reddest steps (4.8–5.0 µm) come out lower than JWST (2.9σ and 2.7σ); we do not know why. JWST's absolute level was tied by its authors to Spitzer, so the agreement in level is not fully independent; the agreement in shape is.
+**WISE 0855−0714.** From [[e11.targets.wise0855.n_pictures_used]] pictures, 3.8–5 µm in 0.1 µm steps with errors from 24 empty paths: over the [[e11.targets.wise0855.jwst.comparison.PRISM.n_bins_detected]] steps where it is detected, SPHEREx gives [[e11.targets.wise0855.jwst.comparison.PRISM.mean_ratio_spherex_over_jwst|f2]] ± [[e11.targets.wise0855.jwst.comparison.PRISM.mean_ratio_err|f2]] times the JWST NIRSpec spectrum of Luhman et al. (2024), averaged in the same steps. The two reddest steps (4.8–5.0 µm) come out lower than JWST (2.9σ and 2.7σ); we do not know why. JWST's absolute level was tied by its authors to Spitzer, so the agreement in level is not fully independent; the agreement in shape is. A SPHEREx spectrum of WISE 0855 was published before ours (Rustamkulov et al. 2026, made with IRSA's spectrophotometry tool), and large SPHEREx brown-dwarf spectral atlases exist (Gagné et al. 2026; Tu et al. 2026); ours is a check of this tool's method, not a first.
 
 ![SPHEREx spectrum of Epsilon Indi B](figs/e11_epsindib.png "Epsilon Indi B: water, methane and carbon monoxide bands")
 
@@ -145,7 +145,7 @@ The challenge asks for spectra. Every SPHEREx picture sees a source at one colou
 | SPHEREx positions (Gaia parallax fixed) | [[motion_epsindib.proper_motion.pmra.spherex_mas_yr|k2]] ± [[motion_epsindib.proper_motion.pmra.err_mas_yr|k2]] | [[motion_epsindib.proper_motion.pmdec.spherex_mas_yr|k2]] ± [[motion_epsindib.proper_motion.pmdec.err_mas_yr|k2]] |
 | Gaia DR3 | [[motion_epsindib.proper_motion.pmra.gaia_mas_yr|k2]] | [[motion_epsindib.proper_motion.pmdec.gaia_mas_yr|k2]] |
 
-**An offset we cannot explain.** In all four windows our positions sit a steady 0.5″ south of Gaia's prediction. A steady offset does not change the motion, but we have not found its cause. Epsilon Indi B is a pair that SPHEREx cannot separate; that is one possibility we have not tested.
+**A steady offset, and what the pair's orbit predicts.** In all four windows our positions sit a steady 0.5″ south and about 0.2″ east of the position Gaia's catalogue values predict. After the measurement we learned (literature review, `docs/LITERATURE2.md`) that Gaia's entry is the brighter brown dwarf Ba alone, while SPHEREx sees the combined light of Ba and its companion Bb 0.7–0.8″ away; and Ba's Gaia motion includes its orbit around the pair's centre (Chen et al. 2022). From the published orbit we calculate (`scripts/epsindi_orbit_check.py`; a check made after the measurement) that the centre of the pair's infrared light should sit 0.50–0.56″ south and 0.13–0.19″ east of Gaia's extrapolated position at 1.6–3.8 µm, steady through 2025–26 — the size and direction we measure. The same calculation gives a motion of +3.97″, −2.45″ per year for the centre of light, also within our errors.
 
 **Barnard's Star did not work this way.** The same method on Barnard's Star gives a north–south motion of [[motion_barnard.proper_motion.pmdec.spherex_mas_yr|k1]] ± [[motion_barnard.proper_motion.pmdec.err_mas_yr|k1]] ″/yr, far from Gaia's [[motion_barnard.proper_motion.pmdec.gaia_mas_yr|k1]] (`data/findings/motion_barnard.json`). Likely cause (untested): it is a bright star (Gaia G = 8.2) that saturates SPHEREx's detector, so with its centre masked the fit rests on its outer light; and only two time windows are available. We make no numeric motion claim for it. Its motion is still plain to see in the tool: subtracting the later pictures (Mar–May 2026) from the earlier ones (Aug–Oct 2025) shows it as an orange–blue pair ([open it](../timemachine.html?ra=269.4463&dec=4.7677&fov=2&mode=subtract)). The tool splits the pictures at the largest gap in time, and this picture is made from the experimental colour-aware pictures. It is a picture, not a measurement.
 
@@ -210,7 +210,7 @@ Before this test, our stacked error bars were 1.5–2.5 times too small for the 
 | Unmodelled neighbour stars | WISE 0855, Apr–May 2026: [[e4.passes.2.significance|f1]]σ → [[e4.passes.2.neighbour_restored.significance|f1]]σ | short-wavelength control; star restored; lower value quoted |
 | Predicted position of WISE 0855 | about 0.08″ | from the Luhman & Esplin (2016) errors |
 | SPHEREx band edges | inverse-variance-weighted mean over 4.4–5.0 µm channels, flat spectrum assumed | not converted to a Spitzer or WISE magnitude |
-| Position offset (Epsilon Indi B) | steady 0.5″ | cancels in the motion; cause unexplained |
+| Position offset (Epsilon Indi B) | steady 0.5″ | cancels in the motion; matches the offset predicted from the pair's published orbit (check made afterwards) |
 | Wavelength map (WCS-WAVE) | about 1 nm | coarse map used; per-pixel calibration product not yet used |
 | Pixel solid angle | 0.5% | header median used instead of a per-pixel map |
 
@@ -278,6 +278,11 @@ python3 scripts/fill_tokens.py
 
 ## References
 
+- Luhman, K. L. et al. 2024, AJ 167, 5 (JWST spectra of WISE 0855−0714), doi:10.3847/1538-3881/ad0b72, arXiv:2311.17316
+- Rustamkulov, Z. et al. 2026, ApJ (SPHEREx spectra of brown dwarfs incl. WISE 0855), arXiv:2607.00543
+- Gagné, J., Faherty, J. K. et al. 2026, ApJ (SPIFF), arXiv:2604.22012; Tu et al. 2026, ApJ (SUDA), arXiv:2604.26771
+- Chen, M. et al. 2022, AJ (orbit of Epsilon Indi Ba+Bb), arXiv:2205.08077
+- King, R. R. et al. 2010, A&A 510, A99 (Epsilon Indi Ba/Bb spectra), arXiv:0911.3143
 - SPHEREx Explanatory Supplement v2.1. https://irsa.ipac.caltech.edu/data/SPHEREx/docs/SPHEREx_Expsupp.pdf
 - SPHEREx DR1 Spectral Images, doi:10.26131/IRSA678. https://doi.org/10.26131/IRSA678
 - SPHEREx Archive at IRSA User Guide. https://caltech-ipac.github.io/spherex-archive-documentation/

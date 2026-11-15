@@ -91,8 +91,8 @@ if e4:
     write("wise0855", dict(
         title="WISE 0855−0714 — the coldest known brown dwarf",
         plain_result=(f"At 4.4–5 µm, combining SPHEREx pictures along its known path gives a clear signal where it should be: "
-                      f"{p2['a_hat_mJy']:.2f} ± {(p2['sigma_a_mJy']**2 + ctrl['a_hat_mJy']**2)**0.5:.2f} mJy in the Nov–Dec 2025 visits, between the brightness Spitzer "
-                      f"({exp['IRAC_4p5']:.2f} mJy) and WISE ({exp['WISE_W2']:.2f} mJy) measured in broader bands. Between visits it shifts the way "
+                      f"{p2['a_hat_mJy']:.2f} ± {(p2['sigma_a_mJy']**2 + ctrl['a_hat_mJy']**2)**0.5:.2f} mJy in the Nov–Dec 2025 visits, consistent with Spitzer (0.48–0.54 mJy) and WISE (0.41–0.50 mJy) in broader bands."
+                      " Between visits it shifts the way "
                       "its known motion predicts, and a source standing still fits the positions far worse. A statement about a known object, not a new object."),
         numbers=[num("Signal, Nov–Dec 2025 visits, against 24 empty paths", round(p2["significance"], 1), unit="σ",
                      nulls=p2.get("null_snrs"), nulls_note="same pictures, path shifted 6–9 px", method="science.html#e4"),
@@ -161,7 +161,7 @@ for tid, name in (("epsindib", "Epsilon Indi B — a pair of nearby brown dwarfs
                         dict(text="Gaia DR3 (Vallenari et al. 2023)", href="https://www.cosmos.esa.int/web/gaia/dr3")],
         method_note=("Each picture is fitted with the star's position free, saturated pixels masked and Gaia neighbours modelled; "
                      "the motion is a straight-line fit to SPHEREx positions with Gaia's parallax held fixed. This fit was not written down in advance. "
-                     + ("Positions sit a steady ~0.5″ south of Gaia's prediction in every survey; the pair is unresolved, so a shifted centre of light is possible — not explained here." if tid == "epsindib" else "")),
+                     + ("Positions sit a steady ~0.5″ south and ~0.2″ east of Gaia's prediction in every window. Gaia's entry is Ba alone and its motion includes its orbit; from the pair's published orbit (Chen et al. 2022) the centre of Ba+Bb's infrared light should sit 0.50–0.56″ south and 0.13–0.19″ east — a check we made after the measurement (Science page)." if tid == "epsindib" else "")),
         method_anchor="science.html#motion"))
 
 # Variables: neutral counts only (referee items on R Dra / RW Aur cards)

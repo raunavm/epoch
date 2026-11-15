@@ -1,6 +1,6 @@
 {
  "title": "WISE 0855\u22120714 \u2014 the coldest known brown dwarf",
- "plain_result": "At 4.4\u20135 \u00b5m, combining SPHEREx pictures along its known path gives a clear signal where it should be: 0.50 \u00b1 0.03 mJy in the Nov\u2013Dec 2025 visits, between the brightness Spitzer (0.51 mJy) and WISE (0.42 mJy) measured in broader bands. Between visits it shifts the way its known motion predicts, and a source standing still fits the positions far worse. A statement about a known object, not a new object.",
+ "plain_result": "At 4.4\u20135 \u00b5m, combining SPHEREx pictures along its known path gives a clear signal where it should be: 0.50 \u00b1 0.03 mJy in the Nov\u2013Dec 2025 visits, consistent with Spitzer (0.48\u20130.54 mJy) and WISE (0.41\u20130.50 mJy) in broader bands. Between visits it shifts the way its known motion predicts, and a source standing still fits the positions far worse. A statement about a known object, not a new object.",
  "numbers": [
   {
    "label": "Signal, Nov\u2013Dec 2025 visits, against 24 empty paths",
