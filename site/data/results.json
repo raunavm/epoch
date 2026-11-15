@@ -205,6 +205,12 @@
      "verdict": "SUPPORTED",
      "status": "SUPPORTED",
      "late": true
+    },
+    {
+     "id": "C22",
+     "verdict": "FAILED",
+     "status": "FAILED as registered",
+     "late": true
     }
    ],
    "science": "science.html#stacking-along-an-orbit",
@@ -212,6 +218,10 @@
     {
      "n": 6,
      "href": "failed.html#6-our-first-faint-asteroid-was-not-really-invisible"
+    },
+    {
+     "n": 18,
+     "href": "failed.html#18-a-blind-asteroid-test-fell-short-of-its-own-success-level"
     }
    ],
    "figure": "data/figs/fig_reveal.png",

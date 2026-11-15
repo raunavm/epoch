@@ -79,3 +79,8 @@ We list every approach that did not work, because a result is only believable if
 **What happened.** The new method recovers Barnard's Star's motion within 0.2σ of Gaia, but our pre-registered criterion also required 8 faint neighbouring stars to agree with Gaia within their own errors. They share a drift of about −0.17″ per year east–west, so the registered verdict is FAILED.
 **Why (likely, read after the result).** The drift reverses with the detector's orientation between the two visits, which points to a tiny fixed offset in detector pixels (about 0.01 pixel). The same effect makes ordinary stars show a small false negative parallax in the distance test (E12), where it is inside the error bar.
 **What we would do next.** Calibrate positions in the detector frame on many stars, then repeat both tests.
+
+## 18. A blind asteroid test fell short of its own success level
+**What happened.** We drew 12 new faint asteroids at random and, before measuring, wrote down how clearly each should show up when its pictures are combined. We had required that at least 70% of those expected to show clearly reach 5σ; 3 of 5 did (60%). The brightness part of the test passed (0.92 times the prediction), and no empty path raised a false alarm (0 of 288).
+**Why (flagged before the run).** The prediction used the noise the fit reports; empty paths show the real noise is about 2.5 times larger. With the measured noise, prediction and measurement agree. About half of the listed pictures for some asteroids could not be downloaded from the public bucket.
+**What we would do next.** Predict with the empty-path noise from the start, and test on a larger blind sample.

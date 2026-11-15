@@ -109,7 +109,7 @@ def main():
         T("rwaur", ["C18"], ["Largest single-band change", "Change at 4.12"], "RW Aurigae and R Draconis", [16]),
         T("rdra", ["C19"], ["Colour bands usable"], "RW Aurigae and R Draconis", [16]),
         O("f1", ["C6a", "C6d"], "Which change is real", [2], "data/figs/fig_e2.png", group="finding", finding="f1", card="start.html"),
-        O("f2", ["C5b"], "Stacking along an orbit", [6], "data/figs/fig_reveal.png", group="finding", finding="f2", card="start.html"),
+        O("f2", ["C5b", "C22"], "Stacking along an orbit", [6, 18], "data/figs/fig_reveal.png", group="finding", finding="f2", card="start.html"),
         O("e1", ["C6b"], "Faint changes in single pictures", [11], "data/figs/fig_e1.png", group="other"),
         O("e3", ["C6c", "C6e"], "Faint changes in single pictures", [14], None, group="other"),
         O("e15", ["C20"], "Using 102 colours", [], "data/figs/e15_methane.png", group="other"),
