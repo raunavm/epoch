@@ -74,5 +74,18 @@
   "detail": {
    "source": "data/findings/e4.json"
   }
+ },
+ "f4": {
+  "title": "A distance from one year of pictures",
+  "interaction": "target",
+  "target": "epsindib",
+  "label": "derived",
+  "unit": "mas",
+  "number": 243,
+  "err": 53,
+  "sentence": "Epsilon Indi B, a pair of brown dwarfs and a challenge test target, traces a small yearly loop as Earth orbits the Sun. Fitting it in SPHEREx positions alone gives a parallax of 243 \u00b1 53 thousandths of an arcsecond \u2014 about 13 light-years (11\u201317); Gaia gives 12. The error bar is set by ordinary stars measured the same way.",
+  "detail": {
+   "source": "data/findings/e12.json"
+  }
  }
 }

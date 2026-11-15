@@ -67,6 +67,16 @@ if e4:
                                "its 4.4–5 µm pictures are combined along its known path, and it shifts between visits as its motion predicts. "
                                + spec + "A statement about a known object, not a new object."),
                      detail=dict(source="data/findings/e4.json"))
+e12 = load("data/findings/e12.json")
+if e12 and e12.get("verdict") == "SUPPORTED":
+    lo, hi = e12["distance_interval_ly_68"]
+    out["f4"] = dict(title="A distance from one year of pictures", interaction="target", target="epsindib", label="derived", unit="mas",
+                     number=round(e12["parallax_mas"]), err=round(e12["parallax_err_mas"]["adopted"]),
+                     sentence=(f"Epsilon Indi B, a pair of brown dwarfs and a challenge test target, traces a small yearly loop as Earth orbits the Sun. "
+                               f"Fitting it in SPHEREx positions alone gives a parallax of {e12['parallax_mas']:.0f} ± {e12['parallax_err_mas']['adopted']:.0f} "
+                               f"thousandths of an arcsecond — about {e12['distance_ly']:.0f} light-years ({lo:.0f}–{hi:.0f}); Gaia gives "
+                               f"{3.26156 * e12['gaia_distance_pc']:.0f}. The error bar is set by ordinary stars measured the same way."),
+                     detail=dict(source="data/findings/e12.json"))
 json.dump(out, open("site/data/findings.json", "w"), indent=1)
 cal = load("data/findings/f1_calibration.json")
 if cal:
