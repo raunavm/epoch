@@ -161,8 +161,8 @@ def main(a):
     mo = json.load(open("data/findings/motion_epsindib.json"))
     meta = json.load(open(f"{SITE}/index/dr1/meta.json"))
     pm = mo["proper_motion"]
-    nums = [(f"{hl['number']}%", "of plain-blink changes are only colour"),
-            (f"{e4['passes'][1]['significance']:.0f}σ", "coldest known brown dwarf, at Spitzer's brightness"),
+    nums = [(f"{hl['number']}%", "of a plain blink's changes vanish, one detector at a time"),
+            (f"{e4['passes'][1]['significance']:.0f}×", "the noise: coldest known brown dwarf, along its path"),
             (f"{pm['pmra']['spherex_mas_yr']/1000:.2f}″/yr", f"Eps Indi B's motion; Gaia says {pm['pmra']['gaia_mas_yr']/1000:.2f}"),
             (f"{meta['n_frames']:,}", "SPHEREx pictures indexed, any spot in the sky")]
     os.makedirs("dist/frames", exist_ok=True)
@@ -170,7 +170,7 @@ def main(a):
         os.remove(os.path.join("dist/frames", f))
     frames = []
     seg_blink_vs_det(a.field, frames, 7 * FPS)
-    seg_reveal(e4r, frames, 6 * FPS, "The coldest known brown dwarf: faint in one picture")
+    seg_reveal(e4r, frames, 6 * FPS, "The coldest known brown dwarf, picture by picture")
     seg_shift(a.shift_shot, tuple(int(x) for x in a.shift_crop.split(",")), frames, 6 * FPS)
     seg_numbers(nums, frames, 7 * FPS)
     seg_name(a.url, frames, 4 * FPS - 6)  # finish safely under 30.0 s
@@ -179,7 +179,7 @@ def main(a):
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(FPS), "-i", "dist/frames/%04d.png",
                     "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", "dist/orrery_demo.mp4"], check=True)
     subs = [(0, 3.5, "Plain blink: everything flickers"), (3.5, 7, "Most of that flicker is colour, not change"),
-            (7, 9.7, "The coldest known brown dwarf: faint in one picture"), (9.7, 13, "Combine pictures along its path: there it is"),
+            (7, 9.7, "The coldest known brown dwarf, picture by picture"), (9.7, 13, "Combine pictures along its path: there it is"),
             (13, 19, "Six months apart: the star has moved"), (19, 26, "Measured, and checked against independent data"),
             (26, 29.7, "Try any spot in the sky")]
     with open("dist/orrery_demo.srt", "w") as f:
