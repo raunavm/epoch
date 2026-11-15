@@ -163,6 +163,14 @@ We then measured 11 faint objects listed as probable cold brown dwarfs from thei
 
 ###### E12 {#e12-label}
 
+## Recovering known variable stars {#e10}
+
+Can SPHEREx alone tell which stars changed brightness between visits? We drew 124 variable stars from Gaia DR3's catalogue (long-period variables, RR Lyrae, eclipsing binaries and Cepheids, all varying by at least 0.3 magnitudes in visible light) and 496 ordinary comparison stars of the same brightness in the same pictures (`docs/protocols/E10.md`). Half of the comparison stars set a threshold that only 1% of ordinary stars should pass; the other half then tested it. The frozen rule: the test passes if, on the long-period variables, the lower end of the 95% interval of the fraction recovered is above 50%, and false alarms stay near 1%.
+
+**Result: inconclusive.** False alarms pass: 2 of 246 test-half comparison stars (0.81%). Of the testable long-period variables, 16 of 24 are recovered (67%, 95% interval 47%–82%): the interval straddles 50%, so the rule gives neither pass nor fail. Over all types, 47 of 96 testable variables are recovered. Ordinary stars scatter by 0.93% between visits, so changes below about 3% cannot be told apart from them. No ordinary star passes the frozen rule for unlisted variable candidates. Limits: 52 long-period variables were drawn but most of the bright ones overload the detector, so only 24 could be tested; for short-period stars two visits catch random phases, so their recall reflects chance timing rather than the method.
+
+![Recovered variables](figs/e10_recall.png "Fraction of catalogued variables recovered, by type and amplitude, against the 1% false-alarm threshold.")
+
 ## Hydrogen lines in emission-line stars {#e20}
 
 Gaia's DR3 software sorts stars into emission-line classes from their low-resolution optical spectra. SPHEREx covers two strong infrared hydrogen lines, Paschen-α at 1.875 µm and Brackett-α at 4.05 µm, so it can check those labels independently. Wolf–Rayet stars have been studied this way (Crowther & Smith 2026); we found no SPHEREx census of the other classes. We drew 60 candidates at random from two classes (30 Herbig Ae/Be, 30 Be stars; G 9.5–14) and 157 ordinary stars of similar brightness and colour 20–200″ away, so measured in the same pictures. The rules were written down before any of their pixels were read (`docs/protocols/E20.md`): in each visit, compare the channel containing the line with a straight line fitted to the neighbouring channels; calibrate on the controls; count a star if the excess reaches 5 times the controls' spread overall and at least 2 in two separate visits. The method counts as working only if at most 2% of controls pass.

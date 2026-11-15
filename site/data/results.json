@@ -330,6 +330,22 @@
    "group": "other"
   },
   {
+   "id": "e10",
+   "claims": [
+    {
+     "id": "C27",
+     "verdict": "NOT CONFIRMED",
+     "status": "NOT CONFIRMED",
+     "late": false
+    }
+   ],
+   "science": "science.html#e10",
+   "failed": [],
+   "figure": "data/figs/e10_recall.png",
+   "extra": [],
+   "group": "other"
+  },
+  {
    "id": "e20",
    "claims": [
     {
