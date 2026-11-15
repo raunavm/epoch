@@ -1,5 +1,5 @@
 // Guided path through the findings. A finding missing from findings.json is omitted.
-import { init, getJSON, h, t, link, badge, fmtPM, unavailable } from './core.js';
+import { init, getJSON, h, t, link, badge, fmtPM, unavailable, loc, locLang } from './core.js';
 import { findingLine, headlineLine } from './components/evidence.js';
 import { renderTargetCard } from './components/targets.js';
 import { mountReveal } from './components/reveal.js';
@@ -55,7 +55,7 @@ async function go(k, focus = true) {
   active?.stop?.();
   cur = k;
   const s = steps[k], mini = h('div', { class: 'mini panel' });
-  const title = h('h2', { tabindex: '-1' }, s.f.title || t(`start.title_${s.kind}`));
+  const title = h('h2', { tabindex: '-1', lang: locLang(s.f, 'title') }, loc(s.f, 'title') || t(`start.title_${s.kind}`));
   box.replaceChildren(
     h('p', { class: 'muted' }, t('start.progress', { k: k + 1, n: steps.length })),
     title, s.key === 'f1' && headline?.number != null ? headlineLine(headline, t('start.f1_line')) : findingLine(s.f, s.key),

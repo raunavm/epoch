@@ -12,7 +12,9 @@
   "detail": {
    "source": "data/findings/e2.json",
    "consistency": "data/findings/e2_d1.json"
-  }
+  },
+  "title_es": "\u00bfQu\u00e9 cambio es real?",
+  "sentence_es": "SPHEREx fotograf\u00eda cada punto en un color infrarrojo distinto cada vez, as\u00ed que un parpadeo simple muestra destellos aunque nada se haya movido. Ver un detector cada vez elimina una mediana del 93% de los cambios que se\u00f1ala un parpadeo simple (20 trozos de cielo elegidos al azar; intervalo de confianza del 95% de la mediana: 90\u201396%; trozos individuales: 22\u201397%). En una comprobaci\u00f3n secundaria hecha despu\u00e9s, con un mismo umbral para las dos vistas (k = 5; ah\u00ed el parpadeo simple se\u00f1ala 12,686 cambios frente a 599, as\u00ed que las falsas alarmas no son iguales), encuentra fuentes de prueba sembradas m\u00e1s o menos con la misma frecuencia que un parpadeo simple (37%, IC del 95%: 31\u201342%, frente a 34%, IC: 28\u201338%, a 20 veces el ruido de una sola imagen). Ninguna de las dos vistas capta asteroides d\u00e9biles en movimiento en im\u00e1genes sueltas; para ellos, combina im\u00e1genes a lo largo de su camino (ver Qu\u00e9 fall\u00f3 n.\u00ba 14)."
  },
  "f2": {
   "title": "Too faint for one picture",
@@ -60,7 +62,9 @@
    "depth_gain_mag": 3.55,
    "ideal_gain_mag": 3.74,
    "e13": "data/findings/e13.json"
-  }
+  },
+  "title_es": "Demasiado d\u00e9bil para una sola imagen",
+  "sentence_es": "De los 8 asteroides d\u00e9biles que pudimos apilar, 7 nunca alcanzan el nivel habitual de detecci\u00f3n (5 veces el ruido) en ninguna imagen suelta. Al combinar sus im\u00e1genes a lo largo de sus \u00f3rbitas conocidas, 3 de ellos destacan por encima de 5 veces la dispersi\u00f3n de los caminos vac\u00edos que tienen al lado, y los 3 siguen apareciendo cuando sus im\u00e1genes se dividen en dos mitades. En 2 de ellos, el brillo medido coincide, con un margen del 20%, con lo que predice su brillo de cat\u00e1logo. El deslizador muestra 98397 (2000 UC3), elegido a mano y no el de mayor puntuaci\u00f3n de los tres. Los n\u00fameros del apilado se calcularon antes de dejar por escrito la prueba de dividir en mitades, as\u00ed que esto es una comprobaci\u00f3n, no una prueba a ciegas."
  },
  "f3": {
   "title": "The coldest known brown dwarf",
@@ -73,7 +77,9 @@
   "sentence": "WISE 0855\u22120714, a challenge test target, stands out at 16.5 times the spread of empty paths when its 4.4\u20135 \u00b5m pictures are combined along its known path, and it shifts between visits as its motion predicts. Its SPHEREx spectrum from 3.8 to 5 \u00b5m averages 0.97 \u00b1 0.03 times JWST's (two reddest points lower). A statement about a known object, not a new object.",
   "detail": {
    "source": "data/findings/e4.json"
-  }
+  },
+  "title_es": "La enana marr\u00f3n m\u00e1s fr\u00eda conocida",
+  "sentence_es": "WISE 0855\u22120714, objetivo de prueba del reto, destaca a 16.5 veces la dispersi\u00f3n de los caminos vac\u00edos cuando sus im\u00e1genes de 4.4\u20135 \u00b5m se combinan a lo largo de su camino conocido, y se desplaza entre visitas como predice su movimiento. Su espectro de SPHEREx de 3.8 a 5 \u00b5m vale en promedio 0.97 \u00b1 0.03 veces el de JWST (los dos puntos m\u00e1s rojos, m\u00e1s bajos). Es una afirmaci\u00f3n sobre un objeto conocido, no un objeto nuevo."
  },
  "f4": {
   "title": "A distance from one year of pictures",
@@ -86,6 +92,8 @@
   "sentence": "Epsilon Indi B, a pair of brown dwarfs and a challenge test target, traces a small yearly loop as Earth orbits the Sun. Fitting it in SPHEREx positions alone gives a parallax of 243 \u00b1 53 thousandths of an arcsecond \u2014 about 13 light-years (11\u201317); Gaia gives 12. The error bar is set by ordinary stars measured the same way.",
   "detail": {
    "source": "data/findings/e12.json"
-  }
+  },
+  "title_es": "Una distancia a partir de un a\u00f1o de im\u00e1genes",
+  "sentence_es": "Epsilon Indi B, una pareja de enanas marrones y objetivo de prueba del reto, traza un peque\u00f1o bucle cada a\u00f1o mientras la Tierra gira alrededor del Sol. Ajustarlo solo con posiciones de SPHEREx da un paralaje de 243 \u00b1 53 mil\u00e9simas de segundo de arco \u2014 unos 13 a\u00f1os luz (11\u201317); Gaia da 12. La barra de error la fijan estrellas corrientes medidas de la misma manera."
  }
 }

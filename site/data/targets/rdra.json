@@ -8,28 +8,34 @@
    "value": 244,
    "err": null,
    "kind": "data",
-   "unit": ""
+   "unit": "",
+   "label_es": "Im\u00e1genes"
   },
   {
    "label": "Colour bands usable in the pre-set test",
    "value": 3,
    "err": null,
    "kind": "derived",
-   "unit": ""
+   "unit": "",
+   "label_es": "Bandas de color utilizables en la prueba fijada de antemano"
   },
   {
    "label": "Peak at 4.7 \u00b5m (for information)",
    "value": "1 Feb 2026",
    "err": null,
    "kind": "derived",
-   "unit": ""
+   "unit": "",
+   "label_es": "M\u00e1ximo a 4.7 \u00b5m (a t\u00edtulo informativo)",
+   "value_es": "1 feb 2026"
   },
   {
    "label": "Catalogue visible-light maximum (VSX period 246 days)",
    "value": "21 Jan 2026",
    "err": null,
    "kind": "model",
-   "unit": ""
+   "unit": "",
+   "label_es": "M\u00e1ximo en luz visible seg\u00fan el cat\u00e1logo (periodo VSX de 246 d\u00edas)",
+   "value_es": "21 ene 2026"
   }
  ],
  "figures": [
@@ -37,20 +43,28 @@
    "src": "data/figs/e9_rdra.png",
    "href": "science.html#e9",
    "alt": "R Draconis brightness through the year in six SPHEREx colour bands",
-   "caption": "Brightness through the year in six colour bands; open circles are outside the pre-set range and for information only."
+   "caption": "Brightness through the year in six colour bands; open circles are outside the pre-set range and for information only.",
+   "alt_es": "Brillo de R Draconis a lo largo del a\u00f1o en seis bandas de color de SPHEREx",
+   "caption_es": "Brillo a lo largo del a\u00f1o en seis bandas de color; los c\u00edrculos huecos est\u00e1n fuera del rango fijado de antemano y son solo informativos."
   }
  ],
  "evidence_links": [
   {
    "text": "Open the prepared field",
-   "href": "timemachine.html?field=rdra"
+   "href": "timemachine.html?field=rdra",
+   "text_es": "Abrir el campo preparado"
   },
   {
    "text": "Method (Science page)",
-   "href": "science.html#e9"
+   "href": "science.html#e9",
+   "text_es": "M\u00e9todo (p\u00e1gina de Ciencia)"
   }
  ],
  "method_note": "Halo photometry (annulus 7\u201312 pixels) chosen on comparison stars before R Draconis was measured (docs/protocols/E9.md). Detectors 5\u20136 are excluded by a pre-set saturation guard; the 4.4\u20135 \u00b5m light curve was made after the result with that guard switched off, so it is descriptive. Infrared maxima of such stars are expected 25\u201350 days after visible ones (Smith et al. 2002).",
  "method_anchor": "science.html#e9",
- "generated_with": "scripts in this repository"
+ "generated_with": "scripts in this repository",
+ "title_es": "R Draconis \u2014 una estrella gigante pulsante",
+ "plain_result_es": "R Draconis es tan brillante que solo se puede medir el halo alrededor de su centro sobrecargado, y la prueba fijada de antemano solo pudo usar tres bandas de color con ruido: en ellas ning\u00fan cambio supera 5 veces el error (43 estrellas brillantes corrientes medidas de la misma manera). Se muestra solo a t\u00edtulo informativo, fuera del rango fijado de antemano: a 4.7 \u00b5m su brillo sube y baja unas 0.3 magnitudes a cada lado de la media y alcanza su m\u00e1ximo hacia el 1 feb 2026, 12 d\u00edas despu\u00e9s del m\u00e1ximo en luz visible que predice el cat\u00e1logo (21 ene 2026).",
+ "status_es": "medido; ning\u00fan cambio confirmado seg\u00fan nuestra regla fijada de antemano",
+ "method_note_es": "Fotometr\u00eda del halo (anillo de 7\u201312 p\u00edxeles) elegida con estrellas de comparaci\u00f3n antes de medir R Draconis (docs/protocols/E9.md). Los detectores 5\u20136 quedan excluidos por una salvaguarda de saturaci\u00f3n fijada de antemano; la curva de luz de 4.4\u20135 \u00b5m se hizo despu\u00e9s del resultado con esa salvaguarda desactivada, as\u00ed que es descriptiva. En estrellas de este tipo, los m\u00e1ximos en infrarrojo se esperan 25\u201350 d\u00edas despu\u00e9s de los visibles (Smith et al. 2002)."
 }

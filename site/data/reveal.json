@@ -3194,5 +3194,6 @@
  "order": "pictures are combined in order of their expected signal-to-noise (brightness model and noise only; measured fluxes are not used to choose the order)",
  "units": "singles and stacks: stars removed, smoothed at the PSF scale, in units of each image's own background noise (same treatment for both)",
  "rerun": "python scripts/run_forced.py --ids 98397 --stamps && python scripts/build_reveal.py --pick 98397",
- "generated_with": "scripts in this repository"
+ "generated_with": "scripts in this repository",
+ "hedge_es": "se\u00f1al modesta; la comprobaci\u00f3n de la escala del error no se super\u00f3 limpiamente, as\u00ed que se usa la escala mayor, m\u00e1s prudente"
 }

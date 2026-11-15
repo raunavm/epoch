@@ -7,7 +7,7 @@ import { mountReveal } from './reveal.js';
 import { TARGETS } from '../live/targets.js';
 
 // Strings are shown exactly as written in the file; numbers are formatted with their uncertainty.
-const value = n => (typeof n.value !== 'number' ? String(n.value ?? '—') : n.err != null ? fmtPM(n.value, n.err) : fmt(n.value, 6)) + (n.unit ? ` ${n.unit}` : '');
+const value = n => (typeof n.value !== 'number' ? String(loc(n, 'value') ?? '—') : n.err != null ? fmtPM(n.value, n.err) : fmt(n.value, 6)) + (n.unit ? ` ${n.unit}` : '');
 
 export async function renderTargetCard(el, id, getJSON) {
   const tg = TARGETS.find(x => x.id === id);
