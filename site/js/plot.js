@@ -26,7 +26,7 @@ function extent(vals, pad = 0.05) {
 }
 
 /**
- * series: [{x[], y[], err?[], kind:'points'|'line'|'dash', color, colors?[], label, cls?}]
+ * series: [{x[], y[], err?[], kind:'points'|'line'|'dash', color, colors?[], label, cls?, sort?: false (keep the given order)}]
  * opts: {width, height, xlabel, ylabel, xlim, ylim, invertX, invertY, title, desc}
  */
 export function plot(series, opts = {}) {
@@ -57,7 +57,7 @@ export function plot(series, opts = {}) {
     const gg = s('g', { class: d.cls || null });
     const pts = d.x.map((x, i) => [x, d.y[i], d.err?.[i]]).filter(p => Number.isFinite(p[0]) && Number.isFinite(p[1]));
     if (d.kind === 'line' || d.kind === 'dash') {
-      const path = pts.sort((a, b) => a[0] - b[0]).map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
+      const path = (d.sort === false ? pts : pts.sort((a, b) => a[0] - b[0])).map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
       gg.append(s('path', { d: path, fill: 'none', stroke: d.color, 'stroke-width': 2.2, 'stroke-dasharray': d.kind === 'dash' ? '6 4' : null }));
     }
     if (d.kind === 'points' || d.err) {

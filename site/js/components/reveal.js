@@ -7,9 +7,9 @@ export function mountReveal(el, data, { compact = false, autoplay = false, snrNo
   const frames = data.frames || [], stacks = [...(data.stack_pngs || [])].sort((a, b) => a.n - b.n);
   const specs = [...(data.spectrum_points || [])].sort((a, b) => a.n_frames_used - b.n_frames_used);
   const N = Math.max(frames.length, ...stacks.map(s => s.n), 1);
-  const full = specs[specs.length - 1];
-  const xlim = full ? pad(full.wl_um) : null;
-  const ylim = full ? pad(full.flux_mJy.flatMap((f, i) => [f - (full.err?.[i] || 0), f + (full.err?.[i] || 0)])) : null;
+  // Axis limits over every step, so no step's points fall off the chart and the axes do not jump while the slider plays.
+  const xlim = specs.length ? pad(specs.flatMap(s => s.wl_um)) : null;
+  const ylim = specs.length ? pad(specs.flatMap(s => s.flux_mJy.flatMap((f, i) => [f - (s.err?.[i] || 0), f + (s.err?.[i] || 0)]))) : null;
 
   const img = h('img', { class: 'stamp', alt: '', width: 256, height: 256, decoding: 'async' });
   const imgBadge = h('span', { class: 'img-badge' });
@@ -44,10 +44,11 @@ export function mountReveal(el, data, { compact = false, autoplay = false, snrNo
     img.alt = t('reveal.alt', { object: data.object, n: label });
     imgBadge.replaceChildren(badge(kind));
     slider.setAttribute('aria-valuetext', t('reveal.valuetext', { n, N }));
-    cap.replaceChildren(t('reveal.caption', { n: label, N }));
-    if (label === 1 && frames[0]) cap.append('\u00a0· ', t('reveal.frame_meta', { wl: fmt(frames[0].wl_um, 3) }));
+    // One picture is not "combined"; a number is shown only for a step whose entry in the data file has one.
+    cap.replaceChildren(label === 1 ? t('reveal.caption_one', { N }) : t('reveal.caption', { n: label, N }));
+    if (label === 1 && frames[0]?.wl_um != null) cap.append('\u00a0· ', t('reveal.frame_meta', { wl: fmt(frames[0].wl_um, 3) }));
     snr.replaceChildren();
-    if (st && st.snr != null) snr.append(t('reveal.snr_times', { snr: fmt(st.snr, 3), note: snrNote || (data.noise_calibration ? t('reveal.against_empty') : t('reveal.own_noise')) }), ' ', badge('derived'));
+    if (st && st.snr != null) snr.append(t('reveal.snr_times', { snr: fmt(st.snr, 3), note: (label > 1 && snrNote) || (data.noise_calibration ? t('reveal.against_empty') : t('reveal.own_noise')) }), ' ', badge('derived'));
 
     const sp = specs.filter(s => s.n_frames_used <= n).pop();
     specBox.replaceChildren();
@@ -55,7 +56,7 @@ export function mountReveal(el, data, { compact = false, autoplay = false, snrNo
     const svg = plot([{ x: sp.wl_um, y: sp.flux_mJy, err: sp.err, kind: 'points', colors: sp.wl_um.map(wlColor), color: 'var(--accent)' }],
       { xlim, ylim, xlabel: t('plot.wl'), ylabel: t('plot.flux'), height: compact ? 240 : 300,
         title: t('reveal.spec_title', { object: data.object, n: sp.n_frames_used }) });
-    specBox.append(svg, h('p', { class: 'caption' }, t('reveal.spec_caption', { n: sp.n_frames_used, k: sp.wl_um.length }), ' ', badge('derived')));
+    specBox.append(svg, h('p', { class: 'caption' }, t(sp.wl_um.length === 1 ? 'reveal.spec_caption_one' : 'reveal.spec_caption', { n: sp.n_frames_used, k: sp.wl_um.length }), ' ', badge('derived')));
   }
 
   // The pictures and empty-path tests behind every number on this card.

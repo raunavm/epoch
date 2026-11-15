@@ -10,6 +10,9 @@ import { makeWCS, project, deproject, waveAt } from '../js/live/wcs.js';
 import { readHeader, parseCards } from '../js/live/fits.js';
 import { changeModel, countChanges, despike } from '../js/live/change.js';
 import { parseRA, parseDec, aperture, gridSize } from '../js/live/grid.js';
+import { TARGETS, propagate, movedTarget } from '../js/live/targets.js';
+import { parseStars, starXY, starRadius, starPM, fetchGaia, GAIA_EPOCH_MJD } from '../js/live/gaia.js';
+import { healpix, tilePixel, tileUrl, parseTile, wiseStamp, hipsDates, HIPS } from '../js/live/wise.js';
 
 const DATA = fileURLToPath(new URL('../data/index/dr1/', import.meta.url));
 const BUCKET = 'https://nasa-irsa-spherex.s3.amazonaws.com';
@@ -161,4 +164,82 @@ test('spreadInTime keeps n distinct frames spanning the whole time range', () =>
   assert.equal(sub[0], fr[0]); assert.equal(sub[299], fr[999]);
   assert.ok(sub.filter(f => f.mjd > 100).length >= 90); // the sparse tail is fully represented
   assert.ok(sub.every((f, k) => !k || f.mjd > sub[k - 1].mjd));
+});
+
+test('typed old-epoch positions of fast movers are recognised; slow or unrelated positions are not', () => {
+  const now = 60982; // about the middle of DR1
+  assert.equal(movedTarget(parseRA('08h55m10.831s'), parseDec('-7d14m42.53s'), now)?.id, 'wise0855'); // the challenge text (2010)
+  assert.equal(movedTarget(parseRA('17 57 48.50'), parseDec('+04 41 36.2'), now)?.id, 'barnard');       // SIMBAD, epoch 2000
+  assert.equal(movedTarget(269.44850252544, 4.73942005111, now)?.id, 'barnard');                          // Gaia DR3, epoch 2016
+  const eps = TARGETS.find(x => x.id === 'epsindib');
+  assert.equal(movedTarget(eps.ra, eps.dec, now)?.id, 'epsindib');
+  assert.equal(movedTarget(...propagate(eps, now), now)?.id, 'epsindib'); // already where it is now: same target, no jump
+  const rw = TARGETS.find(x => x.id === 'rwaur');
+  assert.equal(movedTarget(rw.ra, rw.dec, now), null);              // a variable star has not moved
+  assert.equal(movedTarget(269.452, 4.693 + 0.2, now), null);       // 12 arcmin off Barnard's track
+  assert.equal(movedTarget(180, 0, now), null);
+});
+
+test('Gaia rows: CSV and TSV parse alike, ids keep all 19 digits, missing motion is null', () => {
+  const csv = 'source_id,ra,dec,pmra,pmdec,phot_g_mean_mag\n4472832130942575872,269.44850252543836,4.739420051112412,-801.55096,10362.395,8.1939745\n4472835914798807040,269.4156046589069,4.757268219215219,,,21.216444\n';
+  const tsv = '#comment\nSource\tRA_ICRS\tDE_ICRS\tpmRA\tpmDE\tGmag\n \tdeg\tdeg\tmas/yr\tmas/yr\tmag\n---\t---\t---\t---\t---\t---\n4472832130942575872\t269.44850252544\t+04.73942005111\t -801.551\t10362.394\t 8.193974\n';
+  const a = parseStars(csv), b = parseStars(tsv);
+  assert.equal(a.length, 2); assert.equal(b.length, 1);
+  assert.equal(a[0].id, '4472832130942575872'); assert.equal(b[0].id, a[0].id);
+  assert.ok(Math.abs(a[0].pmdec - b[0].pmdec) < 0.01 && Math.abs(b[0].dec - 4.73942005111) < 1e-12);
+  assert.deepEqual([a[1].pmra, a[1].pmdec], [null, null]);
+  assert.ok(Math.abs(starPM(a[0]) - 10.393) < 0.001); assert.equal(starPM(a[1]), 0);
+  assert.ok(starRadius(8) > starRadius(16) && starRadius(16) > starRadius(21) && starRadius(null) === starRadius(21));
+});
+
+test('Gaia stars are moved from J2016.0 to the picture date (pmRA includes cos dec)', () => {
+  const S = 21, c = (S - 1) / 2, st = { ra: 100, dec: 60, pmra: 6150, pmdec: -12300 }; // 1 and 2 grid pixels per year
+  assert.deepEqual(starXY(st, GAIA_EPOCH_MJD, S, 100, 60).map(v => +v.toFixed(6)), [c, c]);
+  const [x, y] = starXY(st, GAIA_EPOCH_MJD + 365.25, S, 100, 60);
+  assert.ok(Math.abs(x - (c - 1)) < 1e-3 && Math.abs(y - (c + 2)) < 1e-3, `${x}, ${y}`); // east is left, south is down
+  assert.deepEqual(starXY({ ra: 100, dec: 60, pmra: null, pmdec: null }, 70000, S, 100, 60).map(v => +v.toFixed(6)), [c, c]);
+});
+
+test('HEALPix faces and HiPS tile pixel', () => {
+  assert.equal(healpix(10, 80, 0)[0], 0); assert.equal(healpix(100, 80, 0)[0], 1);
+  assert.equal(healpix(359.9, 0, 0)[0], 4); assert.equal(healpix(90, 0, 0)[0], 5);
+  assert.equal(healpix(100, -80, 0)[0], 9); assert.equal(healpix(300, -60, 0)[0], 11);
+  // Checked against the real AllWISE W2 tile: Barnard's Star (2010 position) is the bright source at this row and column.
+  assert.deepEqual(tilePixel(269.4497, 4.7236), { tile: 508502, row: 386, col: 192 });
+  assert.equal(tileUrl(508502), HIPS.base + 'Norder8/Dir500000/Npix508502.fits');
+  for (const [ra, dec] of [[0, 0], [359.999, 89.99], [123.4, -89.99], [200, 41.81], [45, -41.82]]) {
+    const p = tilePixel(ra, dec);
+    assert.ok(Number.isInteger(p.tile) && p.tile >= 0 && p.tile < 12 * 4 ** 8 && p.row >= 0 && p.row < 512 && p.col >= 0 && p.col < 512, `${ra},${dec}`);
+  }
+});
+
+test('HiPS FITS tile parsing', () => {
+  const card = (k, v) => `${k.padEnd(8)}= ${String(v).padStart(20)}`.padEnd(80);
+  const head = (card('SIMPLE', 'T') + card('BITPIX', -32) + card('NAXIS', 2) + card('NAXIS1', 4) + card('NAXIS2', 4) + 'END'.padEnd(80)).padEnd(2880);
+  const buf = new Uint8Array(2880 + 64); buf.set(new TextEncoder().encode(head));
+  const dv = new DataView(buf.buffer); for (let i = 0; i < 16; i++) dv.setFloat32(2880 + 4 * i, i * 1.5, false);
+  assert.deepEqual([...parseTile(buf.buffer, 4)], Array.from({ length: 16 }, (_, i) => i * 1.5));
+  assert.throws(() => parseTile(buf.buffer, 512)); // wrong size
+  assert.throws(() => parseTile(new TextEncoder().encode('<html>not a tile</html>').buffer));
+});
+
+test('WISE tiles and Gaia agree on where Barnard\'s Star was in 2010 (IRSA HiPS mirror + catalogue service)', { skip: process.env.OFFLINE === '1' }, async () => {
+  const [ra, dec] = [269.4463, 4.7677], S = gridSize(8), k = 2;
+  const [w, dates, gaia] = await Promise.all([wiseStamp(ra, dec, S, k), hipsDates(), fetchGaia(ra, dec, 0.1)]);
+  assert.equal(new Date(((dates.mjdMin + dates.mjdMax) / 2 - 40587) * 864e5).getUTCFullYear(), 2010);
+  const star = gaia.stars.find(s => s.id === '4472832130942575872');
+  assert.ok(star, 'Barnard\'s Star is in the Gaia answer with its full id');
+  const [x, y] = starXY(star, (dates.mjdMin + dates.mjdMax) / 2, S, ra, dec); // live-grid pixels -> WISE stamp pixels
+  const at = w.v[Math.round((y + 0.5) * k - 0.5) * w.n + Math.round((x + 0.5) * k - 0.5)];
+  const sorted = Float32Array.from(w.v).sort(), med = sorted[sorted.length >> 1];
+  assert.ok(at > 100 * Math.max(med, 0.1), `WISE value ${at} at the predicted 2010 position, median ${med}`);
+  assert.ok(y - (S - 1) / 2 > 20, 'in 2010 the star was well south of where it is in 2025-26');
+});
+
+test('overlay fetches fail soft: an unreachable service rejects instead of hanging or returning junk', async () => {
+  const down = async () => { throw new Error('network down'); }, notFound = async () => ({ ok: false, status: 404, text: async () => '<html>404</html>' });
+  await assert.rejects(fetchGaia(10, 10, 0.05, down));
+  await assert.rejects(fetchGaia(10, 10, 0.05, notFound));
+  await assert.rejects(wiseStamp(10, 10, 5, 1, notFound));
+  await assert.rejects(hipsDates(notFound));
 });

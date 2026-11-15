@@ -193,7 +193,11 @@ th[aria-sort="descending"] .sort::after { content: " ▼"; }
 .live-meta-wrap summary { cursor: pointer; color: var(--muted); }
 .coadd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
 .coadd-grid.wide { grid-template-columns: minmax(0, 420px); }
-.coadds[hidden], .subtract[hidden], .live-blink[hidden] { display: none; }
+.coadd-grid.wise-pair { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); max-width: 1000px; align-items: start; }
+.wise-blink figure[hidden] { display: none; }
+.card-fig { margin: 12px 0; }
+.card-fig img { max-width: 100%; height: auto; border-radius: 6px; background: #fff; }
+.coadds[hidden], .subtract[hidden], .live-blink[hidden], .wise[hidden] { display: none; }
 .live-spec { margin-top: 16px; }
 @media (max-width: 720px) { .live-grid { grid-template-columns: 1fr; } }
 
@@ -232,6 +236,7 @@ th[aria-sort="descending"] .sort::after { content: " ▼"; }
 .hero2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 340px); grid-template-areas: "q field" "s field" "n field" "c field" "x field"; grid-template-rows: auto auto auto auto 1fr; gap: 0 32px; align-items: start; }
 .hero2 h1 { grid-area: q; font-size: clamp(1.8rem, 4.2vw, 3rem); }
 .hero-right { grid-area: field; }
+.hero-intro { grid-area: s; margin: 0.2em 0 0.8em; max-width: 34em; }
 .headline-sentence { font-size: 0.92rem; color: var(--muted); margin: 8px 2px; }
 .figure-ci { margin: 0 0 0.6em; color: var(--muted); }
 .hero2 .hero-field { margin-top: 1.2em; padding: 12px; }
@@ -246,7 +251,7 @@ th[aria-sort="descending"] .sort::after { content: " ▼"; }
 .figure-label { font-size: 1.05rem; color: var(--muted); max-width: 26em; }
 .below-fold { margin-top: 3em; border-top: 1px solid var(--line); }
 @media (max-width: 860px) {
-  .hero2 { grid-template-columns: 1fr; grid-template-areas: "q" "n" "field" "c" "s"; grid-template-rows: none; }
+  .hero2 { grid-template-columns: 1fr; grid-template-areas: "q" "s" "n" "field" "c"; grid-template-rows: none; }
   .hero2 h1 { margin-bottom: 0.1em; }
   .hero2 .hero-field { margin-top: 0.3em; }
   .hero-field .imgwrap { max-width: 250px; margin: 0 auto; }

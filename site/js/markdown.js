@@ -1,4 +1,5 @@
 // Minimal, safe Markdown → HTML. All text is escaped; only the constructs below produce tags.
+// Relative image paths go through resolve(); links to site pages (x.html, with or without a leading ../) stay relative to the page.
 // Supports: # headings (optional {#id}), paragraphs, - / 1. lists, > quotes, ``` code, ---, | tables |, images, links, **bold**, *em*, `code`.
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const okUrl = u => !/^\s*(javascript|data|vbscript):/i.test(u);
@@ -6,18 +7,19 @@ const okUrl = u => !/^\s*(javascript|data|vbscript):/i.test(u);
 export function renderMarkdown(src, resolve = u => u) {
   const lines = src.replace(/\r\n?/g, '\n').split('\n'), out = [];
   const url = u => okUrl(u) ? esc(/^(https?:|#|mailto:)/.test(u) ? u : resolve(u)) : '#';
+  const href = u => (/^(\.\.\/)?[\w-]+\.html([?#]|$)/.test(u) ? esc(u.replace(/^\.\.\//, '')) : url(u));
   const inline = s => {
     const codes = [];
     s = s.replace(/`([^`]+)`/g, (_, c) => `\u0000${codes.push(esc(c)) - 1}\u0000`);
     s = esc(s)
       .replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+&quot;[^&]*&quot;)?\)/g, (_, a, u) => `<img src="${url(u.replace(/&amp;/g, '&'))}" alt="${a}" loading="lazy">`)
-      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, txt, u) => `<a href="${url(u.replace(/&amp;/g, '&'))}"${/^https?:/.test(u) ? ' rel="noopener"' : ''}>${txt}</a>`)
+      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, txt, u) => `<a href="${href(u.replace(/&amp;/g, '&'))}"${/^https?:/.test(u) ? ' rel="noopener"' : ''}>${txt}</a>`)
       .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
       .replace(/(^|[^\w*])\*([^*\s][^*]*)\*/g, '$1<em>$2</em>')
       .replace(/(^|\W)_([^_\s][^_]*)_(?=\W|$)/g, '$1<em>$2</em>');
     return s.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${codes[i]}</code>`);
   };
-  const slugs = new Set();
+  const slugs = new Set(src.match(/\{#[\w-]+\}\s*$/gm)?.map(x => x.trim().slice(2, -1))); // explicit ids are taken first
   const slug = s => { let b = s.toLowerCase().replace(/<[^>]+>/g, '').replace(/[^\wÀ-ɏ]+/g, '-').replace(/^-|-$/g, '') || 'section', k = b, n = 1; while (slugs.has(k)) k = `${b}-${++n}`; slugs.add(k); return k; };
   const cells = l => l.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
   let i = 0;

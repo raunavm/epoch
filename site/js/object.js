@@ -38,7 +38,7 @@ function render(o) {
       numRow(t('obj.diameter'), Dtxt, L('D_km', 'derived'),
         tr.D_km != null ? [t('obj.independent'), ' ', h('strong', {}, Ttxt), ` (${tr.source || '—'}) `, badge('data'),
           ` · ${t('obj.ratio', { r: fmt(sz.D_km / tr.D_km, 3) })} `, badge('derived'), ' · '] : [t('obj.no_independent'), ' · '], toFrames()),
-      sz.pV != null ? numRow(t('obj.albedo'), fmt(sz.pV, 2), L('pV', 'derived'),
+      sz.pV != null ? numRow(t('obj.albedo'), fmt(sz.pV, 2) + (sz.pV_p16 != null && sz.pV_p84 != null ? ` ${t('obj.pv_interval', { lo: fmt(sz.pV_p16, 2), hi: fmt(sz.pV_p84, 2) })}` : ''), L('pV', 'derived'),
         tr.pV != null ? [t('obj.independent'), ' ', h('strong', {}, fmt(tr.pV, 2)), ` (${tr.source || '—'}) `, badge('data')] : t('obj.no_independent')) : null,
       sz.eta != null ? numRow(t('obj.eta'), fmt(sz.eta, 2), L('eta', 'model'), t('obj.eta_check')) : null);
     sizeSec.append(dl);
@@ -115,8 +115,10 @@ function skyChart(track, frames) {
     return { ra: a.ra + u * (b.ra - a.ra), dec: a.dec + u * (b.dec - a.dec) };
   };
   const fp = frames.map(f => ({ ...at(f.mjd), wl: f.wl_um }));
+  // The path in time order, as one line per visit season (a gap of more than 5 days starts a new line).
+  const seasons = tr.reduce((acc, p, k) => { if (!k || p.mjd - tr[k - 1].mjd > 5) acc.push([]); acc[acc.length - 1].push(p); return acc; }, []);
   const svg = plot([
-    { x: tr.map(p => p.ra), y: tr.map(p => p.dec), kind: 'line', color: 'var(--muted)', label: t('obj.orbit_path') },
+    ...seasons.map((g, k) => ({ x: g.map(p => p.ra), y: g.map(p => p.dec), kind: 'line', sort: false, color: 'var(--muted)', label: k ? null : t('obj.orbit_path') })),
     { x: fp.map(p => p.ra), y: fp.map(p => p.dec), kind: 'points', color: 'var(--accent)', colors: fp.map(p => wlColor(p.wl)), label: t('obj.frame_points') },
   ], { invertX: true, xlabel: t('plot.ra'), ylabel: t('plot.dec'), title: t('obj.path_title'), height: 320 });
   return h('figure', {}, svg, h('figcaption', { class: 'muted' }, t('obj.path_caption'), ' ', badge('model')));

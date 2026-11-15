@@ -4,11 +4,12 @@ import { h, t, link } from '../core.js';
 const ITEMS = [
   ['urlcoords', 'timemachine.html?ra=133.761&dec=-7.2423&fov=2#coord-form'],
   ['fov', 'timemachine.html#fov'],
-  ['spectrum', 'timemachine.html?target=wise0855#coord-form'],
+  ['spectrum', 'timemachine.html?ra=133.761&dec=-7.2423&fov=2#live'],
   ['flags', 'timemachine.html?target=barnard#tm-flags'],
-  ['gaia', 'timemachine.html#showcase'],
-  ['addsub', 'timemachine.html#coord-form'],
-  ['bands', 'timemachine.html#coord-form'],
+  ['gaia', 'timemachine.html?target=barnard&fov=2&gaia=1#live'],
+  ['wise', 'timemachine.html?target=wise0855&fov=8&wise=1#live'],
+  ['addsub', 'timemachine.html?target=barnard&fov=2&mode=subtract#live'],
+  ['bands', 'timemachine.html#showcase'],
   ['update', 'science.html#reproduce-every-figure'],
 ];
 

@@ -1,6 +1,6 @@
 // "Every number opens its evidence": a number rendered as a button that reveals the frames behind it
 // (with links to the original S3 files), the null tests used, and the method section on science.html.
-import { h, t, link, fmt, fmtPM, badge, safeUrl, getJSON } from '../core.js';
+import { h, t, link, fmt, fmtPM, loc, locLang, badge, safeUrl, getJSON } from '../core.js';
 
 const SHOW = 40;
 let uid = 0;
@@ -51,7 +51,7 @@ async function fill(panel, ev) {
       h('p', { class: 'small' }, ev.nulls.map(v => (typeof v === 'object' ? `${v.label}: ${fmt(v.value, 3)}` : fmt(v, 3))).join(' · ')));
     if (ev.nullsNote) parts.push(h('p', { class: 'muted small' }, ev.nullsNote));
   }
-  const a = l => h('a', { href: /^https?:/.test(l.href) ? l.href : link(l.href) }, l.text);
+  const a = l => h('a', { href: /^https?:/.test(l.href) ? l.href : link(l.href), lang: locLang(l, 'text') }, loc(l, 'text'));
   if (ev.links?.length > 3) parts.push(h('ul', { class: 'ev-frames' }, ev.links.map(l => h('li', {}, a(l)))));
   const links = [...(ev.method ? [{ text: t('ev.method'), href: ev.method }] : []), ...(ev.links?.length > 3 ? [] : ev.links || [])];
   if (links.length) parts.push(h('p', { class: 'small' }, links.flatMap((l, i) => [i ? ' · ' : '', a(l)])));
@@ -87,7 +87,7 @@ export function findingLine(f, key) {
   };
   const num = f.number != null ? evidenceNum(h('strong', { class: 'num' }, fmtPM(f.number, f.err), f.unit ? ` ${f.unit}` : ''), ev) : [null, null];
   const range = f.err_low != null && f.err_high != null && Number.isFinite(+f.err_low) ? ` (${f.err_label || t('home.ci')} ${fmt(f.err_low)}–${fmt(f.err_high)}${f.unit || ''})` : '';
-  const main = h('p', { class: 'finding' }, f.sentence || '', ' ', num[0], range, ' ', badge(f.label || 'derived'));
+  const main = h('p', { class: 'finding' }, h('span', { lang: locLang(f, 'sentence') }, loc(f, 'sentence') || ''), ' ', num[0], range, ' ', badge(f.label || 'derived'));
   const a = d.all_fields;
   return h('div', {}, main, num[1], a?.fraction_removed != null ? h('p', { class: 'muted small' },
     t('finding.all_fields', { n: d.per_field?.length ?? '', pct: fmt(100 * a.fraction_removed, 2), naive: a.n_naive, corr: a.n_corrected }),
@@ -98,15 +98,15 @@ export function findingLine(f, key) {
 // and spread_note, opening the per-patch evidence list. Returns [button, panel, intervalText].
 export function headlineNumber(hd, big = false) {
   const unit = hd.unit || '';
-  const ci = hd.err_low != null && hd.err_high != null ? `${hd.err_label || t('home.ci')} ${fmt(hd.err_low)}–${fmt(hd.err_high)}${unit}` : null;
-  const interval = [ci, hd.spread_note].filter(Boolean).join('; ') || null;
+  const ci = hd.err_low != null && hd.err_high != null ? `${loc(hd, 'err_label') || t('home.ci')} ${fmt(hd.err_low)}–${fmt(hd.err_high)}${unit}` : null;
+  const interval = [ci, loc(hd, 'spread_note')].filter(Boolean).join('; ') || null;
   return evidenceNum(h('span', { class: big ? 'big-figure' : 'num' }, hd.err != null ? fmtPM(hd.number, hd.err) : fmt(hd.number), unit), {
-    note: hd.evidence_note, links: hd.evidence, method: hd.method || 'science.html#which-change-is-real', nulls: hd.nulls, nullsNote: hd.nulls_note,
+    note: loc(hd, 'evidence_note'), links: hd.evidence, method: hd.method || 'science.html#which-change-is-real', nulls: hd.nulls, nullsNote: hd.nulls_note,
   }).concat(interval);
 }
 // sentence: override the long headline sentence with a shorter line (Start-here tour).
 export function headlineLine(hd, sentence) {
   const [btn, panel, interval] = headlineNumber(hd);
-  return h('div', {}, h('p', { class: 'finding' }, sentence ?? hd.sentence ?? '', ' ', btn, ' ', hd.number_label || '',
+  return h('div', {}, h('p', { class: 'finding' }, sentence ?? loc(hd, 'sentence') ?? '', ' ', btn, ' ', loc(hd, 'number_label') || '',
     interval ? ` (${interval})` : '', ' ', badge(hd.kind || 'derived')), panel);
 }

@@ -1,6 +1,6 @@
 // A prepared field in three views: plain blink (every picture, in time order), one detector at a time,
 // and the colour-aware view (experimental); with labelled objects, pixel-flag counts and an optional Gaia overlay.
-import { h, put, t, asset, badge, fmt, wlColor, CATS, REDUCED_MOTION } from '../core.js';
+import { h, put, t, link, loc, asset, badge, fmt, wlColor, CATS, REDUCED_MOTION } from '../core.js';
 import { s } from '../plot.js';
 
 const SPEEDS = [0.5, 1, 2, 4];
@@ -87,7 +87,10 @@ export function mountBlink(el, field, { compact = false, minimal = false, view =
   const flagBox = h('dl', { class: 'facts small' });
   const hasGaia = Array.isArray(field.gaia) && field.gaia.length > 0;
   const gaiaBtn = h('button', { type: 'button', class: 'check', 'aria-pressed': 'false', disabled: !hasGaia, onclick: () => { st.gaia = !st.gaia; render(); } },
-    hasGaia ? t('tm.gaia', { n: field.gaia.length }) : t('tm.gaia_none'));
+    t('tm.gaia', { n: field.gaia?.length || 0 }));
+  // No prepared star list: the Gaia overlay is drawn in the live view of the same patch.
+  const gaiaLive = !hasGaia && field.ra != null && field.dec != null
+    ? h('a', { href: link(`timemachine.html?ra=${field.ra}&dec=${field.dec}&fov=2&gaia=1#live`) }, t('tm.gaia_live_link')) : null;
 
   const layoutBtns = ['blink', 'side'].map(k => h('button', { type: 'button', class: 'seg', onclick: () => { st.layout = k; st.playing = k === 'blink' && st.playing; schedule(); render(); } }, t(`tm.mode_${k}`)));
   const selA = frameSelect('a'), selB = frameSelect('b');
@@ -113,7 +116,7 @@ export function mountBlink(el, field, { compact = false, minimal = false, view =
   function fill(v, f, k, n) {
     const src = corr() ? f.corr_png : f.img_png;
     v.img.src = src ? asset(src) : '';
-    v.img.alt = t(corr() ? 'tm.alt_corr' : 'tm.alt_raw', { name: field.name, date: f.date, wl: fmt(f.wl_um, 3) });
+    v.img.alt = t(corr() ? 'tm.alt_corr' : 'tm.alt_raw', { name: loc(field, 'name'), date: f.date, wl: fmt(f.wl_um, 3) });
     v.meta.replaceChildren(
       h('span', { class: 'swatch', style: `background:${wlColor(f.wl_um)}`, 'aria-hidden': 'true' }),
       h('strong', {}, f.date), `\u00a0· ${fmt(f.wl_um, 3)}\u00a0µm`, f.detector != null ? `\u00a0· ${t('live.detector')}\u00a0${f.detector}` : '',
@@ -220,7 +223,7 @@ export function mountBlink(el, field, { compact = false, minimal = false, view =
     counter, h('div', { class: 'tm-views' }, viewA.root, viewB.root),
     minimal ? null : [blinkCtl, sideCtl,
       h('div', { class: 'scrub-wrap' }, h('label', { for: scrub.id, class: 'sr-only' }, t('tm.timeline')), scrub, ends)],
-    small ? null : [astList, legend, h('p', {}, gaiaBtn, hasGaia ? null : h('span', { class: 'muted small' }, ' ', t('tm.gaia_live_note'))), labelList,
+    small ? null : [astList, legend, hasGaia ? h('p', {}, gaiaBtn) : gaiaLive ? h('p', { class: 'small' }, gaiaLive) : null, labelList,
       h('details', { class: 'flags', id: 'tm-flags' }, h('summary', {}, t('tm.flags_h')), flagBox)],
   );
 

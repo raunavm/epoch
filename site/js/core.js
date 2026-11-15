@@ -41,6 +41,11 @@ export function link(href) {
   return path + (path.includes('?') ? '&' : '?') + 'fixtures=1' + (hash ? `#${hash}` : '');
 }
 
+// Text from a data file in the page language: the `<key>_<lang>` field when the file has one, else the English field.
+export function loc(obj, key) { return (LANG !== 'en' && obj?.[`${key}_${LANG}`]) || obj?.[key]; }
+// lang attribute for an element showing loc(obj, key): 'en' when the English fallback is shown on a non-English page.
+export function locLang(obj, key) { return LANG !== 'en' && obj?.[key] && !obj[`${key}_${LANG}`] ? 'en' : null; }
+
 export function t(key, vars) {
   let s = STR[key] ?? EN[key] ?? key;
   if (vars) s = s.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
@@ -74,8 +79,13 @@ export function fmt(x, sig = 3) {
   if (x !== 0 && (Math.abs(x) >= 1e5 || Math.abs(x) < 1e-3)) return x.toExponential(sig - 1);
   return (+x.toPrecision(sig)).toLocaleString(LANG);
 }
+// value ± error, both to the same decimal place. The error keeps 2 significant figures when its leading digits are
+// below 3.55 and 1 otherwise (the Particle Data Group rounding rule), e.g. 3.963 ± 0.074 -> 3.96 ± 0.07, -5.01 ± 1.91 -> -5.0 ± 1.9.
 export function fmtPM(v, e, sig = 3) {
-  return e != null && Number.isFinite(+e) ? `${fmt(v, sig)} ± ${fmt(e, 2)}` : fmt(v, sig);
+  if (e == null || !(+e > 0) || !Number.isFinite(+e) || !Number.isFinite(+v)) return fmt(v, sig);
+  const exp = Math.floor(Math.log10(+e)), d = Math.max(0, (+e / 10 ** exp < 3.55 ? 1 : 0) - exp);
+  const f = x => (+x).toLocaleString(LANG, { minimumFractionDigits: d, maximumFractionDigits: d });
+  return `${f(v)} ± ${f(e)}`;
 }
 export function median(a) {
   const s = a.filter(Number.isFinite).sort((x, y) => x - y);
@@ -138,6 +148,8 @@ export async function init() {
   if (tk) document.title = `${t(tk)} — ${t('site.name')}`;
 
   if (FIXTURES) document.body.prepend(h('div', { class: 'fixture-banner', role: 'note' }, t('common.fixture_banner')));
+  // Results and method pages come from data files written in English; say so on translated pages.
+  if (LANG !== 'en') document.getElementById('main')?.prepend(h('p', { class: 'muted small', role: 'note' }, t('common.data_en')));
 
   const here = location.pathname.split('/').pop() || 'index.html';
   const header = document.getElementById('site-header');
