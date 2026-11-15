@@ -54,23 +54,37 @@ def items_for(pdes, df, offset=(0.0, 0.0)):
     return items, dict(H=H, G=G, D=D, pV=pV, D_ref=t.get("diameter_ref"), name=(t.get("fullname") or str(pdes)).strip())
 
 
-def null_calibration(pdes, df):
-    """E5 (docs/PROTOCOLS.md): 24 off-path tracks; scale estimated on the 12 inner tracks (6.5 px), verified on
-    the 12 outer tracks (8.5 px): rescaled outer spread must be 0.9–1.1, else the larger scale is used.
-    Returns (stack_mean, stack_scale, single_std, all_null_snrs, check dict)."""
-    inner, outer, singles = [], [], []
-    for rad, dst in ((6.5, inner), (8.5, outer)):
-        for a in np.arange(12) * np.pi / 6 + (0 if rad == 6.5 else np.pi / 12):
-            it, _ = items_for(pdes, df, offset=(rad * np.cos(a), rad * np.sin(a)))
-            _, _, A, E = combine(it, HALF)
-            dst.append(A / E)
-            singles += [i["snr"] for i in it if np.isfinite(i["snr"])]
+def e5_scale(inner, outer):
+    """E5 rule: (mean of the 12 inner nulls, scale, check dict). Scale = inner spread if the rescaled outer spread
+    is within 0.9–1.1, else the larger of the two spreads."""
     m_in, s_in = float(np.mean(inner)), float(np.std(inner, ddof=1))
     s_out_rescaled = float(np.std(outer, ddof=1) / s_in)
     scale = s_in if 0.9 <= s_out_rescaled <= 1.1 else max(s_in, float(np.std(outer, ddof=1)))
-    check = dict(scale_inner=round(s_in, 3), outer_spread_after_rescale=round(s_out_rescaled, 3),
-                 passed=bool(0.9 <= s_out_rescaled <= 1.1), scale_used=round(scale, 3))
-    return m_in, scale, float(np.std(singles)), inner + outer, check
+    return m_in, scale, dict(scale_inner=round(s_in, 3), outer_spread_after_rescale=round(s_out_rescaled, 3),
+                             passed=bool(0.9 <= s_out_rescaled <= 1.1), scale_used=round(scale, 3))
+
+
+def null_calibration(pdes, df, order=None, ns=()):
+    """E5 (docs/PROTOCOLS.md): 24 off-path tracks; scale estimated on the 12 inner tracks (6.5 px), verified on
+    the 12 outer tracks (8.5 px): rescaled outer spread must be 0.9–1.1, else the larger scale is used.
+    With order (the (obs_id, detector) combination order) and ns, the same rule is also applied to every partial
+    stack of the first n pictures, so each slider step is calibrated on its own empty paths.
+    Returns (stack_mean, stack_scale, single_std, all_null_snrs, check dict, {n: (mean, scale)})."""
+    inner, outer, singles = [], [], []
+    part = {n: ([], []) for n in ns}
+    for j, rad in enumerate((6.5, 8.5)):
+        for a in np.arange(12) * np.pi / 6 + (0 if rad == 6.5 else np.pi / 12):
+            it, _ = items_for(pdes, df, offset=(rad * np.cos(a), rad * np.sin(a)))
+            _, _, A, E = combine(it, HALF)
+            (inner, outer)[j].append(A / E)
+            singles += [i["snr"] for i in it if np.isfinite(i["snr"])]
+            by = {(i["obs_id"], i["det"]): i for i in it}
+            for n in ns:
+                _, _, a_n, e_n = combine([by[k] for k in order[:n]], HALF)
+                part[n][j].append(a_n / e_n)
+    m_in, scale, check = e5_scale(inner, outer)
+    per_n = {n: e5_scale(*part[n])[:2] for n in ns}
+    return m_in, scale, float(np.std(singles)), inner + outer, check, per_n
 
 
 def detection_image(arr, half=HALF):
@@ -114,7 +128,7 @@ def main(ids, pick):
                               med_single=float(np.nanmedian([i["snr"] for i in items])), stack=float(a / ae), V=float(df.V.median())))
             print(stats[-1], flush=True)
             continue
-        m0, s0, s1, _, _ = null_calibration(pdes, df)
+        m0, s0, s1, _, _, _ = null_calibration(pdes, df)
         stats.append(dict(pdes=pdes, n=len(items), max_single=float(np.nanmax([i["snr"] for i in items]) / s1),
                           med_single=float(np.nanmedian([i["snr"] for i in items]) / s1), stack=float((a / ae - m0) / s0),
                           stack_nominal=float(a / ae), null_std=s0, single_std=s1, V=float(df.V.median())))
@@ -122,12 +136,17 @@ def main(ids, pick):
     st = pd.DataFrame(stats)
     os.makedirs("data/findings", exist_ok=True)
     st.to_csv("data/findings/f2_candidates.csv", index=False)
+    n_forced = sum(os.path.exists(f"data/forced/{i}.parquet") for i in ids)
+    n_ok = int(((st["max_single"] < 5) & (st["stack"] >= 5)).sum()) if len(st) else 0
+    chosen_by = "rule" if pick is None else "--pick"
     if pick is None:
         ok = st[(st["max_single"] < 5) & (st["stack"] >= 5)]
         if len(ok) == 0:
             print("NO CANDIDATE satisfies max single-frame S/N < 5 (the standard 5σ detection threshold); finding 2 not met with this sample")
             return
         pick = ok.sort_values("stack", ascending=False)["pdes"].iloc[0]
+    okd = st[(st["max_single"] < 5) & (st["stack"] >= 5)].sort_values("stack", ascending=False)["pdes"].astype(str).tolist()
+    rank = okd.index(str(pick)) + 1 if str(pick) in okd else None  # 1 = highest calibrated stack among those meeting the rule
     df = pd.read_parquet(f"data/forced/{pick}.parquet")
     items, meta = items_for(pick, df)
     # combination order: by EXPECTED per-picture signal-to-noise (brightness model / noise; never the measured flux)
@@ -135,6 +154,8 @@ def main(ids, pick):
     N = len(items)
     out = "site/data/reveal"
     os.makedirs(out, exist_ok=True)
+    for f in glob.glob(f"{out}/single_*.png") + glob.glob(f"{out}/stack_*.png"):
+        os.remove(f)  # stale pictures from an earlier build
     # display ranges: singles in σ-units of each frame; stack in fraction-of-expected units
     frames, stacks, spec = [], [], []
     ns = sorted(set([1, 2, 3, 5, 8, 12, 18, 25, 35, 50, 70, 100, 140, 200, N]))
@@ -166,12 +187,15 @@ def main(ids, pick):
             er.append(round(float(1 / np.sqrt(w_.sum())), 5))
         spec.append(dict(n_frames_used=n, wl_um=wl, flux_mJy=fl, err=er))
     # null test + noise calibration on 24 off-orbit tracks (static scene refit there)
-    m0, s0, s1, nulls, e5 = null_calibration(pick, df)
-    for stk in stacks:
-        stk["snr_nominal"] = stk["snr"]
-        stk["snr"] = round((stk["snr"] - m0) / s0, 2)  # calibrated significance
+    m0, s0, s1, nulls, e5, per_n = null_calibration(pick, df, order=[(i["obs_id"], i["det"]) for i in items], ns=ns)
     for fr in frames:
-        fr["snr"] = round(fr["snr"] / s1, 2)
+        fr["snr"] = round(fr["snr"] / s1, 2)  # singles: rescaled by the spread of empty-path singles; no mean correction
+    for stk in stacks:  # every step calibrated on its own empty paths (same n pictures, same order); scale never below 1
+        m_n, s_n = (m0, s0) if stk["n"] == N else per_n[stk["n"]]
+        stk.update(snr_nominal=stk["snr"], null_mean=round(m_n, 2), null_scale=round(s_n, 2))
+        stk["snr"] = round((stk["snr_nominal"] - m_n) / (s0 if stk["n"] == N else max(s_n, 1.0)), 2)
+    if stacks[0]["n"] == 1:
+        stacks[0]["snr"] = frames[0]["snr"]  # one picture: show the single-picture value, so the two numbers agree
     single = np.array([i["snr"] for i in items]) / s1
     stack_snr = stacks[-1]["snr"]
     # depth gain: typical single-frame 1σ error vs stack 1σ error, both in units of the expected brightness
@@ -181,15 +205,25 @@ def main(ids, pick):
     n_all = len(pd.read_parquet(f"data/forced/{pick}.parquet"))
     rev = dict(object=meta["name"], designation=f"{pick}", n_frames_before_quality_cut=n_all, meta=meta, frames=frames, stack_pngs=stacks, spectrum_points=spec,
                depth_gain_mag=None if gain is None else round(float(gain), 2), ideal_gain_mag=round(float(ideal), 2),
-               noise_calibration=dict(stack_null_mean=round(m0, 2), stack_null_std=round(s0, 2), single_std=round(s1, 2), n_null_tracks=24, e5_check=e5),
+               noise_calibration=dict(stack_null_mean=round(m0, 2), stack_null_std=round(s0, 2), single_std=round(s1, 2), n_null_tracks=24, e5_check=e5,
+                                      per_step="each step: the same n pictures combined along the 24 empty paths; (S/N - mean of 12 inner nulls)/max(E5 scale, 1)",
+                                      singles="single pictures: S/N divided by the spread of single-picture S/N on the empty paths; no mean correction"),
                single_frame_snr_max=round(float(np.nanmax(single)), 2), single_frame_snr_median=round(float(np.median(single)), 2),
-               stack_snr=stack_snr, null_snrs=[round(x, 2) for x in nulls], n_frames=N,
+               stack_snr=stack_snr, null_snrs=[round((x - m0) / s0, 2) for x in nulls], null_snrs_nominal=[round(x, 2) for x in nulls], n_frames=N,
+               hedge="modest signal; the error-scale check did not pass cleanly, so the larger, more cautious scale is used",
                order="pictures are combined in order of their expected signal-to-noise (brightness model and noise only; measured fluxes are not used to choose the order)",
                units="singles and stacks: stars removed, smoothed at the PSF scale, in units of each image's own background noise (same treatment for both)",
-               rerun="python scripts/run_forced.py --ids %s --stamps && python scripts/build_reveal.py --pick %s" % (pick, pick))
+               rerun="python scripts/run_forced.py --ids %s --stamps && python scripts/build_reveal.py --pick %s" % (pick, pick),
+               generated_with="scripts in this repository")
     json.dump(rev, open("site/data/reveal.json", "w"), indent=1)
     f2 = dict(object=meta["name"], designation=pick, n_frames=N, n_frames_dropped_quality=n_all - N, single_frame_snr_max=rev["single_frame_snr_max"],
               single_frame_snr_median=rev["single_frame_snr_median"], stack_snr=stack_snr,
+              stack_snr_nominal=stacks[-1]["snr_nominal"], null_nominal_mean=round(m0, 2), null_nominal_mean_err=round(e5["scale_inner"] / np.sqrt(12), 2),
+              stack_snr_without_null_mean=round(stacks[-1]["snr_nominal"] / s0, 2), null_mean_err_sigma=round(e5["scale_inner"] / np.sqrt(12) / s0, 2),
+              selection=dict(rule="highest calibrated stack among candidates whose best single picture is below 5 (scripts/build_reveal.py)",
+                             chosen_by=chosen_by, n_ids_listed=len(ids), n_with_forced_photometry=n_forced, n_stacked=int(len(st)),
+                             n_meeting_rule=n_ok, rank_among_meeting_rule=rank, candidates="data/findings/f2_candidates.csv",
+                             note="the quoted significance is not corrected for this choice"),
               null_snr_mean=round(float((np.mean(nulls) - m0) / s0), 2), null_snr_std=1.0, null_nominal_std=round(s0, 2),
               single_std=round(s1, 2), e5_check=e5, significance_note="scale from 12 inner empty tracks, verified on 12 outer tracks (docs/PROTOCOLS.md E5)",
               depth_gain_mag=rev["depth_gain_mag"], ideal_gain_mag=rev["ideal_gain_mag"])

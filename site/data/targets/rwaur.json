@@ -39,5 +39,6 @@
   }
  ],
  "method_note": "Counts use the same rule as the 20-patch test (groups of \u2265 2 pixels beyond 5\u03c3).",
- "method_anchor": "science.html#which-change-is-real"
+ "method_anchor": "science.html#which-change-is-real",
+ "generated_with": "scripts in this repository"
 }

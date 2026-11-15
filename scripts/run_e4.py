@@ -6,7 +6,8 @@ Stages (each resumable; partial results on disk):
               (orrery.forced.measure_frame); one JSON per frame in data/forced/wise0855_e4/,
               stamps in data/stamps/wise0855/
   analyze     primary statistic per pass + 24 null tracks; decision; data/findings/e4.json, site/data/e4/
-Usage: OMP_NUM_THREADS=1 .venv/bin/python scripts/run_e4.py astrometry|forced|analyze [--workers 3]
+  slider      rebuild only the picture-count slider (site/data/e4/reveal.json) from the Nov-Dec 2025 window
+Usage: OMP_NUM_THREADS=1 .venv/bin/python scripts/run_e4.py astrometry|forced|analyze|slider [--workers 3]
 """
 import argparse, glob, json, os, sys, warnings
 os.environ.setdefault("OMP_NUM_THREADS", "1")
@@ -401,25 +402,92 @@ def centroid_pass(frames, n_boot=40, seed=20261115):
                 meas_ra=pra + off[0] / 3600 / np.cos(np.radians(pdec)), meas_dec=pdec + off[1] / 3600, n_boot=n_boot)
 
 
-def build_slider(frames, null_mean, null_std):
-    """Reveal-style frame-count slider data (same format as site/data/reveal.json), all primary frames, all passes."""
+SLIDER_PASS = 2  # the slider shows one visit window only: Nov-Dec 2025, the window behind the quoted significance
+
+
+def build_slider(frames):
+    """Reveal-style frame-count slider data (same format as site/data/reveal.json) for ONE visit window, frames as
+    declared (no quality cut, no neighbour restoration), so the last step is that window's declared statistic.
+    Order: expected S/N (flat template / noise); measured fluxes never choose the order. Every step n is calibrated on
+    its own 24 empty paths (the same n pictures, same order, path displaced): (S/N - null mean) / max(null spread, 1).
+    Returns (frames list, stacks list, per-window summary dict)."""
     from build_reveal import detection_image, png
     from orrery.stack import combine, centre
     out = "site/data/e4"
-    items = sorted(stat(frames, lambda wl: 1.0)["items"], key=lambda i: -i["p"] / i["A_err"])  # expected S/N order
+    on = stat(frames, lambda wl: 1.0)["items"]
+    order = sorted(range(len(on)), key=lambda i: -on[i]["p"] / on[i]["A_err"])  # expected S/N order
+    items = [on[i] for i in order]
+    null_items = [[it[i] for i in order] for it in (items_for(frames, o) for o in NULLS)]
+    single_std = max(float(np.std([i["snr"] for it in null_items for i in it if np.isfinite(i["snr"])])), 1.0)
     N = len(items)
     frs, stacks = [], []
     for k, it in enumerate(items):
         z = detection_image(centre(np.where(it["w"] > 0, it["res"], 0), it["xs"], it["ys"], HALF))
         png(z, f"{out}/single_{k:03d}.png", -3, 6, cmap="gray", mark=(HALF, HALF))
-        frs.append(dict(obs_id=it["obs_id"], detector=it["det"], mjd=it["mjd"], wl_um=round(it["wl"], 4),
-                        single_png=f"e4/single_{k:03d}.png", snr=round(float(it["snr"]), 2), s3_key=it["key"]))
-    for n in [n for n in sorted(set([1, 2, 3, 5, 8, 12, 18, 25, 35, N])) if n <= N]:
+        frs.append(dict(obs_id=it["obs_id"], detector=it["det"], mjd=it["mjd"], wl_um=round(it["wl"], 4), single_png=f"e4/single_{k:03d}.png",
+                        snr=round(float(it["snr"] / single_std), 2), snr_nominal=round(float(it["snr"]), 2), s3_key=it["key"]))
+    for n in [n for n in sorted(set([1, 2, 3, 5, 8, 12, 18, N])) if n <= N]:
         img, _, a_, ae = combine(items[:n], HALF)
+        nulls = []
+        for ni in null_items:
+            _, _, na, ne = combine(ni[:n], HALF)
+            nulls.append(float(na / ne))
+        m, sd = float(np.mean(nulls)), float(np.std(nulls, ddof=1))
         png(detection_image(img), f"{out}/stack_{n:03d}.png", -3, 6, cmap="gray", mark=(HALF, HALF))
         stacks.append(dict(n=n, png=f"e4/stack_{n:03d}.png", snr_nominal=round(float(a_ / ae), 2),
-                           snr=round(float((a_ / ae - null_mean) / null_std), 2), a_hat=round(float(a_), 3), a_err=round(float(ae), 3)))
-    return items, frs, stacks
+                           snr=round(float((a_ / ae - m) / max(sd, 1.0)), 2), null_mean=round(m, 3), null_std=round(sd, 3),
+                           a_hat=round(float(a_), 3), a_err=round(float(ae), 3)))
+    stacks[0]["snr"] = frs[0]["snr"]  # one picture: show the single-picture value, so the two numbers agree
+    last = stacks[-1]
+    summary = dict(n_frames=N, snr_nominal=last["snr_nominal"], null_mean=last["null_mean"], null_std=last["null_std"],
+                   significance=last["snr"], single_std=round(single_std, 3), null_snrs=[round(x, 3) for x in nulls])
+    return frs, stacks, summary
+
+
+def stage_slider(prim, res):
+    """Rebuild site/data/e4/reveal.json from the SLIDER_PASS window and record it in res['slider_stack']."""
+    g = prim[prim["pass"] == SLIDER_PASS]
+    p = next(x for x in res["passes"] if x["pass_id"] == SLIDER_PASS)
+    for f in glob.glob("site/data/e4/single_*.png") + glob.glob("site/data/e4/stack_[0-9]*.png"):
+        os.remove(f)  # stale slider pictures from an earlier build
+    frs, stacks, sm = build_slider(load_frames(g))
+    assert abs(sm["significance"] - p["significance"]) < 0.01, (sm["significance"], p["significance"])  # last step = declared statistic
+    window = f"{p['start']} to {p['end']}"
+    res["slider_stack"] = dict(frames=f"4.4-5.0 um, visit window {SLIDER_PASS} ({window}) only, frames as declared; every step "
+                                      "calibrated on its own 24 empty paths, (S/N - null mean)/max(null spread, 1)",
+                               pass_id=SLIDER_PASS, **{x: sm[x] for x in ("n_frames", "snr_nominal", "null_mean", "null_std", "significance", "single_std")},
+                               a_hat_mJy=p["a_hat_mJy"], sigma_a_mJy=p["sigma_a_mJy"])
+    cal = [round((x - sm["null_mean"]) / max(sm["null_std"], 1.0), 2) for x in sm["null_snrs"]]
+    rev = dict(object="WISE 0855-0714", designation="WISE J085510.83-071442.5", n_frames_before_quality_cut=int(len(g)), meta=dict(name="WISE 0855-0714"),
+               window=dict(pass_id=SLIDER_PASS, start=p["start"], end=p["end"], label="Nov–Dec 2025 visits"),
+               frames=frs, stack_pngs=stacks, spectrum_points=[],
+               noise_calibration=dict(stack_null_mean=sm["null_mean"], stack_null_std=sm["null_std"], single_std=sm["single_std"], n_null_tracks=24,
+                                      per_step="each step: the same n pictures combined along 24 empty paths; (S/N - null mean)/max(null spread, 1)",
+                                      singles="single pictures: S/N divided by the spread of single-picture S/N on the empty paths (floored at 1); no mean correction"),
+               stack_snr=stacks[-1]["snr"], null_snrs=cal, null_snrs_nominal=sm["null_snrs"], n_frames=len(frs),
+               hedge="Nov–Dec 2025 visits only; each step against the same pictures combined along 24 empty paths",
+               order="pictures are combined in order of their expected signal-to-noise (flat template / noise; measured fluxes are not used to choose the order)",
+               units="singles and stacks: Gaia stars removed, smoothed at the PSF scale, in units of each image's own background noise; frames 4.4-5.0 um, "
+                     "Nov-Dec 2025 visits only, each centred on its predicted position (proper motion + parallax)",
+               rerun="OMP_NUM_THREADS=1 .venv/bin/python scripts/run_e4.py forced && .venv/bin/python scripts/run_e4.py analyze  (slider only: run_e4.py slider)",
+               generated_with="scripts in this repository")
+    json.dump(rev, open("site/data/e4/reveal.json", "w"), indent=1, default=float)
+    print("slider stack", res["slider_stack"], flush=True)
+    print("steps", [(s_["n"], s_["snr"]) for s_ in stacks], flush=True)
+
+
+def slider_only():
+    """Rebuild only the slider from the stamps on disk; data/findings/e4.json keeps every other key unchanged."""
+    res = json.load(open("data/findings/e4.json"))
+    df, _ = load_rows()
+    prim = df[(df.wl_um >= 4.4) & (df.wl_um <= 5.0)].sort_values("mjd").reset_index(drop=True)
+    prim["pass"] = passes_of(prim.mjd.values) + 1
+    old = res.get("slider_stack", {})
+    if old.get("pass_id") != SLIDER_PASS and "slider_stack_all_passes_superseded" not in res:
+        res["slider_stack_all_passes_superseded"] = dict(old, note="no longer shown on the site: an all-window stack chosen after the fact "
+                                                         "(quality cut, neighbour restored), not a declared statistic")
+    stage_slider(prim, res)
+    json.dump(res, open("data/findings/e4.json", "w"), indent=1, default=float)
 
 
 NOTES = dict(
@@ -442,7 +510,7 @@ NOTES = dict(
                 "< 0.7 px from the target as 'coincident', so in 31/100 pass-3 frames (9/21 primary frames) the star was not modelled "
                 "and its flux entered the target amplitude. The short-wavelength control (0.75-3.5 um, WISE 0855 expected < 0.01 mJy) "
                 "shows this (control_short_wavelength). passes[].significance is the declared statistic as frozen; "
-                "passes[].neighbour_restored puts the star back (diagnostic). Centroids and the slider use neighbour_restored.",
+                "passes[].neighbour_restored puts the star back (diagnostic). Centroids use neighbour_restored; the slider shows pass 2 only, as declared.",
                 "Pass 1 (2025-05-05/06) has 3 primary frames; one (2025W19_1B_0138_1 D6) has a badly fitted background "
                 "(local chi2/dof = 41, residuals 5-14 sigma across the stamp), which also inflates the null spread (std 57). "
                 "The declared statistic for pass 1 is therefore uninformative; passes[0].sensitivity_quality_cut drops that frame.",
@@ -490,21 +558,7 @@ def main():
                                  p_vs_stationary=float(chi2d.sf(comps[-1]["chi2_vs_stationary"], 2)))
                 print("shift", comps[-1], flush=True)
         res["centroid_shift_vs_prediction"] = comps
-        # slider: all passes, neighbours restored, repo display quality rule (local chi2/dof <= 3, as site/data/reveal.json)
-        pq = prim[prim.chi2_local / prim.dof_local.clip(lower=1) <= 3]
-        frq = load_frames(pq, restore=True)
-        allp, _ = evaluate(frq, lambda wl: 1.0)
-        res["slider_stack"] = dict(frames="4.4-5.0 um, all passes, neighbours restored, local chi2/dof <= 3", n_dropped=int(len(prim) - len(pq)),
-                                   **{x: allp[x] for x in ("n_frames", "a_hat_mJy", "sigma_a_mJy", "snr_nominal", "null_mean", "null_std", "significance")})
-        print("slider stack", res["slider_stack"], flush=True)
-        items, frs, stacks = build_slider(frq, allp["null_mean"], allp["null_std"])
-        rev = dict(object="WISE 0855-0714", designation="WISE J085510.83-071442.5", n_frames_before_quality_cut=int(len(prim)), meta=dict(name="WISE 0855-0714"),
-                   frames=frs, stack_pngs=stacks, spectrum_points=[], noise_calibration=dict(stack_null_mean=allp["null_mean"],
-                   stack_null_std=allp["null_std"], n_null_tracks=24), stack_snr=stacks[-1]["snr"], null_snrs=allp["null_snrs"], n_frames=len(items),
-                   order="pictures are combined in order of their expected signal-to-noise (flat template / noise; measured fluxes are not used to choose the order)",
-                   units="singles and stacks: Gaia stars removed, smoothed at the PSF scale, in units of each image's own background noise; frames 4.4-5.0 um, all passes, each centred on its predicted position (proper motion + parallax)",
-                   rerun="OMP_NUM_THREADS=1 .venv/bin/python scripts/run_e4.py forced && .venv/bin/python scripts/run_e4.py analyze")
-        json.dump(rev, open("site/data/e4/reveal.json", "w"), indent=1, default=float)
+        stage_slider(prim, res)
     else:
         res["decision"] = "not detected at >= 5 vs nulls in any pass (primary statistic); 95% upper limits given per pass"
     res["upper_limit_definition"] = "UL95 = max(a_hat - null_mean*sigma_a, 0) + 1.645*sigma_a*max(null_std, 1)  [mJy, flat in 4.4-5.0 um]"
@@ -516,12 +570,14 @@ def main():
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("stage", choices=["astrometry", "forced", "analyze"])
+    ap.add_argument("stage", choices=["astrometry", "forced", "analyze", "slider"])
     ap.add_argument("--workers", type=int, default=3)
     a = ap.parse_args()
     if a.stage == "astrometry":
         stage_astrometry()
     elif a.stage == "forced":
         stage_forced(min(a.workers, 3))
+    elif a.stage == "slider":
+        slider_only()
     else:
         main()

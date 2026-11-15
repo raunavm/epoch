@@ -1,6 +1,6 @@
 {
  "title": "WISE 0855\u22120714 \u2014 the coldest known brown dwarf",
- "plain_result": "At 4.4\u20135 \u00b5m, combining SPHEREx pictures along its known path gives a clear signal where it should be: 0.50 \u00b1 0.03 mJy in the Nov\u2013Dec 2025 visits, between the brightness Spitzer (0.51 mJy) and WISE (0.42 mJy) measured in similar bands. Between visits it shifts the way its known motion predicts, and a source standing still fits the positions far worse. A statement about a known object, not a discovery.",
+ "plain_result": "At 4.4\u20135 \u00b5m, combining SPHEREx pictures along its known path gives a clear signal where it should be: 0.50 \u00b1 0.03 mJy in the Nov\u2013Dec 2025 visits, between the brightness Spitzer (0.51 mJy) and WISE (0.42 mJy) measured in broader bands. Between visits it shifts the way its known motion predicts, and a source standing still fits the positions far worse. A statement about a known object, not a new object.",
  "numbers": [
   {
    "label": "Signal, Nov\u2013Dec 2025 visits, against 24 empty paths",
@@ -75,7 +75,7 @@
   },
   {
    "label": "Same test for a source standing still (p-value)",
-   "value": "3e-07",
+   "value": "3 \u00d7 10\u207b\u2077",
    "err": null,
    "kind": "derived",
    "unit": ""
@@ -83,7 +83,7 @@
  ],
  "evidence_links": [
   {
-   "text": "All 46 pictures used (4.4\u20135 \u00b5m)",
+   "text": "All 46 pictures at 4.4\u20135 \u00b5m used for the numbers above",
    "href": "science.html#e4"
   },
   {
@@ -93,5 +93,7 @@
  ],
  "method_note": "Position from proper motion and parallax (Luhman & Esplin 2016); each picture fitted with Gaia stars; pictures at 4.4\u20135 \u00b5m combined per visit window; significance against the same path shifted to 24 empty positions. Caveats: a G = 16.3 star sits 0.7\u20131.4 pixels away (our code first dropped it; restored \u2014 see What failed); at short wavelengths, where the brown dwarf is invisible, the Nov\u2013Dec 2025 control is -0.018 \u00b1 0.003 mJy, not zero, likely the neighbour's model; the May 2025 window has only 3 usable pictures and is not informative.",
  "method_anchor": "science.html#e4",
- "slider": "e4/reveal.json"
+ "slider": "e4/reveal.json",
+ "slider_caption": "Nov\u2013Dec 2025 visits only: slide from one picture to all 22 combined along its path. Each step is measured against the same pictures combined along 24 empty paths.",
+ "generated_with": "scripts in this repository"
 }

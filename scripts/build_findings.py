@@ -21,12 +21,23 @@ if h:
 f2 = load("data/findings/f2.json")
 sp = load("data/findings/f2_split.json")
 if f2 and f2.get("single_frame_snr_max", 99) < 5 and f2.get("stack_snr", 0) >= 5:
-    half = f" Each half of the pictures shows it on its own ({sp['odd']['calibrated']:.1f} and {sp['even']['calibrated']:.1f} times the noise), consistent with a real signal." if sp else ""
+    half = ""
+    if sp:
+        hv = [sp[k]["calibrated"] for k in ("odd", "even", "first_half_time", "second_half_time")]
+        half = (f" Split in half (odd/even pictures, or early/late in time), each half gives {min(hv):.1f}–{max(hv):.1f} times the noise, "
+                f"against about {sp['expected_half_if_real']:.1f} expected for half the data if the signal is real.")
+    sel = f2.get("selection") or {}
+    chosen = (f" It was picked by hand after a first pick failed: of {sel['n_stacked']} faint asteroids stacked, {sel['n_meeting_rule']} meet the same rule "
+              "and this one scores lowest of them, so the number is not corrected for that choice."
+              if sel.get("chosen_by") == "--pick" and sel.get("rank_among_meeting_rule") == sel.get("n_meeting_rule") else
+              " The number is not corrected for the choice of this asteroid among the candidates.")
+    offset = (f" Without removing the empty paths' average offset it is {f2['stack_snr_without_null_mean']:.1f}."
+              if "stack_snr_without_null_mean" in f2 else "")
     out["f2"] = dict(title="Too faint for one picture", interaction="reveal", label="derived", unit="σ",
                      number=round(f2["stack_snr"], 1), err=None,
                      sentence=(f"Asteroid {f2['object']} never reaches the usual detection level in any of its {f2['n_frames']} single pictures "
                                f"(best {f2['single_frame_snr_max']:.1f} times the noise). Combined along its orbit it stands out at "
-                               f"{f2['stack_snr']:.1f} times the spread of empty paths beside it — a modest excess.{half}"),
+                               f"{f2['stack_snr']:.1f} times the spread of empty paths beside it — a marginal excess.{offset}{half}{chosen}"),
                      detail=f2)
 e4 = load("data/findings/e4.json")
 if e4:
@@ -35,7 +46,7 @@ if e4:
                      number=round(p2["significance"], 1), err=None,
                      sentence=(f"WISE 0855−0714, a challenge test target, stands out at {p2['significance']:.1f} times the spread of empty paths when "
                                "its 4.4–5 µm pictures are combined along its known path, and it shifts between visits as its motion predicts. "
-                               "A statement about a known object, not a discovery."),
+                               "A statement about a known object, not a new object."),
                      detail=dict(source="data/findings/e4.json"))
 json.dump(out, open("site/data/findings.json", "w"), indent=1)
 cal = load("data/findings/f1_calibration.json")

@@ -41,10 +41,10 @@ Every number on the landing page, the target cards and the findings is a button 
 1. The page loads `data/index/dr1/meta.json` and the 3×3 neighbourhood of sky tiles (`js/live/index.js`, the same rule as `scripts/build_tiles.py`). It keeps frames whose footprint contains the target with a margin of FOV/2.
 2. For each frame, at most 6 at a time, it makes two range requests: the header (bytes 0–28799), then the needed full-width image rows. Each frame costs about `rows × 8160` bytes (`js/live/fits.js`).
 3. It applies TAN-SIP world→pixel (`js/live/wcs.js`: inverse SIP, then Newton iterations on the forward SIP). It resamples bilinearly onto a north-up 6.15″ grid centred on the target and takes the wavelength from `wave_tables.json` (`js/live/grid.js`).
-4. When all frames are in, it runs the change model, revision 2 in `docs/INTERFACES.md` (`js/live/change.js`). The noise floor `f` is read from `data/f1_calibration.json` `{f}`; until that file exists the page uses 0.1 and marks it provisional. Live mode has no FLAGS plane, so single-pixel spikes are removed with a 3×3 median test. This step enables Corrected, Add (per-detector co-adds) and Subtract (pass 1 − pass 2). The finding-1 headline comes only from `findings.json` f1; the live counts are labelled "this view (live)".
+4. When all frames are in, it runs the change model, revision 2 in `docs/INTERFACES.md` (`js/live/change.js`). The noise floor `f` is read from `data/f1_calibration.json` `{f}`; until that file exists the page uses 0.1 and marks it provisional. Live mode has no FLAGS plane, so single-pixel spikes are removed with a 3×3 median test. This step enables Corrected, Add (per-detector co-adds) and Subtract (earlier pictures minus later ones, split at the largest gap in time; made from the colour-aware pictures). The finding-1 headline comes only from `findings.json` f1; the live counts are labelled "this view (live)".
 5. Clicking a pixel gives quick aperture photometry for every frame, with a CSV download.
 
-New data releases need only new index files in `data/index/<release>/`, written by `scripts/build_tiles.py`.
+A new data release needs new index files in `data/index/<release>/`, written by `scripts/build_tiles.py --release <name>`, and a one-line change: point `INDEX` in `js/live/live.js` at `data/index/<name>/`. Live mode shows one release at a time.
 
 Tests (pure functions; the WCS test reads real headers from S3, set `OFFLINE=1` to skip it):
 

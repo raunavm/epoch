@@ -12,7 +12,7 @@ We list every approach that did not work, because a result is only believable if
 **What we changed.** We withdrew the "removes 85%" headline and ran new, pre-registered tests: 20 random patches of sky, planted test sources at equal false-alarm rates, and recall of known asteroids (see the Science page). The headline is whatever those tests support.
 
 ## 3. Asteroid colours disagreed with Gaia — because asteroids spin
-**What happened.** Comparing SPHEREx colours taken on different days with ESA Gaia's spectra gave a three-standard-deviation disagreement in spectral slope for asteroid 224 Oceana.
+**What happened.** Comparing SPHEREx colours taken on different days with ESA Gaia's spectra gave a disagreement in spectral slope well beyond the error bars for asteroid 224 Oceana (that cross-visit comparison was not saved, so we quote no number for it).
 **Why.** An asteroid spins every few hours, so its brightness changes between visits; across visits that looks like colour.
 **What we changed.** Colours are compared only within one visit. Then they agree (χ²/dof 0.21 for Oceana).
 
@@ -27,14 +27,14 @@ We list every approach that did not work, because a result is only believable if
 
 ## 6. Our first faint asteroid was not really invisible
 **What happened.** The first object picked for the "too faint for any one picture" demonstration had a few single pictures far above the detection level — light from something it passed, not the asteroid.
-**What we changed.** A quality rule (drop pictures whose fit near the object is poor), applied identically to single pictures and stacks, and a strict 5-standard-deviation definition of "detected".
+**What we changed.** A quality rule (drop pictures whose fit near the object is poor), applied identically to single pictures and stacks, and a strict 5-standard-deviation definition of "detected". The asteroid now shown, 98397, was then picked by hand. Of the 8 faint asteroids we could stack, 3 meet the rule and 98397 scores lowest of them (`data/findings/f2_candidates.csv`), so its significance is not corrected for the choice.
 
 ## 7. Our error bars were too small
 **What happened.** Stacking along 24 empty paths beside an asteroid gave scatter 1.5–2.5 times larger than our error bars predicted (asteroid stacks).
 **What we changed.** Every stacked significance on the site is quoted against those empty paths. The check that the correction itself is stable (estimate on 12 inner paths, verify on 12 outer paths) did not pass cleanly (0.77 instead of 0.9–1.1), so we use the larger, more conservative correction.
 
 ## 8. Engineering failures
-- NASA/IPAC's search services were down during the hackathon, so we built our own index of all 1,179,406 DR1 pictures from the public archive copy.
+- NASA/IPAC's search and cutout services returned errors when we started (15 Nov 2026), so we built our own index of all 1,179,406 DR1 pictures from the public archive copy.
 - A stale index file made an early run see only one week of data; caught when a bright asteroid was found in far fewer pictures than expected.
 - Downloads with no time-out froze a run; every read now times out.
 
@@ -54,17 +54,17 @@ We list every approach that did not work, because a result is only believable if
 
 ## 12. A clean-up rule that also removed faint real sources
 **What happened.** To stop isolated bad pixels from swamping every method, we removed pixels whose neighbours were quiet. SPHEREx's images of stars are so compact that this also removed many faint real sources, lowering every method's detection rate equally.
-**What we learned.** Detecting a change in a single picture only works for bright changes (about 20 times the noise or more); fainter objects need many pictures combined along their path, which is what the stacking view does.
+**What we learned.** Detecting a change in a single picture is unreliable even for bright changes (at 20 times the noise no method found half of the planted sources); fainter objects need many pictures combined along their path, which is what the stacking view does.
 
 ## 13. Measuring Barnard's Star's motion did not work
 **What happened.** The motion we derive for Barnard's Star (about −5.0 ± 1.9 and +5.6 ± 1.5 arcseconds per year) disagrees with Gaia's (−0.80 and +10.36). Likely cause (untested): the star saturates SPHEREx's detector, so with its centre masked the fit rests on its outer light; and only two time windows are available. The same method works for the fainter Epsilon Indi B, where it matches Gaia.
-**What we show instead.** The difference between the two sky surveys, where the star's light visibly shifts north as expected — as a picture, not as a measurement.
+**What we show instead.** The earlier pictures (Aug–Oct 2025) minus the later ones (Mar–May 2026), where the star's light visibly shifts north as expected — as a picture, not as a measurement. The tool splits the pictures at the largest gap in time, and the picture is made from the experimental colour-aware pictures.
 
 
 ## 14. Our change maps miss real asteroids
 **What happened.** In 36 patches of sky we checked every known asteroid brighter than magnitude 19 against our change maps. The colour-aware view caught 2 of 79 asteroid sightings (95% interval 0.7–8.8%) and the one-detector view caught none (0–4.6%).
-**Why.** Two reasons. Most of these asteroids (57 of 79) are fainter than a single SPHEREx picture can show, so no single-picture method can catch them — that is what combining pictures along a path is for. The brighter ones were erased by us: the archive marks pixels that disagree with other visits as "outliers", which is exactly what a moving object does, and our change maps removed those pixels. With that removal switched off, the brightest test asteroid (V = 14.6) was caught in all 8 of its pictures (a diagnostic, not a pre-registered result).
-**What this means.** Today, Orrery's change maps are a tool for seeing colour flicker and bright changes, not for finding moving asteroids. For movers, use the "combine along a path" view, and the survey difference for nearby stars. The outlier masking must be replaced before any search.
+**Why.** Two reasons. Most of these asteroids (57 of 79) are fainter than a single SPHEREx picture can show, so no single-picture method can catch them — that is what combining pictures along a path is for. The brighter ones were erased by us: the archive's pipeline flags isolated, unusually bright pixels within each single picture as "outliers" (sigma-clipping on a median-filtered image; SPHEREx Explanatory Supplement §3.2.10). It does not compare visits, but a moving object's peak can still trip this flag, and our change maps removed those pixels. With that removal switched off, the brightest test asteroid (V = 14.6) was caught in all 8 of its pictures (a diagnostic, not a pre-registered result).
+**What this means.** Today, Orrery's change maps are a tool for seeing colour flicker and bright changes, not for finding moving asteroids. For movers, use the "combine along a path" view, and the earlier-minus-later picture for nearby stars. The outlier masking must be replaced before any search.
 **We then tried that, in a new pre-registered test (E3b):** with the outlier flag left in, alarm thresholds had to rise (the flag also hides many genuine artefacts), and on 10 new, never-inspected patches every view caught 0 of 17 known-asteroid sightings brighter than magnitude 19 (95% upper limit 18%). On the 36 earlier patches (not a blind test) the colour-aware view rose to 8 of 79. Unmasking alone does not fix single-picture asteroid detection.
 
 ## 15. A star-by-star scene model did not help

@@ -8,7 +8,7 @@
   "err": null,
   "err_low": 90,
   "err_high": 96,
-  "sentence": "SPHEREx photographs each spot in a different infrared colour every time, so a plain blink flickers even when nothing moved. Watching one detector at a time removes a median 93% of the changes a plain blink flags (20 random patches of sky; 95% confidence interval on the median 90\u201396%; individual patches 22\u201397%). At the same alarm threshold it catches planted test sources about as often as a plain blink (37%, 95% CI 31\u201342%, against 34%, CI 28\u201338%, at 20 times the single-picture noise). Neither view catches faint moving asteroids in single pictures \u2014 for those, combine pictures along their path (see What failed #14).",
+  "sentence": "SPHEREx photographs each spot in a different infrared colour every time, so a plain blink flickers even when nothing moved. Watching one detector at a time removes a median 93% of the changes a plain blink flags (20 random patches of sky; 95% confidence interval on the median 90\u201396%; individual patches 22\u201397%). In a secondary check made afterwards, at one common threshold (k = 5; there the plain blink flags 12,686 changes against 599, so false alarms are not equal), it catches planted test sources about as often as a plain blink (37%, 95% CI 31\u201342%, against 34%, CI 28\u201338%, at 20 times the single-picture noise). Neither view catches faint moving asteroids in single pictures \u2014 for those, combine pictures along their path (see What failed #14).",
   "detail": {
    "source": "data/findings/e2.json",
    "consistency": "data/findings/e2_d1.json"
@@ -21,7 +21,7 @@
   "unit": "\u03c3",
   "number": 5.4,
   "err": null,
-  "sentence": "Asteroid 98397 (2000 UC3) never reaches the usual detection level in any of its 295 single pictures (best 4.3 times the noise). Combined along its orbit it stands out at 5.4 times the spread of empty paths beside it \u2014 a modest excess. Each half of the pictures shows it on its own (4.0 and 3.9 times the noise), consistent with a real signal.",
+  "sentence": "Asteroid 98397 (2000 UC3) never reaches the usual detection level in any of its 295 single pictures (best 4.3 times the noise). Combined along its orbit it stands out at 5.4 times the spread of empty paths beside it \u2014 a marginal excess. Without removing the empty paths' average offset it is 4.9. Split in half (odd/even pictures, or early/late in time), each half gives 3.2\u20134.6 times the noise, against about 3.8 expected for half the data if the signal is real. It was picked by hand after a first pick failed: of 8 faint asteroids stacked, 3 meet the same rule and this one scores lowest of them, so the number is not corrected for that choice.",
   "detail": {
    "object": "98397 (2000 UC3)",
    "designation": "98397",
@@ -30,6 +30,22 @@
    "single_frame_snr_max": 4.32,
    "single_frame_snr_median": 0.24,
    "stack_snr": 5.38,
+   "stack_snr_nominal": 7.55,
+   "null_nominal_mean": -0.73,
+   "null_nominal_mean_err": 0.44,
+   "stack_snr_without_null_mean": 4.91,
+   "null_mean_err_sigma": 0.29,
+   "selection": {
+    "rule": "highest calibrated stack among candidates whose best single picture is below 5 (scripts/build_reveal.py)",
+    "chosen_by": "--pick",
+    "n_ids_listed": 59,
+    "n_with_forced_photometry": 17,
+    "n_stacked": 8,
+    "n_meeting_rule": 3,
+    "rank_among_meeting_rule": 3,
+    "candidates": "data/findings/f2_candidates.csv",
+    "note": "the quoted significance is not corrected for this choice"
+   },
    "null_snr_mean": 0.02,
    "null_snr_std": 1.0,
    "null_nominal_std": 1.54,
@@ -53,7 +69,7 @@
   "unit": "\u03c3",
   "number": 16.5,
   "err": null,
-  "sentence": "WISE 0855\u22120714, a challenge test target, stands out at 16.5 times the spread of empty paths when its 4.4\u20135 \u00b5m pictures are combined along its known path, and it shifts between visits as its motion predicts. A statement about a known object, not a discovery.",
+  "sentence": "WISE 0855\u22120714, a challenge test target, stands out at 16.5 times the spread of empty paths when its 4.4\u20135 \u00b5m pictures are combined along its known path, and it shifts between visits as its motion predicts. A statement about a known object, not a new object.",
   "detail": {
    "source": "data/findings/e4.json"
   }

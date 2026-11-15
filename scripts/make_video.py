@@ -1,11 +1,12 @@
 """Render the 30-second demo video from real data products only (no generated imagery).
 
-Segments: plain blink vs one-detector change maps 0–7 s; WISE 0855 combined along its path 7–13 s;
-Barnard's Star survey difference 13–19 s; measured numbers 19–26 s; name and address 26–30 s. English
-subtitles are burned in and also written as an .srt file. Numbers are read from site/data/headline.json,
-data/findings/e4.json, data/findings/motion_epsindib.json and site/data/index/dr1/meta.json.
-Usage: .venv/bin/python scripts/make_video.py --url "https://<github-user>.github.io/orrery/"
-       [--field ecliptic_control] [--object-shot path.png]
+Segments: title card 0–2 s; plain blink vs one-detector change maps 2–7 s; WISE 0855 combined along its path
+7–13 s; Barnard's Star, earlier minus later pictures 13–19 s; measured numbers, one at a time, 19–26 s; name and
+address 26–29.8 s. English subtitles (SUBS, one list) are burned in and also written as an .srt file. Numbers are
+read from site/data/headline.json, data/findings/e4.json, data/findings/motion_epsindib.json and
+site/data/index/dr1/meta.json.
+Usage: .venv/bin/python scripts/make_video.py --url "<github-user>.github.io/orrery" --team "<team-name>"
+       [--field ecliptic_control]
 Outputs: dist/orrery_demo.mp4, dist/orrery_demo.srt (length verified with ffprobe).
 """
 import argparse, json, os, subprocess
@@ -20,6 +21,14 @@ ORG = (230, 159, 0)
 BOLD = "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
 REG = "/System/Library/Fonts/Supplemental/Arial.ttf"
 SITE = "site/data"
+MARGIN = 60
+AI_NOTE = "Made from real SPHEREx data"
+# the only subtitle list: burned into the frames and written to the .srt, so the two cannot differ
+SUBS = [(0, 3.5, "NASA's SPHEREx shoots each spot in a new colour"),
+        (3.5, 7, "So a plain blink flickers; one detector at a time removes most of it"),
+        (7, 9.7, "The coldest known brown dwarf, picture by picture"), (9.7, 13, "Combine pictures along its path: there it is"),
+        (13, 19, "About seven months apart: the star has moved"), (19, 26, "Measured, and checked against independent data"),
+        (26, 29.7, "Try any spot in the sky")]
 
 
 def font(size, bold=True):
@@ -31,8 +40,22 @@ def canvas():
     return im, ImageDraw.Draw(im)
 
 
+def fit(d, text, size, bold=True, max_w=W - 2 * MARGIN):
+    """Largest font up to `size` at which the text fits inside the frame margins."""
+    while d.textlength(text, font=font(size, bold)) > max_w:
+        size -= 2
+    return font(size, bold)
+
+
+def centred(d, y, text, size, fill, bold=True):
+    f = fit(d, text, size, bold)
+    w = d.textlength(text, font=f)
+    assert MARGIN <= (W - w) / 2 and (W + w) / 2 <= W - MARGIN, text
+    d.text(((W - w) / 2, y), text, font=f, fill=fill)
+
+
 def subtitle(d, text):
-    f = font(40)
+    f = fit(d, text, 40, max_w=W - 2 * MARGIN - 44)
     w = d.textlength(text, font=f)
     x, y = (W - w) / 2, H - 92
     d.rounded_rectangle([x - 22, y - 12, x + w + 22, y + 54], 12, fill=(0, 0, 0))
@@ -91,11 +114,17 @@ def seg_blink_vs_det(field_name, frames_out, n_frames):
         d.text((130, 540), f"flagged so far: {tot_a}", font=font(24), fill=FG)
         d.text((730, 540), f"flagged so far: {tot_d}", font=font(24), fill=FG)
         tag(d, 400, 540, "DERIVED", (0, 158, 115)); tag(d, 1000, 540, "DERIVED", (0, 158, 115))
-        subtitle(d, "Plain blink: everything flickers" if k < n_frames / 2 else "Most of that flicker is colour, not change")
         frames_out.append(im)
 
 
-def seg_reveal(rev, frames_out, n_frames, title):
+def seg_title(team, frames_out, n_frames):
+    for k in range(n_frames):
+        im, d = canvas()
+        centred(d, 250, f"Orrery · NASA SPHEREx · {team}", 64, FG)
+        frames_out.append(im)
+
+
+def seg_reveal(rev, frames_out, n_frames):
     singles, stacks, N = rev["frames"], rev["stack_pngs"], rev["n_frames"]
     for k in range(n_frames):
         t = k / n_frames
@@ -108,7 +137,6 @@ def seg_reveal(rev, frames_out, n_frames, title):
         d.text((130, 62), "One picture", font=font(30), fill=FG)
         d.text((730, 62), f"{st['n']} pictures along its path", font=font(30), fill=FG)
         tag(d, 130, 540, "DATA", (0, 158, 115)); tag(d, 730, 540, "DERIVED", (0, 158, 115))
-        subtitle(d, title if t < 0.45 else "Combine pictures along its path: there it is")
         frames_out.append(im)
 
 
@@ -117,35 +145,30 @@ def seg_shift(shot, crop, frames_out, n_frames):
     for k in range(n_frames):
         im, d = canvas()
         im.paste(im0, (410, 70))
-        d.text((410, 30), "Barnard's Star: survey 1 minus survey 2", font=font(28), fill=FG)
+        d.text((410, 30), "Barnard's Star: earlier minus later pictures", font=font(28), fill=FG)
         tag(d, 410, 540, "MODEL / RESIDUAL", (204, 121, 167))
-        subtitle(d, "About seven months apart: the star has moved")
         frames_out.append(im)
 
 
 def seg_numbers(nums, frames_out, n_frames):
+    """One number at a time (equal time each), centred, with its short label underneath."""
     for k in range(n_frames):
         im, d = canvas()
-        shown = min(len(nums), 1 + int(k / n_frames * len(nums) * 1.3))
-        for i, (big, small) in enumerate(nums[:shown]):
-            y = 50 + i * 140
-            d.text((120, y), big, font=font(80), fill=ORG)
-            d.text((560, y + 24), small, font=font(32, False), fill=FG)
-        subtitle(d, "Measured, and checked against independent data")
+        big, small = nums[k * len(nums) // n_frames]
+        assert len(small.split()) <= 7, small
+        centred(d, 190, big, 130, ORG)
+        centred(d, 370, small, 40, FG, bold=False)
         frames_out.append(im)
 
 
 def seg_name(url, frames_out, n_frames):
     for k in range(n_frames):
         im, d = canvas()
-        t = "Orrery"
-        d.text(((W - d.textlength(t, font=font(120))) / 2, 170), t, font=font(120), fill=FG)
-        s = "At this spot in the sky, what really changed?"
-        d.text(((W - d.textlength(s, font=font(38, False))) / 2, 320), s, font=font(38, False), fill=ACC)
-        d.text(((W - d.textlength(url, font=font(34))) / 2, 420), url, font=font(34), fill=FG)
-        s2 = "NASA SPHEREx public data · Space Apps 2026"
-        d.text(((W - d.textlength(s2, font=font(26, False))) / 2, 480), s2, font=font(26, False), fill=FG)
-        subtitle(d, "Try any spot in the sky")
+        centred(d, 150, "Orrery", 120, FG)
+        centred(d, 300, "At this spot in the sky, what really changed?", 38, ACC, bold=False)
+        centred(d, 395, url, 34, FG)
+        centred(d, 455, "NASA SPHEREx public data · Space Apps 2026", 26, FG, bold=False)
+        centred(d, 505, AI_NOTE, 20, (170, 178, 195), bold=False)
         frames_out.append(im)
 
 
@@ -162,38 +185,42 @@ def main(a):
     mo = json.load(open("data/findings/motion_epsindib.json"))
     meta = json.load(open(f"{SITE}/index/dr1/meta.json"))
     pm = mo["proper_motion"]
-    nums = [(f"{hl['number']}%", "of a plain blink's changes vanish, one detector at a time"),
+    nums = [(f"{hl['number']}%", "of a plain blink's changes removed (median)"),
             (f"{e4['passes'][1]['significance']:.1f}σ", "coldest known brown dwarf, against empty paths"),
-            (f"{pm['pmra']['spherex_mas_yr']/1000:+.2f} ± {pm['pmra']['err_mas_yr']/1000:.2f}″/yr", f"Eps Indi B east–west motion; Gaia {pm['pmra']['gaia_mas_yr']/1000:+.2f}"),
+            (f"{pm['pmra']['spherex_mas_yr']/1000:+.2f} ± {pm['pmra']['err_mas_yr']/1000:.2f}″/yr", f"Eps Indi B east–west; Gaia {pm['pmra']['gaia_mas_yr']/1000:+.2f}"),
             (f"{meta['n_frames']:,}", "SPHEREx pictures indexed")]
     os.makedirs("dist/frames", exist_ok=True)
     for f in os.listdir("dist/frames"):
         os.remove(os.path.join("dist/frames", f))
     frames = []
-    seg_blink_vs_det(a.field, frames, 7 * FPS)
-    seg_reveal(e4r, frames, 6 * FPS, "The coldest known brown dwarf, picture by picture")
+    seg_title(a.team, frames, 2 * FPS)
+    seg_blink_vs_det(a.field, frames, 5 * FPS)
+    seg_reveal(e4r, frames, 6 * FPS)
     seg_shift(a.shift_shot, tuple(int(x) for x in a.shift_crop.split(",")), frames, 6 * FPS)
     seg_numbers(nums, frames, 7 * FPS)
     seg_name(a.url, frames, 4 * FPS - 6)  # finish safely under 30.0 s
     for i, im in enumerate(frames):
+        text = next((t for s_, e_, t in SUBS if s_ <= i / FPS < e_), None)
+        if text:
+            subtitle(ImageDraw.Draw(im), text)
         im.save(f"dist/frames/{i:04d}.png")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(FPS), "-i", "dist/frames/%04d.png",
-                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", "dist/orrery_demo.mp4"], check=True)
-    subs = [(0, 3.5, "Plain blink: everything flickers"), (3.5, 7, "Most of that flicker is colour, not change"),
-            (7, 9.7, "The coldest known brown dwarf, picture by picture"), (9.7, 13, "Combine pictures along its path: there it is"),
-            (13, 19, "About seven months apart: the star has moved"), (19, 26, "Measured, and checked against independent data"),
-            (26, 29.7, "Try any spot in the sky")]
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20",
+                    "-metadata", "title=Orrery: at this spot in the sky, what really changed?",
+                    "-metadata", f"comment={AI_NOTE} (DR1); no generated imagery. See README.",
+                    "dist/orrery_demo.mp4"], check=True)
     with open("dist/orrery_demo.srt", "w") as f:
-        for i, (s_, e_, t) in enumerate(subs, 1):
+        for i, (s_, e_, t) in enumerate(SUBS, 1):
             f.write(f"{i}\n{srt_time(s_)} --> {srt_time(e_)}\n{t}\n\n")
     dur = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", "dist/orrery_demo.mp4"]).decode())
     print("duration_s", dur)
-    assert dur < 30.0, "video exceeds 30 s"
+    assert dur <= 29.9, "video must stay at or under 29.9 s"
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--url", default="Orrery · SPHEREx Space Apps 2026")
+    ap.add_argument("--url", default="<github-user>.github.io/orrery")
+    ap.add_argument("--team", default="<team-name>", help="registered team name for the title card")
     ap.add_argument("--field", default="ecliptic_control")
     ap.add_argument("--shift-shot", default="dist/barnard_sub.png")
     ap.add_argument("--shift-crop", default="123,936,543,1356", help="x0,y0,x1,y1 of the subtract image in the screenshot")

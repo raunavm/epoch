@@ -2671,114 +2671,142 @@
   {
    "n": 1,
    "png": "reveal/stack_001.png",
-   "snr": 0.47,
+   "snr": -0.01,
    "a_hat": -0.002,
    "a_err": 0.306,
-   "snr_nominal": -0.01
+   "snr_nominal": -0.01,
+   "null_mean": 0.37,
+   "null_scale": 0.8
   },
   {
    "n": 2,
    "png": "reveal/stack_002.png",
-   "snr": 0.83,
+   "snr": 0.27,
    "a_hat": 0.118,
    "a_err": 0.22,
-   "snr_nominal": 0.54
+   "snr_nominal": 0.54,
+   "null_mean": 0.23,
+   "null_scale": 1.12
   },
   {
    "n": 3,
    "png": "reveal/stack_003.png",
-   "snr": 1.52,
+   "snr": 1.07,
    "a_hat": 0.301,
    "a_err": 0.188,
-   "snr_nominal": 1.6
+   "snr_nominal": 1.6,
+   "null_mean": 0.24,
+   "null_scale": 1.27
   },
   {
    "n": 5,
    "png": "reveal/stack_005.png",
-   "snr": 2.2,
+   "snr": 1.98,
    "a_hat": 0.404,
    "a_err": 0.152,
-   "snr_nominal": 2.65
+   "snr_nominal": 2.65,
+   "null_mean": 0.16,
+   "null_scale": 1.26
   },
   {
    "n": 8,
    "png": "reveal/stack_008.png",
-   "snr": 2.53,
+   "snr": 2.13,
    "a_hat": 0.394,
    "a_err": 0.125,
-   "snr_nominal": 3.16
+   "snr_nominal": 3.16,
+   "null_mean": 0.01,
+   "null_scale": 1.48
   },
   {
    "n": 12,
    "png": "reveal/stack_012.png",
-   "snr": 3.18,
+   "snr": 2.55,
    "a_hat": 0.442,
    "a_err": 0.106,
-   "snr_nominal": 4.16
+   "snr_nominal": 4.16,
+   "null_mean": -0.03,
+   "null_scale": 1.64
   },
   {
    "n": 18,
    "png": "reveal/stack_018.png",
-   "snr": 4.41,
+   "snr": 3.7,
    "a_hat": 0.557,
    "a_err": 0.092,
-   "snr_nominal": 6.05
+   "snr_nominal": 6.05,
+   "null_mean": -0.12,
+   "null_scale": 1.67
   },
   {
    "n": 25,
    "png": "reveal/stack_025.png",
-   "snr": 4.27,
+   "snr": 3.87,
    "a_hat": 0.486,
    "a_err": 0.083,
-   "snr_nominal": 5.83
+   "snr_nominal": 5.83,
+   "null_mean": -0.21,
+   "null_scale": 1.56
   },
   {
    "n": 35,
    "png": "reveal/stack_035.png",
-   "snr": 4.58,
+   "snr": 4.64,
    "a_hat": 0.491,
    "a_err": 0.078,
-   "snr_nominal": 6.32
+   "snr_nominal": 6.32,
+   "null_mean": -0.38,
+   "null_scale": 1.44
   },
   {
    "n": 50,
    "png": "reveal/stack_050.png",
-   "snr": 4.45,
+   "snr": 4.76,
    "a_hat": 0.451,
    "a_err": 0.074,
-   "snr_nominal": 6.12
+   "snr_nominal": 6.12,
+   "null_mean": -0.38,
+   "null_scale": 1.37
   },
   {
    "n": 70,
    "png": "reveal/stack_070.png",
-   "snr": 4.59,
+   "snr": 4.94,
    "a_hat": 0.451,
    "a_err": 0.071,
-   "snr_nominal": 6.33
+   "snr_nominal": 6.33,
+   "null_mean": -0.5,
+   "null_scale": 1.38
   },
   {
    "n": 100,
    "png": "reveal/stack_100.png",
-   "snr": 5.23,
+   "snr": 5.32,
    "a_hat": 0.507,
    "a_err": 0.069,
-   "snr_nominal": 7.32
+   "snr_nominal": 7.32,
+   "null_mean": -0.65,
+   "null_scale": 1.5
   },
   {
    "n": 140,
    "png": "reveal/stack_140.png",
-   "snr": 5.44,
+   "snr": 5.89,
    "a_hat": 0.514,
    "a_err": 0.067,
-   "snr_nominal": 7.64
+   "snr_nominal": 7.64,
+   "null_mean": -0.89,
+   "null_scale": 1.45
   },
   {
    "n": 200,
    "png": "reveal/stack_200.png",
-   "snr": 5.33,
+   "snr": 5.86,
    "a_hat": 0.489,
    "a_err": 0.065,
-   "snr_nominal": 7.47
+   "snr_nominal": 7.47,
+   "null_mean": -0.85,
+   "null_scale": 1.42
   },
   {
    "n": 295,
@@ -2786,7 +2814,9 @@
    "snr": 5.38,
    "a_hat": 0.485,
    "a_err": 0.064,
-   "snr_nominal": 7.55
+   "snr_nominal": 7.55,
+   "null_mean": -0.73,
+   "null_scale": 1.54
   }
  ],
  "spectrum_points": [
@@ -3088,6 +3118,8 @@
    ]
   }
  ],
+ "depth_gain_mag": 3.55,
+ "ideal_gain_mag": 3.74,
  "noise_calibration": {
   "stack_null_mean": -0.73,
   "stack_null_std": 1.54,
@@ -3098,12 +3130,40 @@
    "outer_spread_after_rescale": 0.768,
    "passed": false,
    "scale_used": 1.538
-  }
+  },
+  "per_step": "each step: the same n pictures combined along the 24 empty paths; (S/N - mean of 12 inner nulls)/max(E5 scale, 1)",
+  "singles": "single pictures: S/N divided by the spread of single-picture S/N on the empty paths; no mean correction"
  },
  "single_frame_snr_max": 4.32,
  "single_frame_snr_median": 0.24,
  "stack_snr": 5.38,
  "null_snrs": [
+  -0.91,
+  -1.78,
+  0.52,
+  0.6,
+  1.46,
+  1.03,
+  0.78,
+  -0.22,
+  -1.22,
+  0.61,
+  -0.82,
+  -0.06,
+  0.12,
+  -1.22,
+  0.86,
+  -0.16,
+  0.33,
+  1.22,
+  -0.46,
+  -0.4,
+  -0.34,
+  -0.93,
+  0.52,
+  1.01
+ ],
+ "null_snrs_nominal": [
   -2.13,
   -3.46,
   0.06,
@@ -3130,8 +3190,9 @@
   0.82
  ],
  "n_frames": 295,
+ "hedge": "modest signal; the error-scale check did not pass cleanly, so the larger, more cautious scale is used",
  "order": "pictures are combined in order of their expected signal-to-noise (brightness model and noise only; measured fluxes are not used to choose the order)",
  "units": "singles and stacks: stars removed, smoothed at the PSF scale, in units of each image's own background noise (same treatment for both)",
  "rerun": "python scripts/run_forced.py --ids 98397 --stamps && python scripts/build_reveal.py --pick 98397",
- "hedge": "modest signal; the error-scale check did not pass cleanly, so the larger, more cautious scale is used"
+ "generated_with": "scripts in this repository"
 }

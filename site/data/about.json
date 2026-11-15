@@ -34,6 +34,26 @@
    "url": "https://doi.org/10.1051/0004-6361/202243940"
   },
   {
+   "text": "Gaia Collaboration, Prusti et al. 2016, The Gaia mission, A&A 595, A1.",
+   "url": "https://doi.org/10.1051/0004-6361/201629272"
+  },
+  {
+   "text": "Wenger et al. 2000, The SIMBAD astronomical database, A&AS 143, 9.",
+   "url": "https://doi.org/10.1051/aas:2000332"
+  },
+  {
+   "text": "Berthier et al. 2006, SkyBoT, a new VO service to identify Solar System objects, ASP Conf. Ser. 351, 367.",
+   "url": "https://ssp.imcce.fr/webservices/skybot/"
+  },
+  {
+   "text": "Kirkpatrick et al. 2021, The Field Substellar Mass Function Based on the Full-sky 20 pc Census of 525 L, T, and Y Dwarfs, ApJS 253, 7 (WISE 0855 position in the live view, via SIMBAD).",
+   "url": "https://doi.org/10.3847/1538-4365/abd107"
+  },
+  {
+   "text": "van Leeuwen 2007, Validation of the new Hipparcos reduction, A&A 474, 653 (RW Aurigae position, via SIMBAD).",
+   "url": "https://doi.org/10.1051/0004-6361:20078357"
+  },
+  {
    "text": "Harris 1998, A Thermal Model for Near-Earth Asteroids, Icarus 131, 291.",
    "url": "https://doi.org/10.1006/icar.1997.5865"
   },
@@ -66,7 +86,7 @@
    "url": "http://byw.tools/wiseview"
   }
  ],
- "acknowledgement": "This publication makes use of data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration. This research has made use of the NASA/IPAC Infrared Science Archive, which is funded by the National Aeronautics and Space Administration and operated by the California Institute of Technology. SPHEREx DR1 data: doi:10.26131/IRSA678. This work has made use of data from the European Space Agency (ESA) mission Gaia, processed by the Gaia Data Processing and Analysis Consortium (DPAC). Orrery is not endorsed by NASA.",
+ "acknowledgement": "This publication makes use of data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration. This research has made use of the NASA/IPAC Infrared Science Archive, which is funded by the National Aeronautics and Space Administration and operated by the California Institute of Technology. SPHEREx DR1 data: doi:10.26131/IRSA678. This work has made use of data from the European Space Agency (ESA) mission Gaia (https://www.cosmos.esa.int/gaia), processed by the Gaia Data Processing and Analysis Consortium (DPAC, https://www.cosmos.esa.int/web/gaia/dpac/consortium). Funding for the DPAC has been provided by national institutions, in particular the institutions participating in the Gaia Multilateral Agreement. This research has made use of the SIMBAD database, operated at CDS, Strasbourg, France. Orrery is not endorsed by NASA.",
  "data_sources": [
   {
    "text": "SPHEREx DR1 Level-2 spectral images, read in the browser from NASA's public archive copy on AWS (no server, no IRSA services). Our index covers 1,179,406 pictures.",
@@ -101,7 +121,7 @@
    "url": "https://ssp.imcce.fr/webservices/skybot/"
   },
   {
-   "text": "CDS SIMBAD: positions and motions of the five test targets.",
+   "text": "CDS SIMBAD: positions and motions of the five test targets (from Gaia DR3, Kirkpatrick et al. 2021 for WISE 0855 in the live view, and van Leeuwen 2007 for RW Aurigae).",
    "url": "https://simbad.cds.unistra.fr/"
   },
   {

@@ -8,7 +8,7 @@
  "err_high": 96,
  "kind": "derived",
  "number_label": "of the changes a plain blink flags disappear when you watch one detector at a time",
- "sentence": "SPHEREx photographs each spot in a different infrared colour every time, so a plain blink flickers even when nothing moved. Watching one detector at a time removes a median 93% of the changes a plain blink flags (20 random patches of sky; 95% confidence interval on the median 90\u201396%; individual patches 22\u201397%). At the same alarm threshold it catches planted test sources about as often as a plain blink (37%, 95% CI 31\u201342%, against 34%, CI 28\u201338%, at 20 times the single-picture noise). Neither view catches faint moving asteroids in single pictures \u2014 for those, combine pictures along their path (see What failed #14).",
+ "sentence": "SPHEREx photographs each spot in a different infrared colour every time, so a plain blink flickers even when nothing moved. Watching one detector at a time removes a median 93% of the changes a plain blink flags (20 random patches of sky; 95% confidence interval on the median 90–96%; individual patches 22–97%). In a secondary check made afterwards, at one common threshold (k = 5; there the plain blink flags 12,686 changes against 599, so false alarms are not equal), it catches planted test sources about as often as a plain blink (37%, 95% CI 31–42%, against 34%, CI 28–38%, at 20 times the single-picture noise). Neither view catches faint moving asteroids in single pictures — for those, combine pictures along their path (see What failed #14).",
  "modes": [
   {
    "id": "all",
@@ -25,86 +25,86 @@
  ],
  "default_mode": "all",
  "method": "science.html#which-change-is-real",
- "evidence_note": "Per patch of sky: changes in a plain blink \u2192 changes when each detector is viewed on its own (data/findings/e2.json).",
+ "evidence_note": "Per patch of sky: changes in a plain blink → changes when each detector is viewed on its own (data/findings/e2.json).",
  "evidence": [
   {
-   "text": "e2_00 (|b| 41\u00b0): 629 \u2192 57 (91% removed)",
+   "text": "e2_00 (|b| 41°): 629 → 57 (91% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_01 (|b| 36\u00b0): 401 \u2192 43 (89% removed)",
+   "text": "e2_01 (|b| 36°): 401 → 43 (89% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_02 (|b| 21\u00b0): 870 \u2192 27 (97% removed)",
+   "text": "e2_02 (|b| 21°): 870 → 27 (97% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_03 (|b| 44\u00b0): 185 \u2192 25 (86% removed)",
+   "text": "e2_03 (|b| 44°): 185 → 25 (86% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_04 (|b| 67\u00b0): 446 \u2192 36 (92% removed)",
+   "text": "e2_04 (|b| 67°): 446 → 36 (92% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_05 (|b| 68\u00b0): 524 \u2192 41 (92% removed)",
+   "text": "e2_05 (|b| 68°): 524 → 41 (92% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_06 (|b| 17\u00b0): 168 \u2192 40 (76% removed)",
+   "text": "e2_06 (|b| 17°): 168 → 40 (76% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_07 (|b| 13\u00b0): 1208 \u2192 46 (96% removed)",
+   "text": "e2_07 (|b| 13°): 1208 → 46 (96% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_08 (|b| 23\u00b0): 1559 \u2192 47 (97% removed)",
+   "text": "e2_08 (|b| 23°): 1559 → 47 (97% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_09 (|b| 21\u00b0): 956 \u2192 31 (97% removed)",
+   "text": "e2_09 (|b| 21°): 956 → 31 (97% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_10 (|b| 15\u00b0): 1430 \u2192 40 (97% removed)",
+   "text": "e2_10 (|b| 15°): 1430 → 40 (97% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_11 (|b| 3\u00b0): 659 \u2192 28 (96% removed)",
+   "text": "e2_11 (|b| 3°): 659 → 28 (96% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_12 (|b| 79\u00b0): 216 \u2192 53 (75% removed)",
+   "text": "e2_12 (|b| 79°): 216 → 53 (75% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_13 (|b| 61\u00b0): 55 \u2192 43 (22% removed)",
+   "text": "e2_13 (|b| 61°): 55 → 43 (22% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_14 (|b| 41\u00b0): 195 \u2192 31 (84% removed)",
+   "text": "e2_14 (|b| 41°): 195 → 31 (84% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_15 (|b| 32\u00b0): 1020 \u2192 58 (94% removed)",
+   "text": "e2_15 (|b| 32°): 1020 → 58 (94% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_16 (|b| 7\u00b0): 793 \u2192 34 (96% removed)",
+   "text": "e2_16 (|b| 7°): 793 → 34 (96% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_17 (|b| 43\u00b0): 467 \u2192 45 (90% removed)",
+   "text": "e2_17 (|b| 43°): 467 → 45 (90% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_18 (|b| 5\u00b0): 1808 \u2192 82 (95% removed)",
+   "text": "e2_18 (|b| 5°): 1808 → 82 (95% removed)",
    "href": "science.html#which-change-is-real"
   },
   {
-   "text": "e2_19 (|b| 5\u00b0): 613 \u2192 33 (95% removed)",
+   "text": "e2_19 (|b| 5°): 613 → 33 (95% removed)",
    "href": "science.html#which-change-is-real"
   }
  ],
@@ -123,5 +123,6 @@
   ]
  },
  "err_label": "95% CI on the median",
- "spread_note": "individual patches 22\u201397%"
+ "spread_note": "individual patches 22–97%",
+ "generated_with": "scripts in this repository"
 }

@@ -40,7 +40,7 @@ def gaia_target(ra2000, dec2000, pmra, pmdec):
          f"{ra16},{dec16},0.02))")
     t = s.run_sync(q).to_table().to_pandas()
     t["pm"] = np.hypot(t.pmra.fillna(0), t.pmdec.fillna(0))
-    return t.sort_values("pm", ascending=False).iloc[0].to_dict()
+    return t.sort_values("pm", ascending=False).head(1).to_dict("records")[0]  # per-column types: source_id stays an exact integer
 
 
 def predict(g, mjd):

@@ -1,7 +1,7 @@
 {
  "title": "R Draconis \u2014 a pulsating giant star",
  "status": "not measured yet",
- "plain_result": "Not measured yet. 1635 SPHEREx pictures of this variable star are available in the Time Machine. We tried a per-star test, but this star saturates SPHEREx's detector in almost every picture (3 usable of 250), so it cannot be measured with our method (What failed #16). The counts below are for the whole patch of sky, not for the star itself.",
+ "plain_result": "Not measured yet. 1635 SPHEREx pictures of this variable star are available in the Time Machine. We tried a per-star test, but this star saturates SPHEREx's detector in almost every picture (3 usable of 250), so it cannot be measured with our method (What failed #16). The counts below are for the whole patch of sky, not for the star itself. On this patch the experimental colour-aware view flags more changes than the plain blink (2180 against 419); we have not established why, so these counts are not a measurement of the star.",
  "numbers": [
   {
    "label": "Pictures",
@@ -39,5 +39,6 @@
   }
  ],
  "method_note": "Counts use the same rule as the 20-patch test (groups of \u2265 2 pixels beyond 5\u03c3).",
- "method_anchor": "science.html#which-change-is-real"
+ "method_anchor": "science.html#which-change-is-real",
+ "generated_with": "scripts in this repository"
 }
