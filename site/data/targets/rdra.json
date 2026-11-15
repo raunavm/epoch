@@ -1,44 +1,56 @@
 {
  "title": "R Draconis \u2014 a pulsating giant star",
- "status": "not measured yet",
- "plain_result": "Not measured yet. 1635 SPHEREx pictures of this variable star are available in the Time Machine. We tried a per-star test, but this star saturates SPHEREx's detector in almost every picture (3 usable of 250), so it cannot be measured with our method (What failed #16). The counts below are for the whole patch of sky, not for the star itself. On this patch the experimental colour-aware view flags more changes than the plain blink (2180 against 419); we have not established why, so these counts are not a measurement of the star.",
+ "status": "measured; no change confirmed by our pre-set rule",
+ "plain_result": "R Draconis is so bright that only the halo around its overloaded centre can be measured, and the pre-set test could use only three noisy colour bands: there no change passes 5 times the error (43 ordinary bright stars measured the same way). Shown for information only, outside the pre-set range: at 4.7 \u00b5m its brightness rises and falls by about 0.3 magnitudes either side of average and peaks around 1 Feb 2026, 12 days after the catalogue's predicted visible-light maximum (21 Jan 2026).",
  "numbers": [
   {
    "label": "Pictures",
-   "value": 1635,
+   "value": 244,
    "err": null,
    "kind": "data",
    "unit": ""
   },
   {
-   "label": "Flagged changes, plain blink",
-   "value": 419,
+   "label": "Colour bands usable in the pre-set test",
+   "value": 3,
    "err": null,
    "kind": "derived",
    "unit": ""
   },
   {
-   "label": "Flagged changes, one detector at a time",
-   "value": 123,
+   "label": "Peak at 4.7 \u00b5m (for information)",
+   "value": "1 Feb 2026",
    "err": null,
    "kind": "derived",
    "unit": ""
   },
   {
-   "label": "Flagged changes, colour-aware view (experimental)",
-   "value": 2180,
+   "label": "Catalogue visible-light maximum (VSX period 246 days)",
+   "value": "21 Jan 2026",
    "err": null,
-   "kind": "derived",
+   "kind": "model",
    "unit": ""
+  }
+ ],
+ "figures": [
+  {
+   "src": "data/figs/e9_rdra.png",
+   "href": "science.html#e9",
+   "alt": "R Draconis brightness through the year in six SPHEREx colour bands",
+   "caption": "Brightness through the year in six colour bands; open circles are outside the pre-set range and for information only."
   }
  ],
  "evidence_links": [
   {
    "text": "Open the prepared field",
    "href": "timemachine.html?field=rdra"
+  },
+  {
+   "text": "Method (Science page)",
+   "href": "science.html#e9"
   }
  ],
- "method_note": "Counts use the same rule as the 20-patch test (groups of \u2265 2 pixels beyond 5\u03c3).",
- "method_anchor": "science.html#which-change-is-real",
+ "method_note": "Halo photometry (annulus 7\u201312 pixels) chosen on comparison stars before R Draconis was measured (docs/protocols/E9.md). Detectors 5\u20136 are excluded by a pre-set saturation guard; the 4.4\u20135 \u00b5m light curve was made after the result with that guard switched off, so it is descriptive. Infrared maxima of such stars are expected 25\u201350 days after visible ones (Smith et al. 2002).",
+ "method_anchor": "science.html#e9",
  "generated_with": "scripts in this repository"
 }

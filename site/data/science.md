@@ -195,6 +195,20 @@ For an asteroid with a known orbit, we predict where it is in every picture (JPL
 
 **Not new.** Stacking along known orbits is established: NEOWISE (Masiero et al.), the KBMOD shift-and-stack search (Whidden et al. 2019), IRSA's MOST tutorial, and other Space Apps 2026 teams. We use it as a measured demonstration, not as a new method.
 
+###### E9 {#e9-label}
+
+## RW Aurigae and R Draconis: measuring stars too bright for the detector {#e9}
+
+Both variable-star targets overload SPHEREx's detector at their centres in almost every picture, which is why our first per-star test (E7, below) could not reach a verdict. In E9 we measured them from the halo of light around the centre, which grows in proportion to the star's brightness. The halo radii and the error bars were set on ordinary stars of similar brightness before the targets were measured: 41 for RW Aurigae and 43 for R Draconis; when the method was set, 0 of 82 and 0 of 395 of their visits crossed the threshold (`docs/protocols/E9.md`). The rule: a change is confirmed only if it exceeds 5 times its error.
+
+![RW Aurigae change by colour](figs/e9_rwaur.png "RW Aurigae: change between two visits, by colour band")
+
+**RW Aurigae** (visits Sep 2025 and Mar 2026). No colour band passes 5 times its error, so no change is confirmed. Read descriptively, the change is not grey: brighter by about 48% at 0.9 µm and 39% at 1.4 µm, fainter by about 21% at 4.1 µm (errors 5–16%, which include the star's own extra picture-to-picture scatter, applied after the result). Larger changes at short wavelengths are what is reported for this star's dimming episodes (CBET 5530; Dodin et al. 2019); its state on our visit dates is not known to us.
+
+![R Draconis through the year](figs/e9_rdra.png "R Draconis: brightness through the year in six colour bands")
+
+**R Draconis.** The pre-set test could use only three noisy colour bands, and no change passes. Outside the pre-set range (a check made after the result, with a saturation guard switched off), its 4.4–5 µm brightness rises and falls by about 0.3 magnitudes either side of average and peaks in early February 2026, about two weeks after the catalogue's predicted visible-light maximum — the expected direction for such stars, whose infrared maxima lag (Smith et al. 2002).
+
 ###### E6 {#e6-label}
 
 ## A scene model built only from Gaia stars {#e6}

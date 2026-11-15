@@ -248,3 +248,58 @@ if e8:
                      "The faint-neighbour drift flips sign with the detector's orientation between visits, which points to a small offset in "
                      "the detector frame (a reading made after the result)."),
         method_anchor="science.html#e8"))
+
+# Phase 2: E9 (RW Aurigae, R Draconis) — halo photometry with comparison-star errors
+e9 = load("data/findings/e9.json")
+if e9:
+    from datetime import datetime, timedelta
+    day = lambda mjd: (datetime(1858, 11, 17) + timedelta(days=float(mjd))).strftime("%-d %b %Y")
+    w = e9["targets"]["rwaur"]
+    col = {c["detector"]: c for c in w["colour"]["post_hoc_inflated"]["contrast"]}
+    lam = {c["detector"]: c["lam_um"] for c in w["colour"]["contrast"]}
+    zmax = max(abs(a["z"]) for a in w["a_w"])
+    write("rwaur", dict(
+        title="RW Aurigae — a young variable star",
+        status="measured; no change confirmed by our pre-set rule",
+        plain_result=(f"Its centre overloads SPHEREx's detector, so we measured it from the halo of light around it, a method tested first on "
+                      f"{w['comparison']['n_stars']} ordinary stars of similar brightness. Between the two visits (Sep 2025 and Mar 2026) it looks "
+                      f"{100*col[1]['c']:.0f} ± {100*col[1]['sigma']:.0f}% brighter at {lam[1]:.1f} µm and {100*col[2]['c']:.0f} ± {100*col[2]['sigma']:.0f}% at {lam[2]:.1f} µm, "
+                      f"but {abs(100*col[5]['c']):.0f} ± {100*col[5]['sigma']:.0f}% fainter at {lam[5]:.1f} µm: not a grey change, bigger in the bluest colours, "
+                      "the pattern published for its dimming episodes. Its own pictures scatter 1.1–3 times more than the ordinary stars', so by the "
+                      "rule we wrote down beforehand (5 times the error) no change is confirmed."),
+        numbers=[num(f"Change at {lam[1]:.2f} µm, Mar 2026 vs Sep 2025", f"{100*col[1]['c']:+.0f} ± {100*col[1]['sigma']:.0f}%", None, method="science.html#e9"),
+                 num(f"Change at {lam[2]:.2f} µm", f"{100*col[2]['c']:+.0f} ± {100*col[2]['sigma']:.0f}%", None, method="science.html#e9"),
+                 num(f"Change at {lam[4]:.2f} µm", f"{100*col[4]['c']:+.0f} ± {100*col[4]['sigma']:.0f}%", None, method="science.html#e9"),
+                 num(f"Change at {lam[5]:.2f} µm", f"{100*col[5]['c']:+.0f} ± {100*col[5]['sigma']:.0f}%", None, method="science.html#e9"),
+                 num("Largest change against the pre-set threshold", f"{zmax:.1f} times the error (threshold 5)", None),
+                 num("Ordinary stars over the threshold", f"{w['comparison']['n_windows_exceeding']} of {w['comparison']['n_windows']} visits", None)],
+        figures=[dict(src="data/figs/e9_rwaur.png", href="science.html#e9",
+                      alt="RW Aurigae's brightness change between two SPHEREx visits in five colour bands, next to ordinary stars",
+                      caption="Left: change by colour band, with the scatter of ordinary stars in grey and our 5× threshold dashed. Right: the same test on 41 ordinary stars.")],
+        evidence_links=[dict(text="Open the prepared field", href="timemachine.html?field=rwaur"), dict(text="Method (Science page)", href="science.html#e9")],
+        method_note=("Halo photometry (annulus 4–7 pixels) chosen and its errors set on comparison stars before RW Aurigae was measured "
+                     "(docs/protocols/E9.md); 4.4–5 µm not used (more saturated than any comparison star). The colour-by-colour errors use the "
+                     "star's own picture scatter, applied after the result (labelled in the results file). RW Aurigae is an unresolved pair 1.5″ apart."),
+        method_anchor="science.html#e9"))
+    r = e9["targets"]["rdra"]
+    dm = r["post_hoc_guard_off"]["date_of_maximum"][0]
+    write("rdra", dict(
+        title="R Draconis — a pulsating giant star",
+        status="measured; no change confirmed by our pre-set rule",
+        plain_result=(f"R Draconis is so bright that only the halo around its overloaded centre can be measured, and the pre-set test could use only "
+                      f"three noisy colour bands: there no change passes 5 times the error ({r['comparison']['n_stars']} ordinary bright stars measured "
+                      f"the same way). Shown for information only, outside the pre-set range: at {dm['lam_um']:.1f} µm its brightness rises and falls by "
+                      f"about {dm['semi_amplitude_mag']:.1f} magnitudes either side of average and peaks around {day(dm['mjd_max'])}, "
+                      f"{dm['lag_days']:.0f} days after the catalogue's predicted visible-light maximum ({day(dm['catalogue_visual_max_mjd'])})."),
+        numbers=[num("Pictures", r["n_pictures"], None, kind="data"),
+                 num("Colour bands usable in the pre-set test", len(r["detectors_used"]), None),
+                 num(f"Peak at {dm['lam_um']:.1f} µm (for information)", day(dm["mjd_max"]), None),
+                 num("Catalogue visible-light maximum (VSX period 246 days)", day(dm["catalogue_visual_max_mjd"]), None, kind="model")],
+        figures=[dict(src="data/figs/e9_rdra.png", href="science.html#e9",
+                      alt="R Draconis brightness through the year in six SPHEREx colour bands",
+                      caption="Brightness through the year in six colour bands; open circles are outside the pre-set range and for information only.")],
+        evidence_links=[dict(text="Open the prepared field", href="timemachine.html?field=rdra"), dict(text="Method (Science page)", href="science.html#e9")],
+        method_note=("Halo photometry (annulus 7–12 pixels) chosen on comparison stars before R Draconis was measured (docs/protocols/E9.md). "
+                     "Detectors 5–6 are excluded by a pre-set saturation guard; the 4.4–5 µm light curve was made after the result with that guard "
+                     "switched off, so it is descriptive. Infrared maxima of such stars are expected 25–50 days after visible ones (Smith et al. 2002)."),
+        method_anchor="science.html#e9"))

@@ -1,44 +1,74 @@
 {
  "title": "RW Aurigae \u2014 a young variable star",
- "status": "not measured yet",
- "plain_result": "Not measured yet. 225 SPHEREx pictures of this variable star are available in the Time Machine. We tried a per-star test (one brightness per picture, colour removed, compared with ordinary stars), but this star saturates SPHEREx's detector in most pictures: our fit of its outer light is poor, so a change cannot be told apart from a bad fit (What failed #16). The counts below are for the whole patch of sky, not for the star itself.",
+ "status": "measured; no change confirmed by our pre-set rule",
+ "plain_result": "Its centre overloads SPHEREx's detector, so we measured it from the halo of light around it, a method tested first on 41 ordinary stars of similar brightness. Between the two visits (Sep 2025 and Mar 2026) it looks 48 \u00b1 16% brighter at 0.9 \u00b5m and 39 \u00b1 11% at 1.4 \u00b5m, but 21 \u00b1 5% fainter at 4.1 \u00b5m: not a grey change, bigger in the bluest colours, the pattern published for its dimming episodes. Its own pictures scatter 1.1\u20133 times more than the ordinary stars', so by the rule we wrote down beforehand (5 times the error) no change is confirmed.",
  "numbers": [
   {
-   "label": "Pictures",
-   "value": 225,
+   "label": "Change at 0.93 \u00b5m, Mar 2026 vs Sep 2025",
+   "value": "+48 \u00b1 16%",
    "err": null,
-   "kind": "data",
-   "unit": ""
+   "kind": "derived",
+   "unit": "",
+   "method": "science.html#e9"
   },
   {
-   "label": "Flagged changes, plain blink",
-   "value": 1009,
+   "label": "Change at 1.38 \u00b5m",
+   "value": "+39 \u00b1 11%",
+   "err": null,
+   "kind": "derived",
+   "unit": "",
+   "method": "science.html#e9"
+  },
+  {
+   "label": "Change at 3.12 \u00b5m",
+   "value": "-6 \u00b1 4%",
+   "err": null,
+   "kind": "derived",
+   "unit": "",
+   "method": "science.html#e9"
+  },
+  {
+   "label": "Change at 4.12 \u00b5m",
+   "value": "-21 \u00b1 5%",
+   "err": null,
+   "kind": "derived",
+   "unit": "",
+   "method": "science.html#e9"
+  },
+  {
+   "label": "Largest change against the pre-set threshold",
+   "value": "2.4 times the error (threshold 5)",
    "err": null,
    "kind": "derived",
    "unit": ""
   },
   {
-   "label": "Flagged changes, one detector at a time",
-   "value": 54,
+   "label": "Ordinary stars over the threshold",
+   "value": "0 of 82 visits",
    "err": null,
    "kind": "derived",
    "unit": ""
-  },
+  }
+ ],
+ "figures": [
   {
-   "label": "Flagged changes, colour-aware view (experimental)",
-   "value": 101,
-   "err": null,
-   "kind": "derived",
-   "unit": ""
+   "src": "data/figs/e9_rwaur.png",
+   "href": "science.html#e9",
+   "alt": "RW Aurigae's brightness change between two SPHEREx visits in five colour bands, next to ordinary stars",
+   "caption": "Left: change by colour band, with the scatter of ordinary stars in grey and our 5\u00d7 threshold dashed. Right: the same test on 41 ordinary stars."
   }
  ],
  "evidence_links": [
   {
    "text": "Open the prepared field",
    "href": "timemachine.html?field=rwaur"
+  },
+  {
+   "text": "Method (Science page)",
+   "href": "science.html#e9"
   }
  ],
- "method_note": "Counts use the same rule as the 20-patch test (groups of \u2265 2 pixels beyond 5\u03c3).",
- "method_anchor": "science.html#which-change-is-real",
+ "method_note": "Halo photometry (annulus 4\u20137 pixels) chosen and its errors set on comparison stars before RW Aurigae was measured (docs/protocols/E9.md); 4.4\u20135 \u00b5m not used (more saturated than any comparison star). The colour-by-colour errors use the star's own picture scatter, applied after the result (labelled in the results file). RW Aurigae is an unresolved pair 1.5\u2033 apart.",
+ "method_anchor": "science.html#e9",
  "generated_with": "scripts in this repository"
 }
