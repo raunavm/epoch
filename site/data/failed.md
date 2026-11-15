@@ -84,3 +84,8 @@ We list every approach that did not work, because a result is only believable if
 **What happened.** We drew 12 new faint asteroids at random and, before measuring, wrote down how clearly each should show up when its pictures are combined. We had required that at least 70% of those expected to show clearly reach 5σ; 3 of 5 did (60%). The brightness part of the test passed (0.92 times the prediction), and no empty path raised a false alarm (0 of 288).
 **Why (flagged before the run).** The prediction used the noise the fit reports; empty paths show the real noise is about 2.5 times larger. With the measured noise, prediction and measurement agree. For some asteroids about half of the pictures failed to download during the run; the files are on the public archive (checked afterwards), so the failures were temporary.
 **What we would do next.** Predict with the empty-path noise from the start, and test on a larger blind sample.
+
+## 19. Our pre-planned check for the VY CMa "shell" did not see it
+**What happened.** To replay how a withdrawn SPHEREx claim was caught, we wrote down a smooth-ring statistic before reading any picture. It found no ring at the detector spot where the artefact sits, for any of the three stars there.
+**Why (read after the result).** The artefact is a set of thin spikes, which our ring statistic averaged away, and our comparison stars were much brighter than VY CMa at the wavelength used.
+**What we did next.** A pattern-matching test defined afterwards (and labelled so) shows the spikes are shared pixel for pixel by different stars at that spot and absent elsewhere, reproducing the published check (Science page, "A check that would have stopped a withdrawn claim").

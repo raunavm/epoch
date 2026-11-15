@@ -328,6 +328,49 @@
     }
    ],
    "group": "other"
+  },
+  {
+   "id": "e17",
+   "claims": [
+    {
+     "id": "C25",
+     "verdict": "SUPPORTED",
+     "status": "SUPPORTED",
+     "late": true
+    }
+   ],
+   "science": "science.html#e17",
+   "failed": [],
+   "figure": "data/figs/e17_recovery.png",
+   "extra": [],
+   "group": "other"
+  },
+  {
+   "id": "e19",
+   "claims": [
+    {
+     "id": "C23",
+     "verdict": "FAILED",
+     "status": "FAILED",
+     "late": false
+    },
+    {
+     "id": "C24",
+     "verdict": "SUPPORTED",
+     "status": "SUPPORTED, post hoc",
+     "late": true
+    }
+   ],
+   "science": "science.html#e19",
+   "failed": [
+    {
+     "n": 19,
+     "href": "failed.html#19-our-pre-planned-check-for-the-vy-cma-shell-did-not-see-it"
+    }
+   ],
+   "figure": "data/figs/e19_shield.png",
+   "extra": [],
+   "group": "other"
   }
  ]
 }

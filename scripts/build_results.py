@@ -113,6 +113,8 @@ def main():
         O("e1", ["C6b"], "Faint changes in single pictures", [11], "data/figs/fig_e1.png", group="other"),
         O("e3", ["C6c", "C6e"], "Faint changes in single pictures", [14], None, group="other"),
         O("e15", ["C20"], "Using 102 colours", [], "data/figs/e15_methane.png", group="other"),
+        O("e17", ["C25"], "Searching blind for moving objects", [], "data/figs/e17_recovery.png", group="other"),
+        O("e19", ["C23", "C24"], "A check that would have stopped", [19], "data/figs/e19_shield.png", group="other"),
     ]
     for r in rows:
         for c in r["claims"]:
