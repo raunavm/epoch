@@ -118,6 +118,22 @@ The May 2025 visits have only 3 usable pictures, one of them badly fitted, and i
 
 ![WISE 0855−0714, Apr–May 2026](e4/stack_pass3_neighbour_restored.png "Apr–May 2026 visits, with the neighbour star restored to the model.")
 
+###### E11 {#e11-label}
+
+## Spectra on the fly, checked against JWST {#e11}
+
+The challenge asks for spectra. Every SPHEREx picture sees a source at one colour, so combining many pictures of a source gives its spectrum. To check that our spectra are right we measured three test targets the same way the live tool does (fitted per picture, combined in fixed colour steps chosen before any flux was looked at; `docs/protocols/E11.md`) and compared them with published measurements.
+
+![SPHEREx spectrum of WISE 0855 next to JWST](figs/e11_wise0855.png "WISE 0855−0714: SPHEREx (blue) and JWST (orange)")
+
+**WISE 0855−0714.** From 238 pictures, 3.8–5 µm in 0.1 µm steps with errors from 24 empty paths: over the 10 steps where it is detected, SPHEREx gives 0.97 ± 0.03 times the JWST NIRSpec spectrum of Luhman et al. (2024), averaged in the same steps. The two reddest steps (4.8–5.0 µm) come out lower than JWST (2.9σ and 2.7σ); we do not know why. JWST's absolute level was tied by its authors to Spitzer, so the agreement in level is not fully independent; the agreement in shape is.
+
+![SPHEREx spectrum of Epsilon Indi B](figs/e11_epsindib.png "Epsilon Indi B: water, methane and carbon monoxide bands")
+
+**Epsilon Indi B** (two brown dwarfs 0.7″ apart, seen as one). From 246 pictures, 0.75–5 µm: six absorption bands pass our pre-set test (a dip more than 3 times its error at a published band position) — water at 1.4 and 1.9 µm, methane at 1.6, 2.2 and 3.3 µm, carbon monoxide at 4.5–4.8 µm — as expected for T-type brown dwarfs (King et al. 2010). Through standard filters our brightness is 0.89–1.05 times published values in H, Ks, W1 and Spitzer 4.5 µm, 0.86 at Spitzer 3.6 µm, and 0.73 at J, where our colour steps are too coarse for the narrow 1.27 µm peak (0.88 when the pictures are added without steps; a check added after the first result).
+
+**Barnard's Star: failed.** 239 pictures, and all but 1 have a saturated pixel next to the star, so no spectrum passes our rule.
+
 ###### Motion {#motion-label}
 
 ## Measuring how a star moves, from SPHEREx positions {#motion}

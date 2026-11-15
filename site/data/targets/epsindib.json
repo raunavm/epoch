@@ -36,6 +36,14 @@
    "err": null,
    "kind": "data",
    "unit": ""
+  },
+  {
+   "label": "Absorption bands found in its SPHEREx spectrum (water, methane, carbon monoxide)",
+   "value": 6,
+   "err": null,
+   "kind": "derived",
+   "unit": "",
+   "method": "science.html#e11"
   }
  ],
  "evidence_links": [
@@ -50,5 +58,13 @@
  ],
  "method_note": "Each picture is fitted with the star's position free, saturated pixels masked and Gaia neighbours modelled; the motion is a straight-line fit to SPHEREx positions with Gaia's parallax held fixed. This fit was not written down in advance. Positions sit a steady ~0.5\u2033 south of Gaia's prediction in every survey; the pair is unresolved, so a shifted centre of light is possible \u2014 not explained here.",
  "method_anchor": "science.html#motion",
+ "figures": [
+  {
+   "src": "data/figs/e11_epsindib.png",
+   "href": "science.html#e11",
+   "alt": "SPHEREx spectrum of Epsilon Indi B from 0.75 to 5 micrometres with water, methane and carbon monoxide bands marked",
+   "caption": "SPHEREx spectrum from 246 pictures. Grey strips: absorption bands that passed our pre-set test. Green: published brightness through standard filters."
+  }
+ ],
  "generated_with": "scripts in this repository"
 }

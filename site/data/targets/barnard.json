@@ -49,7 +49,8 @@
    "href": "failed.html"
   }
  ],
- "method_note": "The picture: the tool splits the pictures at the largest gap in time and subtracts the later set from the earlier one, using the experimental colour-aware pictures. The motion fit: likely cause of the failure (untested) is saturation \u2014 saturated pixels are masked, so the position rests on the star's outer light; Gaia's parallax is held fixed.",
+ "method_note": "The picture: the tool splits the pictures at the largest gap in time and subtracts the later set from the earlier one, using the experimental colour-aware pictures. The motion fit: likely cause of the failure (untested) is saturation \u2014 saturated pixels are masked, so the position rests on the star's outer light; Gaia's parallax is held fixed. A spectrum also failed: 238 of 239 pictures have a saturated pixel next to the star (Science page, spectra).",
  "method_anchor": "failed.html",
+ "figures": [],
  "generated_with": "scripts in this repository"
 }

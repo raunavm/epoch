@@ -70,7 +70,7 @@
   "unit": "\u03c3",
   "number": 16.5,
   "err": null,
-  "sentence": "WISE 0855\u22120714, a challenge test target, stands out at 16.5 times the spread of empty paths when its 4.4\u20135 \u00b5m pictures are combined along its known path, and it shifts between visits as its motion predicts. A statement about a known object, not a new object.",
+  "sentence": "WISE 0855\u22120714, a challenge test target, stands out at 16.5 times the spread of empty paths when its 4.4\u20135 \u00b5m pictures are combined along its known path, and it shifts between visits as its motion predicts. Its SPHEREx spectrum from 3.8 to 5 \u00b5m averages 0.97 \u00b1 0.03 times JWST's (two reddest points lower). A statement about a known object, not a new object.",
   "detail": {
    "source": "data/findings/e4.json"
   }

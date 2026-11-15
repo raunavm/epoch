@@ -41,7 +41,39 @@ def sci(x):
     return f"{m} × 10{'⁻' if int(e) < 0 else ''}{''.join('⁰¹²³⁴⁵⁶⁷⁸⁹'[int(c)] for c in str(abs(int(e))))}"
 
 
+E11 = (load("data/findings/e11.json") or {}).get("targets", {})
+
+
+def add_e11(tid, card):
+    """Spectrum figure + one summary number from E11 (docs/protocols/E11.md), if present."""
+    t = E11.get(tid)
+    if not t:
+        return card
+    figs = card.setdefault("figures", [])
+    nums = card.setdefault("numbers", [])
+    if tid == "wise0855":
+        c = t["jwst"]["comparison"]["PRISM"]
+        nums.append(num(f"Spectrum 3.8–5 µm vs JWST: average ratio over the {c['n_bins_detected']} detected colour steps",
+                        round(c["mean_ratio_spherex_over_jwst"], 2), round(c["mean_ratio_err"], 2), method="science.html#e11"))
+        figs.append(dict(src="data/figs/e11_wise0855.png", href="science.html#e11",
+                         alt="SPHEREx spectrum of WISE 0855 from 3.8 to 5 micrometres, following the JWST spectrum",
+                         caption=(f"SPHEREx spectrum ({t['n_pictures_used']} pictures; blue) next to JWST (Luhman et al. 2024; orange). "
+                                  "The two reddest points are lower than JWST; we do not know why.")))
+    elif tid == "epsindib":
+        nums.append(num("Absorption bands found in its SPHEREx spectrum (water, methane, carbon monoxide)", len(t["bands_named"]), None,
+                        method="science.html#e11"))
+        figs.append(dict(src="data/figs/e11_epsindib.png", href="science.html#e11",
+                         alt="SPHEREx spectrum of Epsilon Indi B from 0.75 to 5 micrometres with water, methane and carbon monoxide bands marked",
+                         caption=(f"SPHEREx spectrum from {t['n_pictures_used']} pictures. Grey strips: absorption bands that passed our "
+                                  "pre-set test. Green: published brightness through standard filters.")))
+    elif tid == "barnard":
+        card["method_note"] = card.get("method_note", "") + (f" A spectrum also failed: {t['n_pictures'] - t['n_pictures_used']} of {t['n_pictures']} pictures "
+                                                             "have a saturated pixel next to the star (Science page, spectra).")
+    return card
+
+
 def write(tid, card):
+    add_e11(tid, card)
     card["generated_with"] = "scripts in this repository"
     json.dump(card, open(f"{OUT}/{tid}.json", "w"), indent=1)
     print(tid, "->", card["plain_result"][:120])

@@ -53,13 +53,19 @@ if e13 and "f2" in out and e13.get("n_combined_ge5"):
     out["f2"]["detail"] = dict(out["f2"]["detail"], e13="data/findings/e13.json")
     out["f2"].update(title="Too faint for one picture", number=e13["n_combined_ge5"], unit=f"of {e13['n_no_single_5sigma']}")
 e4 = load("data/findings/e4.json")
+e11 = load("data/findings/e11.json")
+spec = ""
+if e11:
+    c = e11["targets"]["wise0855"]["jwst"]["comparison"]["PRISM"]
+    spec = (f"Its SPHEREx spectrum from 3.8 to 5 µm averages {c['mean_ratio_spherex_over_jwst']:.2f} ± {c['mean_ratio_err']:.2f} times "
+            "JWST's (two reddest points lower). ")
 if e4:
     p2 = e4["passes"][1]
     out["f3"] = dict(title="The coldest known brown dwarf", interaction="target", target="wise0855", label="derived", unit="σ",
                      number=round(p2["significance"], 1), err=None,
                      sentence=(f"WISE 0855−0714, a challenge test target, stands out at {p2['significance']:.1f} times the spread of empty paths when "
                                "its 4.4–5 µm pictures are combined along its known path, and it shifts between visits as its motion predicts. "
-                               "A statement about a known object, not a new object."),
+                               + spec + "A statement about a known object, not a new object."),
                      detail=dict(source="data/findings/e4.json"))
 json.dump(out, open("site/data/findings.json", "w"), indent=1)
 cal = load("data/findings/f1_calibration.json")
