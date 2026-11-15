@@ -44,3 +44,11 @@ We list every approach that did not work, because a result is only believable if
 ## 10. A neighbouring star was silently dropped
 **What happened.** Our fitting code treated any catalogued star within 0.7 pixels of the target as "the target itself" and left it out. Around WISE 0855 a star of magnitude 16.3 sits 0.7 pixels from the brown dwarf's predicted position in the third sky survey, so its light was added to the brown dwarf's (a control at short wavelengths, where WISE 0855 is invisible, showed the leak).
 **What we changed.** The star was put back for WISE 0855 (third-survey signal drops from 13.6 to 10.6 standard deviations against empty paths); both numbers are reported. The rule itself must be replaced by matching on catalogue identity, not distance, before any further runs.
+
+## 11. The colour-aware view did not beat a simple median
+**What happened.** In a test fixed in advance (planted sources in 20 random patches of sky, each method's alarm threshold set on a separate calibration patch), no method found half of the planted sources even at 20 times the single-picture noise, so the pre-registered comparison is a tie at "too faint for all". Our colour-aware view looked ahead at the brightest level, but only because one stray spike in the calibration patch set its threshold lower; at a common threshold a plain median of other pictures from the same detector found more, and on the test patches the colour-aware view raised about three times as many false alarms.
+**What we changed.** The headline is no longer about the colour-aware view. It stays in the tool as an experimental option, labelled as such.
+
+## 12. A clean-up rule that also removed faint real sources
+**What happened.** To stop isolated bad pixels from swamping every method, we removed pixels whose neighbours were quiet. SPHEREx's images of stars are so compact that this also removed many faint real sources, lowering every method's detection rate equally.
+**What we learned.** Detecting a change in a single picture only works for bright changes (about 20 times the noise or more); fainter objects need many pictures combined along their path, which is what the stacking view does.
