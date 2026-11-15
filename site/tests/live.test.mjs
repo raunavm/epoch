@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { tileOf, neighbourTiles, containsWithMargin, footprintContains, s3Key } from '../js/live/index.js';
 import { makeWCS, project, deproject, waveAt } from '../js/live/wcs.js';
 import { readHeader, parseCards } from '../js/live/fits.js';
-import { changeModel, countChanges } from '../js/live/change.js';
+import { changeModel, countChanges, despike } from '../js/live/change.js';
 import { parseRA, parseDec, aperture, gridSize } from '../js/live/grid.js';
 
 const DATA = fileURLToPath(new URL('../data/index/dr1/', import.meta.url));
@@ -126,15 +126,24 @@ function synth({ withMover }) {
   return { frames, S };
 }
 
-test('change model: steep-spectrum static star gives many naive changes and zero corrected; a mover survives', () => {
+test('change model rev. 2 (f = 0.1): steep-spectrum static star gives many naive changes and zero corrected; a mover survives', () => {
   const { frames, S } = synth({ withMover: false });
-  const r = changeModel(frames, S);
-  assert.ok(r.nNaive >= 10, `naive changes ${r.nNaive}`);
+  const r = changeModel(frames, S, 0.1);
+  assert.ok(r.nNaiveAll >= 10, `naive (all frames) changes ${r.nNaiveAll}`);
   assert.equal(r.nCorr, 0);
-  const m = changeModel(synth({ withMover: true }).frames, S);
-  assert.ok(countChanges(m.corr[13], S) >= 1, 'mover lost in corrected map');
+  const m = changeModel(synth({ withMover: true }).frames, S, 0.1);
+  assert.ok(countChanges(despike(m.corr[13], S), S) >= 1, 'mover lost in corrected map');
   assert.ok(Math.abs(m.corr[13][6 * S + 17]) > 5);
-  for (const e of [0, 5, 20]) assert.equal(countChanges(m.corr[e], S), 0);
+  assert.ok(m.nCorr >= 1);
+  for (const e of [0, 5, 20]) assert.equal(countChanges(despike(m.corr[e], S), S), 0);
+});
+
+test('single-pixel spike rejection removes a resampled hot pixel but keeps a PSF-sized source', () => {
+  const S = 15, m = new Float32Array(S * S);
+  m[3 * S + 3] = 40; m[3 * S + 4] = 20; m[4 * S + 3] = 15; m[4 * S + 4] = 8; // bilinear-spread spike (2x2)
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) m[y * S + x] += 30 * Math.exp(-((x - 10) ** 2 + (y - 10) ** 2) / (2 * 1.2 ** 2));
+  assert.equal(countChanges(m, S), 2);
+  assert.equal(countChanges(despike(m, S), S), 1);
 });
 
 test('aperture photometry subtracts the annulus', () => {

@@ -1,5 +1,5 @@
 // Live mode: any RA/Dec -> SPHEREx DR1 frames read straight from the public S3 bucket in the browser.
-import { h, put, t, fmt, badge, wlColor, REDUCED_MOTION } from '../core.js';
+import { h, put, t, fmt, badge, wlColor, REDUCED_MOTION, getJSON, findingLine } from '../core.js';
 import { plot, s as svg } from '../plot.js';
 import { findFrames } from './index.js';
 import { readHeader, readRows } from './fits.js';
@@ -8,7 +8,7 @@ import { gridSize, rowsNeeded, resample, aperture, toMJy, asinhRGBA, divergingRG
 import { changeModel } from './change.js';
 
 const INDEX = 'data/index/dr1/';
-const MAX_CONCURRENT = 6, CONFIRM_MB = 60;
+const MAX_CONCURRENT = 6, CONFIRM_MB = 120, F_PROVISIONAL = 0.1;
 const PASS_COLORS = ['#56B4E9', '#E69F00'];
 const META_KEYS = [['PSF_FWHM', 'live.meta_psf'], ['L2DQAFLG', 'live.meta_dqa'], ['L2 N_OUTLIER', 'live.meta_outlier'],
   ['L2 N_PERSIST', 'live.meta_persist'], ['L2 SATSTRKS', 'live.meta_streaks'], ['L2 N_GHOST', 'live.meta_ghost']];
@@ -20,9 +20,10 @@ async function getJSONAbs(path, signal) {
   try { const r = await fetch(path, { signal }); return r.ok ? await r.json() : null; } catch { return null; }
 }
 export async function loadIndex() {
-  cached ??= Promise.all([getJSONAbs(INDEX + 'meta.json'), getJSONAbs(INDEX + 'wave_tables.json')]);
-  const [meta, wave] = await cached;
-  return meta ? { meta, wave } : null;
+  cached ??= Promise.all([getJSONAbs(INDEX + 'meta.json'), getJSONAbs(INDEX + 'wave_tables.json'), getJSONAbs('data/f1_calibration.json')]);
+  const [meta, wave, cal] = await cached;
+  const f = Number.isFinite(cal?.f) ? cal.f : null;
+  return meta ? { meta, wave, f: f ?? F_PROVISIONAL, fProvisional: f == null } : null;
 }
 
 /**
@@ -52,7 +53,7 @@ export function mountLive(el, target, onState) {
   const blinkBox = h('div', { class: 'live-blink' });
   const specBox = h('section', { class: 'live-spec', 'aria-labelledby': 'h-live-spec' },
     h('h3', { id: 'h-live-spec' }, t('live.spec_h')), h('p', { class: 'hint' }, t('live.spec_hint')));
-  const findingBox = h('p', { class: 'finding small' });
+  const findingBox = h('div', { class: 'finding-box' });
 
   function setCorrected(on) {
     if (on && !st.cm) return;
@@ -198,7 +199,7 @@ export function mountLive(el, target, onState) {
     const t0 = performance.now();
     const idx = await loadIndex();
     if (!idx) { status.textContent = t('live.no_index'); return; }
-    const { meta, wave } = idx;
+    const { meta, wave, f: fFloor, fProvisional } = idx;
     const tileCache = {};
     const { frames } = await findFrames(meta, target.ra, target.dec, target.fov / 60,
       n => (tileCache[n] ??= getJSONAbs(`${INDEX}${n}.json`, signal)));
@@ -246,9 +247,14 @@ export function mountLive(el, target, onState) {
     const total = (performance.now() - t0) / 1000;
     if (!st.frames.length) { status.textContent = t('live.all_failed'); return; }
     st.frames.forEach((f, k) => { f.idx = k; });
-    st.cm = changeModel(st.frames.map(f => ({ v: f.v, lam: f.lam, det: f.det, mjd: f.mjd })), S);
+    st.cm = changeModel(st.frames.map(f => ({ v: f.v, lam: f.lam, det: f.det, mjd: f.mjd })), S, fFloor);
     status.textContent = t('live.done', { n: st.frames.length, failed, mb: fmt(st.bytes / 1e6, 3), first: fmt(first, 2), total: fmt(total, 2) });
-    findingBox.replaceChildren(t('live.changes', { naive: st.cm.nNaive, corr: st.cm.nCorr }), ' ', badge('derived'));
+    const headline = (await getJSON('findings.json'))?.f1;
+    put(findingBox,
+      h('h3', {}, t('live.changes_h')),
+      headline ? findingLine(headline) : null,
+      h('p', {}, h('strong', {}, t('live.changes_view')), ' ', t('live.changes', { all: st.cm.nNaiveAll, det: st.cm.nNaiveDet, corr: st.cm.nCorr }), ' ', badge('derived')),
+      h('p', { class: 'muted small' }, t('live.changes_method', { f: fFloor }), fProvisional ? [' ', h('strong', {}, t('live.provisional', { f: fFloor }))] : null));
     if (st.sel) spectrum();
     draw();
   }

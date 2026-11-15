@@ -247,7 +247,7 @@
  "live.view_subtract": "Restar",
  "live.detector": "detector",
  "live.keys": "Teclas: espacio reproducir/pausa · ← → avanzar · C sin corregir/corregido",
- "live.markers": "Marcas amarillas: la posición que escribiste. Anillo rosa: posición prevista de un objetivo rápido. Cuadro azul: píxel elegido.",
+ "live.markers": "Marcas amarillas: la posición que escribiste. Anillo rosa: camino previsto de un objetivo rápido. Cuadro azul: píxel elegido. No se muestran superposiciones de catálogos (Gaia, WISE): sus servicios no se pueden leer directamente desde un navegador.",
  "live.meta_h": "Sobre esta imagen (cabecera)",
  "live.meta_psf": "Tamaño del desenfoque, PSF_FWHM (″)",
  "live.meta_dqa": "Control de calidad, L2DQAFLG",
@@ -264,7 +264,7 @@
  "live.sub_short": "El mayor hueco es de menos de dos meses, así que aún no son dos recorridos distintos del cielo; los objetos lentos apenas se notarán.",
  "live.sub_none": "Hacen falta imágenes a ambos lados de un hueco temporal.",
  "live.sub_label": "Pasada 1 menos pasada 2",
- "live.changes": "Cambios señalados en estas imágenes: {naive} con parpadeo simple dentro de cada detector, {corr} tras la corrección.",
+ "live.changes": "parpadeo simple, todas las imágenes en orden temporal: {all} cambios; parpadeo simple dentro de cada detector: {det}; tras la corrección: {corr}.",
  "live.spec_h": "Espectro al momento",
  "live.spec_hint": "Haz clic o toca cualquier píxel de la imagen de arriba.",
  "live.spec_label": "Fotometría rápida de apertura (DATOS, no el modelo completo)",
@@ -273,5 +273,9 @@
  "live.spec_none": "No hay imágenes útiles en este píxel.",
  "live.spec_caveat": "Suma de 3×3 píxeles menos la mediana de un anillo a 3–5 píxeles, convertida con el ángulo sólido de píxel de cada imagen. Las barras de error salen de la dispersión del anillo e ignoran el ruido correlacionado del remuestreo. Colores: pasada 1 y pasada 2.",
  "live.pass": "pasada {n}",
- "live.csv": "Descargar CSV"
+ "live.csv": "Descargar CSV",
+ "live.changes_h": "¿Cuántos cambios son reales?",
+ "live.changes_view": "Esta vista (en vivo):",
+ "live.changes_method": "Un cambio es un grupo de al menos 2 píxeles a más de 5 unidades de ruido de lo esperado. El ruido incluye un mínimo de {f} × brillo por la forma imperfecta de las estrellas. Los picos de un solo píxel se eliminan con una prueba de mediana 3×3, porque el modo en vivo no lee el plano de marcas de píxeles.",
+ "live.provisional": "El mínimo {f} es provisional hasta que se mida en el campo de calibración."
 }

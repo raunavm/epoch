@@ -1,0 +1,20 @@
+[
+ {
+  "field": "wise0855",
+  "name": "WISE 0855\u22120714",
+  "ra": 133.760249,
+  "dec": -7.242245
+ },
+ {
+  "field": "barnard",
+  "name": "Barnard's Star",
+  "ra": 269.446191,
+  "dec": 4.767694
+ },
+ {
+  "field": "epsindib",
+  "name": "Epsilon Indi B (Ba+Bb, unresolved)",
+  "ra": 331.096197,
+  "dec": -56.800583
+ }
+]

@@ -6,7 +6,7 @@ Writes data/forced/<id>.parquet (one row per frame) and, with --stamps, data/sta
 Idempotent per object.
 """
 import argparse, os, subprocess, sys, warnings
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 import numpy as np
 import pandas as pd
 
@@ -38,7 +38,20 @@ def code_version():
         return "uncommitted"
 
 
-def run(pdes, index, workers, stamps, vmax, force=False):
+def _job(a):
+    key, eph, sd = a
+    try:
+        r = measure_frame(key, eph, stamp_dir=sd)
+    except Exception as e:
+        return dict(key=key, error=repr(e))
+    if r:
+        for c in ["V", "r", "delta", "alpha", "RA", "DEC", "RA_rate", "DEC_rate"]:
+            if c in eph:
+                r[c] = float(eph[c])
+    return r
+
+
+def run(pdes, index, workers, stamps, vmax, force=False, cap=0):
     out = f"data/forced/{pdes.replace(' ', '_')}.parquet"
     if os.path.exists(out) and not force:
         return pd.read_parquet(out)
@@ -56,6 +69,11 @@ def run(pdes, index, workers, stamps, vmax, force=False):
     if len(cand) == 0:
         pd.DataFrame().to_parquet(out)
         return None
+    if cap and len(cand) > cap:
+        # validation sample: keep detectors 1 (Gaia overlap), 4 (2.4–3.8 µm), 5, 6 (thermal); subsample 2 and 3
+        keep = cand[cand.detector.isin([1, 4, 5, 6])]
+        rest = [g.sample(min(len(g), 15), random_state=0) for _, g in cand[cand.detector.isin([2, 3])].groupby("detector")]
+        cand = pd.concat([keep] + rest)
     cand = cand.sort_values("mjd")
     pe = fetch_epochs(pdes, list(cand["mjd"].values))
     # Horizons returns rows in time order; match each frame to its epoch explicitly (no positional zip)
@@ -65,20 +83,10 @@ def run(pdes, index, workers, stamps, vmax, force=False):
     assert np.all(np.abs(pe["mjd"].values[j] - cand["mjd"].values) < 1e-4), "ephemeris/frame epoch mismatch"
     pe = pe.iloc[j].set_index(cand.index)
     rows = []
-
-    def job(i):
-        try:
-            r = measure_frame(cand.loc[i, "key"], pe.loc[i], stamp_dir=(f"data/stamps/{pdes.replace(' ', '_')}" if stamps else None))
-        except Exception as e:
-            return dict(key=cand.loc[i, "key"], error=repr(e))
-        if r:
-            for c in ["V", "r", "delta", "alpha", "RA", "DEC", "RA_rate", "DEC_rate"]:
-                if c in pe.columns:
-                    r[c] = float(pe.loc[i, c])
-        return r
-
-    with ThreadPoolExecutor(workers) as ex:
-        for r in ex.map(job, cand.index):
+    sd = f"data/stamps/{pdes.replace(' ', '_')}" if stamps else None
+    args = [(cand.loc[i, "key"], pe.loc[i].to_dict(), sd) for i in cand.index]
+    with ProcessPoolExecutor(workers) as ex:
+        for r in ex.map(_job, args, chunksize=2):
             if r:
                 rows.append(r)
     df = pd.DataFrame(rows)
@@ -99,11 +107,12 @@ if __name__ == "__main__":
     ap.add_argument("--vmax", type=float, default=22)
     ap.add_argument("--stamps", action="store_true")
     ap.add_argument("--redo", action="store_true")
+    ap.add_argument("--cap", type=int, default=0)
     a = ap.parse_args()
     ids = [x for x in a.ids.split(",") if x] + ([l.strip() for l in open(a.file) if l.strip()] if a.file else [])
     index = load_index()
     for pdes in ids:
-        df = run(pdes, index, a.workers, a.stamps, a.vmax, a.redo)
+        df = run(pdes, index, a.workers, a.stamps, a.vmax, a.redo, a.cap)
         n = 0 if df is None else len(df)
         good = 0 if df is None or "snr" not in df else int((df["snr"] > 5).sum())
         print(f"{pdes}: frames={n} snr>5={good}", flush=True)

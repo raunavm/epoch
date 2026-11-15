@@ -247,7 +247,7 @@
  "live.view_subtract": "Subtract",
  "live.detector": "detector",
  "live.keys": "Keys: space play/pause · ← → step · C raw/corrected",
- "live.markers": "Yellow ticks: the position you entered. Pink ring: predicted position of a fast-moving target. Blue square: pixel you clicked.",
+ "live.markers": "Yellow ticks: the position you entered. Pink ring: predicted path of a fast-moving target. Blue square: pixel you clicked. Catalogue overlays (Gaia, WISE) are not shown: their services cannot be read directly by a browser.",
  "live.meta_h": "About this picture (header)",
  "live.meta_psf": "Blur size, PSF_FWHM (″)",
  "live.meta_dqa": "Quality check, L2DQAFLG",
@@ -264,7 +264,7 @@
  "live.sub_short": "The largest gap is shorter than two months, so these are not two separate sky surveys yet; slow movers will barely show.",
  "live.sub_none": "Need pictures on both sides of a time gap.",
  "live.sub_label": "Pass 1 minus pass 2",
- "live.changes": "Changes flagged in these pictures: {naive} by plain blinking within each detector, {corr} after correction.",
+ "live.changes": "plain blink, all pictures in time order: {all} changes; plain blink within each detector: {det}; after correction: {corr}.",
  "live.spec_h": "Spectrum on the fly",
  "live.spec_hint": "Click or tap any pixel in the picture above.",
  "live.spec_label": "Quick aperture photometry (DATA, not the full model)",
@@ -273,5 +273,9 @@
  "live.spec_none": "No usable pictures at this pixel.",
  "live.spec_caveat": "3×3-pixel sum minus the median of a ring 3–5 pixels out, converted with each picture's pixel solid angle. Error bars come from the ring's scatter and ignore the correlated noise added by resampling. Colours: pass 1 and pass 2.",
  "live.pass": "pass {n}",
- "live.csv": "Download CSV"
+ "live.csv": "Download CSV",
+ "live.changes_h": "How many changes are real?",
+ "live.changes_view": "This view (live):",
+ "live.changes_method": "A change is a group of at least 2 pixels more than 5 noise units away from expected. Noise includes a {f} × brightness floor for imperfect star shapes. Single-pixel spikes are removed with a 3×3 median test, because live mode does not read the pixel-flag plane.",
+ "live.provisional": "The {f} floor is provisional until it is measured on the calibration field."
 }
