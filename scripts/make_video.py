@@ -1,10 +1,9 @@
 """Render the 30-second demo video from real data products only (no generated imagery).
 
 Segments: title card 0–2 s; plain blink vs one-detector change maps 2–7 s; WISE 0855 combined along its path
-7–13 s; Barnard's Star, earlier minus later pictures 13–19 s; measured numbers, one at a time, 19–26 s; name and
+7–13 s; Barnard's Star, NASA WISE 2010 blinked with SPHEREx 2025–26, 13–19 s; measured numbers, one at a time, 19–26 s; name and
 address 26–29.8 s. English subtitles (SUBS, one list) are burned in and also written as an .srt file. Numbers are
-read from site/data/headline.json, data/findings/e4.json, data/findings/motion_epsindib.json and
-site/data/index/dr1/meta.json.
+read from site/data/headline.json, data/findings/e4.json, e11.json and e13.json.
 Usage: .venv/bin/python scripts/make_video.py --url "<github-user>.github.io/orrery" --team "<team-name>"
        [--field ecliptic_control]
 Outputs: dist/orrery_demo.mp4, dist/orrery_demo.srt (length verified with ffprobe).
@@ -27,7 +26,7 @@ AI_NOTE = "Made from real SPHEREx data"
 SUBS = [(0, 3.5, "NASA's SPHEREx shoots each spot in a new colour"),
         (3.5, 7, "So a plain blink flickers; one detector at a time removes most of it"),
         (7, 9.7, "The coldest known brown dwarf, picture by picture"), (9.7, 13, "Combine pictures along its path: there it is"),
-        (13, 19, "About seven months apart: the star has moved"), (19, 26, "Measured, and checked against independent data"),
+        (13, 19, "Fifteen years apart: Barnard's Star has moved"), (19, 26, "Measured, and checked against independent data"),
         (26, 29.7, "Try any spot in the sky")]
 
 
@@ -140,13 +139,16 @@ def seg_reveal(rev, frames_out, n_frames):
         frames_out.append(im)
 
 
-def seg_shift(shot, crop, frames_out, n_frames):
-    im0 = Image.open(shot).convert("RGB").crop(crop).resize((460, 460), Image.NEAREST)
+def seg_lookback(wise_png, spx_png, frames_out, n_frames, period=24):
+    """Blink NASA WISE (2010) and SPHEREx (2025-26) of the same 8' patch (live-mode screenshots, same grid)."""
+    pics = [(Image.open(wise_png).convert("RGB").resize((460, 460), Image.LANCZOS), "NASA WISE, 2010", "DATA"),
+            (Image.open(spx_png).convert("RGB").resize((460, 460), Image.LANCZOS), "SPHEREx, 2025–26 (median)", "DERIVED")]
     for k in range(n_frames):
         im, d = canvas()
-        im.paste(im0, (410, 70))
-        d.text((410, 30), "Barnard's Star: earlier minus later pictures", font=font(28), fill=FG)
-        tag(d, 410, 540, "MODEL / RESIDUAL", (204, 121, 167))
+        pic, label, kind = pics[(k // (period // 2)) % 2]
+        im.paste(pic, (410, 80))
+        d.text((410, 30), "Barnard's Star · " + label, font=font(30), fill=FG)
+        tag(d, 410, 550, kind, (0, 158, 115))
         frames_out.append(im)
 
 
@@ -182,13 +184,12 @@ def main(a):
     e4r = json.load(open(f"{SITE}/e4/reveal.json"))
     hl = json.load(open(f"{SITE}/headline.json"))
     e4 = json.load(open("data/findings/e4.json"))
-    mo = json.load(open("data/findings/motion_epsindib.json"))
-    meta = json.load(open(f"{SITE}/index/dr1/meta.json"))
-    pm = mo["proper_motion"]
+    e11 = json.load(open("data/findings/e11.json"))["targets"]["wise0855"]["jwst"]["comparison"]["PRISM"]
+    e13 = json.load(open("data/findings/e13.json"))
     nums = [(f"{hl['number']}%", "of a plain blink's changes removed (median)"),
             (f"{e4['passes'][1]['significance']:.1f}σ", "coldest known brown dwarf, against empty paths"),
-            (f"{pm['pmra']['spherex_mas_yr']/1000:+.2f} ± {pm['pmra']['err_mas_yr']/1000:.2f}″/yr", f"Eps Indi B east–west; Gaia {pm['pmra']['gaia_mas_yr']/1000:+.2f}"),
-            (f"{meta['n_frames']:,}", "SPHEREx pictures indexed")]
+            (f"{e11['mean_ratio_spherex_over_jwst']:.2f} ± {e11['mean_ratio_err']:.2f}", "its SPHEREx spectrum ÷ JWST's"),
+            (f"{e13['n_combined_ge5']} of {e13['n_no_single_5sigma']}", "faint asteroids brought out by combining pictures")]
     os.makedirs("dist/frames", exist_ok=True)
     for f in os.listdir("dist/frames"):
         os.remove(os.path.join("dist/frames", f))
@@ -196,7 +197,7 @@ def main(a):
     seg_title(a.team, frames, 2 * FPS)
     seg_blink_vs_det(a.field, frames, 5 * FPS)
     seg_reveal(e4r, frames, 6 * FPS)
-    seg_shift(a.shift_shot, tuple(int(x) for x in a.shift_crop.split(",")), frames, 6 * FPS)
+    seg_lookback(a.wise_shot, a.spherex_shot, frames, 6 * FPS)
     seg_numbers(nums, frames, 7 * FPS)
     seg_name(a.url, frames, 4 * FPS - 6)  # finish safely under 30.0 s
     for i, im in enumerate(frames):
@@ -222,6 +223,6 @@ if __name__ == "__main__":
     ap.add_argument("--url", default="<github-user>.github.io/orrery")
     ap.add_argument("--team", default="<team-name>", help="registered team name for the title card")
     ap.add_argument("--field", default="ecliptic_control")
-    ap.add_argument("--shift-shot", default="dist/barnard_sub.png")
-    ap.add_argument("--shift-crop", default="123,936,543,1356", help="x0,y0,x1,y1 of the subtract image in the screenshot")
+    ap.add_argument("--wise-shot", default="dist/barnard_wise2010.png", help="live-mode WISE panel (timemachine.html?target=barnard&fov=8&wise=1)")
+    ap.add_argument("--spherex-shot", default="dist/barnard_spherex2025.png", help="live-mode SPHEREx detector-6 median panel, same page")
     main(ap.parse_args())
