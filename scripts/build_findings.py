@@ -47,7 +47,7 @@ if e13 and "f2" in out and e13.get("n_combined_ge5"):
     out["f2"]["sentence"] = (f"Of the {e13['n_stacked']} faint asteroids we could stack, {e13['n_no_single_5sigma']} never reach the usual "
         f"detection level (5 times the noise) in any single picture. Combined along their known orbits, {e13['n_combined_ge5']} of those stand out "
         f"above 5 times the spread of empty paths beside them, and all {e13['n_ge5_pass_split']} still show up when their pictures are split in half. "
-        f"For {len(good)} of them the measured brightness matches, within 20%, what its catalogued brightness predicts. "
+        f"Measured against the brightness predicted from each one's catalogued magnitude they give " + ", ".join(f"{r['amp_ratio_measured_over_predicted']:.2f} ± {r['amp_ratio_err']:.2f}" for r in ok) + " (the comparison code was corrected after its first run). "
         f"The slider shows {out['f2']['detail']['object']}, picked by hand and not the highest-scoring of the three. "
         "The stack numbers were computed before the split test was written down, so this is a check, not a blind test.")
     out["f2"]["detail"] = dict(out["f2"]["detail"], e13="data/findings/e13.json")
@@ -73,9 +73,9 @@ if e12 and e12.get("verdict") == "SUPPORTED":
     out["f4"] = dict(title="A distance from one year of pictures", interaction="target", target="epsindib", label="derived", unit="mas",
                      number=round(e12["parallax_mas"]), err=round(e12["parallax_err_mas"]["adopted"]),
                      sentence=(f"Epsilon Indi B, a pair of brown dwarfs and a challenge test target, traces a small yearly loop as Earth orbits the Sun. "
-                               f"Fitting it in SPHEREx positions alone gives a parallax of {e12['parallax_mas']:.0f} ± {e12['parallax_err_mas']['adopted']:.0f} "
+                               f"Fitting its SPHEREx positions, with nothing taken from Gaia for this object, gives a parallax of {e12['parallax_mas']:.0f} ± {e12['parallax_err_mas']['adopted']:.0f} "
                                f"thousandths of an arcsecond — about {e12['distance_ly']:.0f} light-years ({lo:.0f}–{hi:.0f}); Gaia gives "
-                               f"{3.26156 * e12['gaia_distance_pc']:.0f}. The error bar is set by ordinary stars measured the same way."),
+                               f"{3.26156 * e12['gaia_distance_pc']:.0f}. The error bar is set by ordinary stars measured the same way, which all show a small false wobble of their own (not corrected)."),
                      detail=dict(source="data/findings/e12.json"))
 json.dump(out, open("site/data/findings.json", "w"), indent=1)
 cal = load("data/findings/f1_calibration.json")

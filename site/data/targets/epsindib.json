@@ -53,12 +53,11 @@
    "label_es": "Paralaje a partir de posiciones de SPHEREx (prueba registrada de antemano, superada)"
   },
   {
-   "label": "Parallax (Gaia DR3)",
+   "label": "Parallax (Gaia DR3: Ba 270.7; system, from Epsilon Indi A, 274.8)",
    "value": 270.7,
    "err": null,
    "kind": "data",
-   "unit": "mas",
-   "label_es": "Paralaje (Gaia DR3)"
+   "unit": "mas"
   },
   {
    "label": "Distance (68% interval)",

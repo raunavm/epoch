@@ -1,7 +1,7 @@
 {
  "title": "R Draconis \u2014 a pulsating giant star",
  "status": "measured; no change confirmed by our pre-set rule",
- "plain_result": "R Draconis is so bright that only the halo around its overloaded centre can be measured, and the pre-set test could use only three noisy colour bands: there no change passes 5 times the error (43 ordinary bright stars measured the same way). Shown for information only, outside the pre-set range: at 4.7 \u00b5m its brightness rises and falls by about 0.3 magnitudes either side of average and peaks around 1 Feb 2026, 12 days after the catalogue's predicted visible-light maximum (21 Jan 2026).",
+ "plain_result": "R Draconis is so bright that only the halo around its overloaded centre can be measured, and the pre-set test could use only three noisy colour bands: there no change passes 5 times the error (43 ordinary bright stars measured the same way). Shown for information only, outside the pre-set range: at 4.7 \u00b5m its brightness rises and falls by about 0.3 magnitudes either side of average and peaks around 1 Feb 2026 (\u00b1 3 days, formal). The catalogue predicts a visible-light maximum near 21 Jan 2026, uncertain by 2\u20133 weeks, so the infrared\u2013visible lag is not measured.",
  "numbers": [
   {
    "label": "Pictures",
@@ -60,11 +60,9 @@
    "text_es": "M\u00e9todo (p\u00e1gina de Ciencia)"
   }
  ],
- "method_note": "Halo photometry (annulus 7\u201312 pixels) chosen on comparison stars before R Draconis was measured (docs/protocols/E9.md). Detectors 5\u20136 are excluded by a pre-set saturation guard; the 4.4\u20135 \u00b5m light curve was made after the result with that guard switched off, so it is descriptive. Infrared maxima of such stars are expected 25\u201350 days after visible ones (Smith et al. 2002).",
+ "method_note": "Halo photometry (annulus 7\u201312 pixels) chosen on comparison stars before R Draconis was measured (docs/protocols/E9.md). Detectors 5\u20136 are excluded by a pre-set saturation guard; the 4.4\u20135 \u00b5m light curve was made after the result with that guard switched off, so it is descriptive. Published infrared maxima of such stars lag the visible ones by about 0.05\u20130.13 of a period, 12\u201332 days for R Draconis (Smith et al. 2002).",
  "method_anchor": "science.html#e9",
  "generated_with": "scripts in this repository",
  "title_es": "R Draconis \u2014 una estrella gigante pulsante",
- "plain_result_es": "R Draconis es tan brillante que solo se puede medir el halo alrededor de su centro sobrecargado, y la prueba fijada de antemano solo pudo usar tres bandas de color con ruido: en ellas ning\u00fan cambio supera 5 veces el error (43 estrellas brillantes corrientes medidas de la misma manera). Se muestra solo a t\u00edtulo informativo, fuera del rango fijado de antemano: a 4.7 \u00b5m su brillo sube y baja unas 0.3 magnitudes a cada lado de la media y alcanza su m\u00e1ximo hacia el 1 feb 2026, 12 d\u00edas despu\u00e9s del m\u00e1ximo en luz visible que predice el cat\u00e1logo (21 ene 2026).",
- "status_es": "medido; ning\u00fan cambio confirmado seg\u00fan nuestra regla fijada de antemano",
- "method_note_es": "Fotometr\u00eda del halo (anillo de 7\u201312 p\u00edxeles) elegida con estrellas de comparaci\u00f3n antes de medir R Draconis (docs/protocols/E9.md). Los detectores 5\u20136 quedan excluidos por una salvaguarda de saturaci\u00f3n fijada de antemano; la curva de luz de 4.4\u20135 \u00b5m se hizo despu\u00e9s del resultado con esa salvaguarda desactivada, as\u00ed que es descriptiva. En estrellas de este tipo, los m\u00e1ximos en infrarrojo se esperan 25\u201350 d\u00edas despu\u00e9s de los visibles (Smith et al. 2002)."
+ "status_es": "medido; ning\u00fan cambio confirmado seg\u00fan nuestra regla fijada de antemano"
 }

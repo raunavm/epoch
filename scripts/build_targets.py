@@ -202,7 +202,7 @@ if e12 and os.path.exists(f"{OUT}/epsindib.json"):
     card["numbers"] = [n for n in card["numbers"] if not n["label"].startswith("Pictures used")] + [
         num("Parallax from SPHEREx positions (pre-registered test, passed)", round(e12["parallax_mas"]), round(e12["parallax_err_mas"]["adopted"]),
             unit="mas", method="science.html#e12"),
-        num("Parallax (Gaia DR3)", round(e12["gaia_parallax_mas"], 1), None, kind="data", unit="mas"),
+        num("Parallax (Gaia DR3: Ba 270.7; system, from Epsilon Indi A, 274.8)", round(e12["gaia_parallax_mas"], 1), None, kind="data", unit="mas"),
         num("Distance (68% interval)", f"{e12['distance_ly']:.1f} light-years ({lo:.1f}–{hi:.1f})", None, method="science.html#e12")]
     card.setdefault("figures", []).insert(0, dict(src="data/figs/e12_parallax.png", href="science.html#e12",
         alt="Epsilon Indi B's path across the sky over a year, with the yearly wobble that gives its distance",
@@ -257,7 +257,7 @@ if e9:
     w = e9["targets"]["rwaur"]
     col = {c["detector"]: c for c in w["colour"]["post_hoc_inflated"]["contrast"]}
     lam = {c["detector"]: c["lam_um"] for c in w["colour"]["contrast"]}
-    zmax = max(abs(a["z"]) for a in w["a_w"])
+    zbest = max((d for d in w["a_dw"] if d.get("z") is not None), key=lambda d: abs(d["z"]))
     write("rwaur", dict(
         title="RW Aurigae — a young variable star",
         status="measured; no change confirmed by our pre-set rule",
@@ -265,13 +265,15 @@ if e9:
                       f"{w['comparison']['n_stars']} ordinary stars of similar brightness. Between the two visits (Sep 2025 and Mar 2026) it looks "
                       f"{100*col[1]['c']:.0f} ± {100*col[1]['sigma']:.0f}% brighter at {lam[1]:.1f} µm and {100*col[2]['c']:.0f} ± {100*col[2]['sigma']:.0f}% at {lam[2]:.1f} µm, "
                       f"but {abs(100*col[5]['c']):.0f} ± {100*col[5]['sigma']:.0f}% fainter at {lam[5]:.1f} µm: not a grey change, bigger in the bluest colours, "
-                      "the pattern published for its dimming episodes. Its own pictures scatter 1.1–3 times more than the ordinary stars', so by the "
-                      "rule we wrote down beforehand (5 times the error) no change is confirmed."),
+                      "the pattern our literature notes predicted, before this measurement, if the fading reported in early 2025 had ended between our "
+                      "visits. One band passes 5 times its error in one visit, but the rule we wrote down beforehand needs two, and its own pictures "
+                      "scatter 1.1–3 times more than the ordinary stars' (which widens its errors), so no change is confirmed."),
         numbers=[num(f"Change at {lam[1]:.2f} µm, Mar 2026 vs Sep 2025", f"{100*col[1]['c']:+.0f} ± {100*col[1]['sigma']:.0f}%", None, method="science.html#e9"),
                  num(f"Change at {lam[2]:.2f} µm", f"{100*col[2]['c']:+.0f} ± {100*col[2]['sigma']:.0f}%", None, method="science.html#e9"),
                  num(f"Change at {lam[4]:.2f} µm", f"{100*col[4]['c']:+.0f} ± {100*col[4]['sigma']:.0f}%", None, method="science.html#e9"),
                  num(f"Change at {lam[5]:.2f} µm", f"{100*col[5]['c']:+.0f} ± {100*col[5]['sigma']:.0f}%", None, method="science.html#e9"),
-                 num("Largest change against the pre-set threshold", f"{zmax:.1f} times the error (threshold 5)", None),
+                 num("Largest single-band change against the pre-set threshold", f"{abs(zbest['z']):.1f} times the error at {lam[zbest['detector']]:.1f} µm (rule: 5×, in 2 bands)", None),
+                 num("Without the star's own scatter factor", f"{w['without_error_inflation']['windows_with_2_detectors_over_5sigma']} visits with 2 bands over 5×", None),
                  num("Ordinary stars over the threshold", f"{w['comparison']['n_windows_exceeding']} of {w['comparison']['n_windows']} visits", None)],
         figures=[dict(src="data/figs/e9_rwaur.png", href="science.html#e9",
                       alt="RW Aurigae's brightness change between two SPHEREx visits in five colour bands, next to ordinary stars",
@@ -289,8 +291,9 @@ if e9:
         plain_result=(f"R Draconis is so bright that only the halo around its overloaded centre can be measured, and the pre-set test could use only "
                       f"three noisy colour bands: there no change passes 5 times the error ({r['comparison']['n_stars']} ordinary bright stars measured "
                       f"the same way). Shown for information only, outside the pre-set range: at {dm['lam_um']:.1f} µm its brightness rises and falls by "
-                      f"about {dm['semi_amplitude_mag']:.1f} magnitudes either side of average and peaks around {day(dm['mjd_max'])}, "
-                      f"{dm['lag_days']:.0f} days after the catalogue's predicted visible-light maximum ({day(dm['catalogue_visual_max_mjd'])})."),
+                      f"about {dm['semi_amplitude_mag']:.1f} magnitudes either side of average and peaks around {day(dm["mjd_max"])} "
+                      f"(± 3 days, formal). The catalogue predicts a visible-light maximum near {day(dm['catalogue_visual_max_mjd'])}, uncertain by 2–3 weeks, so the "
+                      "infrared–visible lag is not measured."),
         numbers=[num("Pictures", r["n_pictures"], None, kind="data"),
                  num("Colour bands usable in the pre-set test", len(r["detectors_used"]), None),
                  num(f"Peak at {dm['lam_um']:.1f} µm (for information)", day(dm["mjd_max"]), None),
@@ -301,5 +304,6 @@ if e9:
         evidence_links=[dict(text="Open the prepared field", href="timemachine.html?field=rdra"), dict(text="Method (Science page)", href="science.html#e9")],
         method_note=("Halo photometry (annulus 7–12 pixels) chosen on comparison stars before R Draconis was measured (docs/protocols/E9.md). "
                      "Detectors 5–6 are excluded by a pre-set saturation guard; the 4.4–5 µm light curve was made after the result with that guard "
-                     "switched off, so it is descriptive. Infrared maxima of such stars are expected 25–50 days after visible ones (Smith et al. 2002)."),
+                     "switched off, so it is descriptive. Published infrared maxima of such stars lag the visible ones by about 0.05–0.13 of a period, "
+                     "12–32 days for R Draconis (Smith et al. 2002)."),
         method_anchor="science.html#e9"))
