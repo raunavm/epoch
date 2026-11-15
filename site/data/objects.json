@@ -13,7 +13,10 @@
   "pV": 0.136,
   "class_plain": "main asteroid belt, between Mars and Jupiter",
   "page": "object.html?id=224",
-  "gaia_chi2_dof": 0.21
+  "gaia_chi2_dof": 0.21,
+  "ratio_to_independent": 1.14,
+  "D_truth_source_short": "NEOWISE (Mainzer et al. 2014)",
+  "class_label": "main asteroid belt"
  },
  {
   "id": "84",
@@ -29,7 +32,10 @@
   "pV": 0.061,
   "class_plain": "main asteroid belt, between Mars and Jupiter",
   "page": "object.html?id=84",
-  "gaia_chi2_dof": 0.98
+  "gaia_chi2_dof": 0.98,
+  "ratio_to_independent": 0.93,
+  "D_truth_source_short": "IRAS",
+  "class_label": "main asteroid belt"
  },
  {
   "id": "266",
@@ -45,7 +51,10 @@
   "pV": 0.037,
   "class_plain": "main asteroid belt, between Mars and Jupiter",
   "page": "object.html?id=266",
-  "gaia_chi2_dof": 2.85
+  "gaia_chi2_dof": 2.85,
+  "ratio_to_independent": 1.14,
+  "D_truth_source_short": "NEOWISE (Mainzer et al. 2014)",
+  "class_label": "main asteroid belt"
  },
  {
   "id": "2241",
@@ -61,7 +70,10 @@
   "pV": 0.02,
   "class_plain": "Jupiter Trojan, sharing Jupiter's orbit",
   "page": "object.html?id=2241",
-  "gaia_chi2_dof": 2.01
+  "gaia_chi2_dof": 2.01,
+  "ratio_to_independent": 1.64,
+  "D_truth_source_short": "NEOWISE (Mainzer et al. 2014)",
+  "class_label": "Jupiter Trojan"
  },
  {
   "id": "757",
@@ -77,6 +89,9 @@
   "pV": 0.117,
   "class_plain": "main asteroid belt, between Mars and Jupiter",
   "page": "object.html?id=757",
-  "gaia_chi2_dof": 5.52
+  "gaia_chi2_dof": 5.52,
+  "ratio_to_independent": 1.15,
+  "D_truth_source_short": "NEOWISE (Mainzer et al. 2014)",
+  "class_label": "main asteroid belt"
  }
 ]

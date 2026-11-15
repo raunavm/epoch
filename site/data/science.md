@@ -57,7 +57,7 @@ The term f · |S_p| is a noise floor proportional to each star's brightness. SPH
 
 **Control patch.** On the patch on the ecliptic declared in advance (RA 180°, Dec 0°), the counts are 389 (plain blink), 52 (one detector at a time) and 57 (colour-aware).
 
-**What this number does and does not say.** It measures how much of a plain blink is colour flicker. It does not say how many real changes survive in the one-detector view; that test (E3, recall of known asteroids) is incomplete and is not reported as a result.
+**What this number does and does not say.** It measures how much of a plain blink is colour flicker. Two checks on real changes: (1) planted test sources at 20 times the single-picture noise are caught about as often by the one-detector view as by a plain blink at the same alarm threshold (37%, 95% CI 31–42%, against 34%, CI 28–38%; `data/findings/e2_d1.json`, a secondary check requested by our referee); (2) known asteroids are almost never caught in single pictures by any of our views (one-detector 0 of 79 sightings, colour-aware 2 of 79; E3, `data/findings/e3.json`) — see [What failed #14](failed.html).
 
 ![Changes per patch: plain blink, one detector at a time, colour-aware view](figs/fig_e2.png "Changes per patch for the plain blink (M1), one detector at a time (M2) and the colour-aware view (M4), sorted by Galactic latitude. Logarithmic scale.")
 
@@ -129,7 +129,7 @@ Survey 1 (2025 May) has only 3 usable pictures, one of them badly fitted, and is
 
 **An offset we cannot explain.** In all four windows our positions sit a steady 0.5″ south of Gaia's prediction. A steady offset does not change the motion, but we have not found its cause. Epsilon Indi B is a pair that SPHEREx cannot separate; that is one possibility we have not tested.
 
-**Barnard's Star did not work this way.** The same method on Barnard's Star gives a north–south motion of 5.6 ± 1.5 ″/yr, far from Gaia's 10.4 (`data/findings/motion_barnard.json`). It is a bright star (Gaia G = 8.2) and only two time windows are available; we have not checked the cause. We make no numeric motion claim for it. Its motion is still plain to see in the tool: subtracting survey 2 from survey 1 shows it as an orange–blue pair (`timemachine.html?target=barnard&mode=subtract`).
+**Barnard's Star did not work this way.** The same method on Barnard's Star gives a north–south motion of 5.6 ± 1.5 ″/yr, far from Gaia's 10.4 (`data/findings/motion_barnard.json`). Likely cause (untested): it is a bright star (Gaia G = 8.2) that saturates SPHEREx's detector, so with its centre masked the fit rests on its outer light; and only two time windows are available. We make no numeric motion claim for it. Its motion is still plain to see in the tool: subtracting survey 2 from survey 1 shows it as an orange–blue pair ([open it](timemachine.html?ra=269.4463&dec=4.7677&fov=2&mode=subtract)).
 
 ## Stacking along an orbit {#stacking-along-an-orbit}
 
@@ -184,7 +184,7 @@ The pixel model was written twice, independently (one with numpy, one with JAX, 
 
 - DR1 only. Later releases need only a new index (`scripts/build_tiles.py`).
 - Single-picture change detection needs bright changes, about 20 times the noise or more.
-- How many real changes the one-detector view keeps has not been measured yet (E3 incomplete).
+- Single-picture change maps do not find faint moving asteroids (E3: 0/79 and 2/79 known-asteroid sightings); our masking of the archive's outlier flag erased the brighter ones.
 - The colour-aware view is experimental; it lost its pre-registered test.
 - Spectra on click in the browser use quick aperture sums, not the full model.
 - No search for unknown objects was run.

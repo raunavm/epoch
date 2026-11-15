@@ -1,6 +1,7 @@
 {
  "title": "R Draconis \u2014 a pulsating giant star",
- "plain_result": "1635 SPHEREx pictures. This star really changes brightness, so every view should keep flagging it; measuring how much it changes needs one brightness per picture after removing its colour, which we have not done yet. Below are the raw counts of flagged changes in this patch for each view, without interpretation.",
+ "status": "not measured yet",
+ "plain_result": "Not measured yet. 1635 SPHEREx pictures of this variable star are available in the Time Machine; measuring how its brightness changes needs one brightness per picture after removing its colour, which we have not done. The counts are for the whole patch of sky, not for the star itself.",
  "numbers": [
   {
    "label": "Pictures",

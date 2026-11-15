@@ -3088,8 +3088,6 @@
    ]
   }
  ],
- "depth_gain_mag": 3.55,
- "ideal_gain_mag": 3.74,
  "noise_calibration": {
   "stack_null_mean": -0.73,
   "stack_null_std": 1.54,
@@ -3134,5 +3132,6 @@
  "n_frames": 295,
  "order": "pictures are combined in order of their expected signal-to-noise (brightness model and noise only; measured fluxes are not used to choose the order)",
  "units": "singles and stacks: stars removed, smoothed at the PSF scale, in units of each image's own background noise (same treatment for both)",
- "rerun": "python scripts/run_forced.py --ids 98397 --stamps && python scripts/build_reveal.py --pick 98397"
+ "rerun": "python scripts/run_forced.py --ids 98397 --stamps && python scripts/build_reveal.py --pick 98397",
+ "hedge": "modest signal; the error-scale check did not pass cleanly, so the larger, more cautious scale is used"
 }

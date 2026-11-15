@@ -38,6 +38,8 @@ if __name__ == "__main__":
         f["n"] = len(c)
         jobs += [(t + 2400000.5, f["ra"], f["dec"]) for t in groups(c.mjd.values)]
         print(i, round(f["ra"], 5), round(f["dec"], 5), f["band"], len(f["cand"]), flush=True)
+    if "reverse" in sys.argv:                 # a second process can work from the end (cached files are skipped)
+        jobs = jobs[::-1]
     print(len(jobs), "queries", flush=True)
     t = time.time()
     with ThreadPoolExecutor(threads) as ex:

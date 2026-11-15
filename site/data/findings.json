@@ -8,7 +8,7 @@
   "err": null,
   "err_low": 90,
   "err_high": 96,
-  "sentence": "SPHEREx photographs each spot in a different infrared colour every time, so a plain blink flickers even when nothing moved. Watching one detector at a time removes a median 93% of the changes a plain blink flags (20 random patches of sky; 95% range 90\u201396%; worst patch 22%), and in the same patches it still catches planted test sources as often as a plain blink does (37% against 34% at 20 times the single-picture noise).",
+  "sentence": "SPHEREx photographs each spot in a different infrared colour every time, so a plain blink flickers even when nothing moved. Watching one detector at a time removes a median 93% of the changes a plain blink flags (20 random patches of sky; 95% confidence interval on the median 90\u201396%; individual patches 22\u201397%). At the same alarm threshold it catches planted test sources about as often as a plain blink (37%, 95% CI 31\u201342%, against 34%, CI 28\u201338%, at 20 times the single-picture noise). Neither view catches faint moving asteroids in single pictures \u2014 for those, combine pictures along their path (see What failed #14).",
   "detail": {
    "source": "data/findings/e2.json",
    "consistency": "data/findings/e2_d1.json"

@@ -197,7 +197,14 @@ def gaia(name, ra0, dec0, S):
     r = S * SCALE_ARCSEC / 2 * 1.5 / 3600
     q = (f"SELECT source_id, ra, dec, pmra, pmdec, parallax, phot_g_mean_mag FROM gaiadr3.gaia_source "
          f"WHERE 1=CONTAINS(POINT('ICRS', ra, dec), CIRCLE('ICRS', {ra0}, {dec0}, {r})) AND phot_g_mean_mag < 19")
-    t = pyvo.dal.TAPService("https://gaia.aip.de/tap").run_sync(q, maxrec=100000).to_table().to_pandas()
+    for i in range(6):                        # gaia.aip.de rate-limits (HTTP 429) when several jobs query at once
+        try:
+            t = pyvo.dal.TAPService("https://gaia.aip.de/tap").run_sync(q, maxrec=100000).to_table().to_pandas()
+            break
+        except Exception:
+            if i == 5:
+                raise
+            time.sleep(30 * (i + 1))
     t.to_json(path)
     return t
 
@@ -232,6 +239,8 @@ def _skybot_query(jd, ra0, dec0):
             if n204 == 2:
                 objs = []
                 break
+            time.sleep(1)                     # empty answer: re-ask once after a short pause
+            continue
         time.sleep(5 * (i + 1))
     else:
         raise RuntimeError(f"SkyBoT failed for JD {jd}")

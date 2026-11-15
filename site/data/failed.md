@@ -17,7 +17,7 @@ We list every approach that did not work, because a result is only believable if
 **What we changed.** Colours are compared only within one visit. Then they agree (χ²/dof 0.21 for Oceana).
 
 ## 4. Sizes from heat glow came out about 15% too large
-**What happened.** Diameters from SPHEREx's 3–5 µm heat glow were 14–15% larger than NEOWISE's for three of the first five asteroids, and the data rose faster with wavelength than the standard thermal model predicts.
+**What happened.** Diameters from SPHEREx's 3–5 µm heat glow ranged from 7% below to 64% above the independent values for the first five asteroids (four of five too large), and the data rose faster with wavelength than the standard thermal model predicts.
 **Why (likely).** At 3–5 µm SPHEREx sees the steep, short-wavelength edge of an asteroid's heat glow, where the simple thermal model is least accurate at the viewing angles involved.
 **What we changed.** Sizes are no longer a headline. A calibration protocol (fit on even-numbered asteroids, test on odd-numbered ones) is written but not finished; object pages show sizes as evidence for the pixel model only.
 
@@ -57,7 +57,7 @@ We list every approach that did not work, because a result is only believable if
 **What we learned.** Detecting a change in a single picture only works for bright changes (about 20 times the noise or more); fainter objects need many pictures combined along their path, which is what the stacking view does.
 
 ## 13. Measuring Barnard's Star's motion did not work
-**What happened.** Barnard's Star is bright enough to saturate SPHEREx's detector. With its saturated centre masked, our position fits rest on the star's outer light, and the motion we derive (about −5.0 ± 1.9 and +5.6 ± 1.5 arcseconds per year) disagrees with Gaia's (−0.80 and +10.36). The same method works for the fainter Epsilon Indi B, where it matches Gaia.
+**What happened.** The motion we derive for Barnard's Star (about −5.0 ± 1.9 and +5.6 ± 1.5 arcseconds per year) disagrees with Gaia's (−0.80 and +10.36). Likely cause (untested): the star saturates SPHEREx's detector, so with its centre masked the fit rests on its outer light; and only two time windows are available. The same method works for the fainter Epsilon Indi B, where it matches Gaia.
 **What we show instead.** The difference between the two sky surveys, where the star's light visibly shifts north as expected — as a picture, not as a measurement.
 
 

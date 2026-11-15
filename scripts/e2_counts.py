@@ -116,8 +116,8 @@ def figure(recs, ctrl, path):
     ax.set_ylabel("change components (sum over frames)", fontsize=8)
     ax.tick_params(axis="y", labelsize=7)
     ax.set_title(f"E2: change counts at k = 5, rev 2 (zero plotted as 0.5). Control field (separate): "
-                 f"{ctrl['naive_all']} / {ctrl['naive_det']} / {ctrl['corrected']}", fontsize=8)
-    ax.legend(fontsize=7, frameon=False, ncol=3, loc="upper left")
+                 f"{ctrl['naive_all']} / {ctrl['naive_det']} / {ctrl['corrected']}", fontsize=8, pad=18)
+    ax.legend(fontsize=7, frameon=False, ncol=3, loc="lower center", bbox_to_anchor=(0.5, 1.0))
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
     fig.tight_layout()

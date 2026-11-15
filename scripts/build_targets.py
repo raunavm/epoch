@@ -35,15 +35,16 @@ if e4:
     write("wise0855", dict(
         title="WISE 0855−0714 — the coldest known brown dwarf",
         plain_result=(f"At 4.4–5 µm, combining SPHEREx pictures along its known path gives a clear signal where it should be: "
-                      f"{p2['a_hat_mJy']:.2f} ± {p2['sigma_a_mJy']:.2f} mJy in the Nov–Dec 2025 visits, between the brightness Spitzer "
+                      f"{p2['a_hat_mJy']:.2f} ± {(p2['sigma_a_mJy']**2 + ctrl['a_hat_mJy']**2)**0.5:.2f} mJy in the Nov–Dec 2025 visits, between the brightness Spitzer "
                       f"({exp['IRAC_4p5']:.2f} mJy) and WISE ({exp['WISE_W2']:.2f} mJy) measured in similar bands. Between visits it shifts the way "
                       "its known motion predicts, and a source standing still fits the positions far worse. A statement about a known object, not a discovery."),
         numbers=[num("Signal, Nov–Dec 2025 visits, against 24 empty paths", round(p2["significance"], 1), unit="σ",
                      nulls=p2.get("null_snrs"), nulls_note="same pictures, path shifted 6–9 px", method="science.html#e4"),
                  num("Signal, Apr–May 2026 visits (a neighbouring star restored to the model)", round(p3.get("significance", float("nan")), 1), unit="σ",
                      method="science.html#e4"),
-                 num("Brightness at 4.4–5 µm, Nov–Dec 2025", round(p2["a_hat_mJy"], 3), round(p2["sigma_a_mJy"], 3), unit="mJy"),
-                 num("Shift between visit windows: measured", f"{sh['measured_shift_arcsec'][0]:+.1f}″, {sh['measured_shift_arcsec'][1]:+.1f}″", None),
+                 num("Brightness at 4.4–5 µm, Nov–Dec 2025 (error includes the short-wavelength control offset)", round(p2["a_hat_mJy"], 3),
+                     round((p2["sigma_a_mJy"] ** 2 + ctrl["a_hat_mJy"] ** 2) ** 0.5, 3), unit="mJy"),
+                 num("Shift between visit windows: measured", f"{sh['measured_shift_arcsec'][0]:+.1f} ± {sh['err_arcsec'][0]:.1f}″, {sh['measured_shift_arcsec'][1]:+.1f} ± {sh['err_arcsec'][1]:.1f}″", None),
                  num("Shift between visit windows: predicted", f"{sh['predicted_shift_arcsec'][0]:+.1f}″, {sh['predicted_shift_arcsec'][1]:+.1f}″", None, kind="model"),
                  num("Match to prediction (p-value)", round(sh["p_vs_prediction"], 2), None),
                  num("Same test for a source standing still (p-value)", f"{sh['p_vs_stationary']:.0e}", None)],
@@ -68,7 +69,7 @@ for tid, name in (("epsindib", "Epsilon Indi B — a pair of nearby brown dwarfs
     if p_agree < 0.01:
         write(tid, dict(
             title=name,
-            plain_result=("This star is so bright that it saturates SPHEREx's detector, and our position measurement fails for it: "
+            plain_result=("Our position measurement fails for this star (likely cause, untested: it saturates SPHEREx's detector, so the fit rests on its outer light): "
                           f"from SPHEREx we get {pa['spherex_mas_yr']/1000:+.1f} ± {pa['err_mas_yr']/1000:.1f}″ and {pd_['spherex_mas_yr']/1000:+.1f} ± {pd_['err_mas_yr']/1000:.1f}″ per year, "
                           f"which disagrees with Gaia's {pa['gaia_mas_yr']/1000:+.2f}″ and {pd_['gaia_mas_yr']/1000:+.2f}″. The picture of survey 1 minus survey 2 does show the star's light "
                           "moving north, as Gaia predicts, but we do not turn that picture into a number."),
@@ -79,7 +80,7 @@ for tid, name in (("epsindib", "Epsilon Indi B — a pair of nearby brown dwarfs
                      num("Chance the two agree", f"{p_agree:.0e}", None)],
             evidence_links=[dict(text="Why it fails: What failed, item 13", href="failed.html"),
                             dict(text="See the survey difference live", href="timemachine.html?ra=269.4463&dec=4.7677&fov=2&mode=subtract")],
-            method_note="Saturated pixels are masked, so the position rests on the star's outer light, which is not enough here.",
+            method_note="Likely cause (untested): saturation — saturated pixels are masked, so the position rests on the star's outer light.",
             method_anchor="failed.html"))
         continue
     write(tid, dict(
@@ -106,9 +107,10 @@ for tid, name in (("rwaur", "RW Aurigae — a young variable star"), ("rdra", "R
         continue
     write(tid, dict(
         title=name,
-        plain_result=(f"{f['n_frames']} SPHEREx pictures. This star really changes brightness, so every view should keep flagging it; "
-                      "measuring how much it changes needs one brightness per picture after removing its colour, which we have not done yet. "
-                      "Below are the raw counts of flagged changes in this patch for each view, without interpretation."),
+        status="not measured yet",
+        plain_result=(f"Not measured yet. {f['n_frames']} SPHEREx pictures of this variable star are available in the Time Machine; "
+                      "measuring how its brightness changes needs one brightness per picture after removing its colour, which we have not done. "
+                      "The counts are for the whole patch of sky, not for the star itself."),
         numbers=[num("Pictures", f["n_frames"], None, kind="data"),
                  num("Flagged changes, plain blink", f["n_naive_all"], None),
                  num("Flagged changes, one detector at a time", f["n_naive_det"], None),

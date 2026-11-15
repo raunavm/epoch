@@ -4,11 +4,15 @@ Truth: IMCCE SkyBoT known asteroids (geocentric, LOC=500: SPHEREx's low-Earth-or
 main-belt objects), V < 19, inside the 48 px field >= 3 px from every edge, per frame (build_field.known_asteroids,
 cached queries in data/cache/skybot/; truth is computed on all cached frames, then the frame cap is applied).
 Frame cap: fields with > 250 frames use 250 frames spread evenly in time (frames sorted by MJD,
-np.linspace(0, n-1, 250).round()). Maps: M4 = change model revision 2 corrected map, M2 = consecutive blink of the
-same detector (the asteroid frame is the later frame of the pair); both from orrery.change.change_model with the
-frozen f. Detected: a change component (8-connected, >= 2 px, |map| > k_method) with any pixel within 2 px of the
-predicted position. Pairs without an M2 map (first frame of a detector) are excluded for both methods so the two
-methods are scored on identical pairs (count recorded).
+np.linspace(0, n-1, 250).round()). Primary maps and rules = E1 with deviation D1 (docs/PROTOCOLS.md):
+M4 = change model revision 2 corrected map, M2 = consecutive blink of the same detector with S = |reference (earlier)
+frame| (orrery.e1.blink_d1; the asteroid frame is the later frame of the pair), both despiked (orrery.e1.despike),
+positive 8-connected components of >= 2 px above the method's k frozen in data/findings/e1_thresholds.json.
+Detected: such a component with any pixel within 2 px of the predicted position. Secondary (labelled *_rev2_k5): the
+original rev-2 rule as used by the Time Machine / finding 1 (no despike, both signs, k = 5, blink S = larger of the
+two frames). Pairs without an M2 map (first frame of a detector) are excluded for all methods so they are scored on
+identical pairs (count recorded). diag_M4_unmasked (diagnostic, NOT the protocol metric): M4 with D1 rules computed
+on the resample without the hard-bad/OUTLIER mask, to measure what the OUTLIER mask costs (OUTLIER fires on movers).
 Usage: .venv/bin/python scripts/e3_recall.py            (fields from data/findings/e3_fields.json + 6 existing + E2)
 """
 import json, os, sys
@@ -19,19 +23,19 @@ from scipy import ndimage
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from orrery.change import change_model, _EIGHT  # noqa: E402
+from orrery import e1  # noqa: E402
 import build_field as bf  # noqa: E402
 
 S, EDGE, VMAX, R_MATCH, CAP = 48, 3, 19.0, 2.0, 250
+METHODS = ("M4", "M2", "M4_rev2_k5", "M2_rev2_k5", "diag_M4_unmasked")
 EXISTING = ["barnard", "wise0855", "epsindib", "rwaur", "rdra", "ecliptic_control"]
 
 
 def thresholds():
     p = "data/findings/e1_thresholds.json"
-    if os.path.exists(p):
-        t = json.load(open(p))
-        get = lambda m: t[m]["k"] if isinstance(t.get(m), dict) else t[m]
-        return dict(M2=float(get("M2")), M4=float(get("M4"))), p
-    return dict(M2=5.0, M4=5.0), "e1_thresholds.json not available: k = 5 for both (rev 2 frozen value)"
+    t = json.load(open(p))
+    return dict(M2=float(t["methods"]["M2"]["k"]), M4=float(t["methods"]["M4"]["k"])), \
+        f"{p} (frozen {t['frozen_local']}; deviation D1 rules)"
 
 
 def wilson(k, n, z):
@@ -40,7 +44,7 @@ def wilson(k, n, z):
     p = k / n
     c = (p + z * z / (2 * n)) / (1 + z * z / n)
     h = z * np.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / (1 + z * z / n)
-    return [round(float(c - h), 4), round(float(c + h), 4)]
+    return [round(max(0.0, float(c - h)), 4), round(min(1.0, float(c + h)), 4)]
 
 
 def components(m, k):
@@ -57,6 +61,13 @@ def components(m, k):
 
 def hit(comps, x, y):
     return any(np.hypot(c[:, 0] - x, c[:, 1] - y).min() <= R_MATCH for c in comps)
+
+
+def hit_d1(m, k, x, y):
+    """D1 rules (orrery.e1.components: despiked map, positive components only) with the E3 2 px radius."""
+    lab = e1.components(m, k)
+    jj, ii = np.mgrid[0:S, 0:S]
+    return bool((lab[np.hypot(ii - x, jj - y) <= R_MATCH] > 0).any())
 
 
 def load_field(name):
@@ -76,6 +87,12 @@ def run_field(name, d, ra0, dec0, src, k, f):
     sel = np.sort(sel)
     v, lam, det, mjd = d["v"][sel], d["lam"][sel], d["detector"][sel], mjd_all[sel]
     r = change_model(v, lam, det, mjd, f=f)
+    m2 = [None if m is None else e1.despike(m) for m in e1.blink_d1(r["vs"], r["sigma"], r["prev_det"], f)]
+    m4 = [e1.despike(m) for m in r["corr"]]
+    # diagnostic only (not the protocol metric): rev 2 + D1 rules on the UNMASKED resample (no hard-bad/OUTLIER NaN),
+    # to measure how much the OUTLIER mask (bit 19 fires on moving objects) costs
+    vr = d["v_raw"][sel]
+    m4u = [e1.despike(m) for m in change_model(vr, np.where(np.isfinite(vr), d["lam"][sel], np.nan), det, mjd, f=f)["corr"]]
     rows = []
     n_no_m2 = 0
     for e, g in enumerate(sel):
@@ -83,10 +100,10 @@ def run_field(name, d, ra0, dec0, src, k, f):
                  and EDGE <= o["y"] <= S - 1 - EDGE]
         if not truth:
             continue
-        if r["naive_det"][e] is None:
+        if m2[e] is None:
             n_no_m2 += len(truth)
             continue
-        c4, c2 = components(r["corr"][e], k["M4"]), components(r["naive_det"][e], k["M2"])
+        c4, c2 = components(r["corr"][e], 5.0), components(r["naive_det"][e], 5.0)
         for o in truth:
             ix, iy = int(round(o["x"])), int(round(o["y"]))
             rows.append(dict(field=name, frame=int(e), obs_id=str(d["obs_id"][g]), detector=int(det[e]),
@@ -94,63 +111,102 @@ def run_field(name, d, ra0, dec0, src, k, f):
                              x=round(o["x"], 2), y=round(o["y"], 2),
                              wl_um=round(float(lam[e][iy, ix]), 3) if np.isfinite(lam[e][iy, ix]) else None,
                              centre_has_data=bool(np.isfinite(v[e][iy, ix])),
-                             M4=hit(c4, o["x"], o["y"]), M2=hit(c2, o["x"], o["y"])))
+                             M4=hit_d1(m4[e], k["M4"], o["x"], o["y"]), M2=hit_d1(m2[e], k["M2"], o["x"], o["y"]),
+                             M4_rev2_k5=hit(c4, o["x"], o["y"]), M2_rev2_k5=hit(c2, o["x"], o["y"]),
+                             diag_M4_unmasked=hit_d1(m4u[e], k["M4"], o["x"], o["y"])))
     rec = dict(field=name, source=src, n_frames_cached=N0, n_frames_used=len(sel), skybot_queries=n_q,
                n_pairs=len(rows), n_pairs_excluded_no_m2_map=n_no_m2,
                n_asteroids=len({q["name"] for q in rows}),
-               M4_hits=sum(q["M4"] for q in rows), M2_hits=sum(q["M2"] for q in rows))
+               **{f"{m}_hits": sum(q[m] for q in rows) for m in METHODS})
     return rec, rows, (r, v, d["v_raw"][sel], sel)
+
+
+def bin_stats(sub):
+    """Hits per method; recall and Wilson 68/95% for the primary methods."""
+    out = {m: sum(q[m] for q in sub) for m in METHODS}
+    for m in ("M4", "M2"):
+        out[f"{m}_recall"] = round(out[m] / len(sub), 4) if sub else None
+        out[f"{m}_wilson68"], out[f"{m}_wilson95"] = wilson(out[m], len(sub), 1.0), wilson(out[m], len(sub), 1.96)
+    return out
 
 
 def summary(rows):
     out = dict(n_pairs=len(rows))
-    for m in ("M4", "M2"):
+    for m in METHODS:
         kk = sum(q[m] for q in rows)
         out[m] = dict(hits=kk, recall=round(kk / len(rows), 4) if rows else None,
                       wilson68=wilson(kk, len(rows), 1.0), wilson95=wilson(kk, len(rows), 1.96))
+    dat = [q for q in rows if q["centre_has_data"]]
+    out["diagnostic_centre_pixel_masked"] = dict(
+        n_pairs=len(rows) - len(dat), note="predicted-position pixel NaN in the masked map (hard-bad or OUTLIER); "
+                                            "not part of the protocol metric",
+        recall_where_centre_has_data={m: [sum(q[m] for q in dat), len(dat)] for m in METHODS})
     ast = {}
     for q in rows:
-        a = ast.setdefault((q["field"], q["name"]), dict(M4=False, M2=False, vmag=q["vmag"], n=0))
-        a["M4"] |= q["M4"]; a["M2"] |= q["M2"]; a["n"] += 1
+        a = ast.setdefault((q["field"], q["name"]), dict({m: False for m in METHODS}, vmag=q["vmag"], n=0))
+        for m in METHODS:
+            a[m] |= q[m]
+        a["n"] += 1
     out["per_asteroid"] = dict(n_asteroids=len(ast))
-    for m in ("M4", "M2"):
+    for m in METHODS:
         kk = sum(a[m] for a in ast.values())
         out["per_asteroid"][m] = dict(detected_in_ge1_frame=kk, recall=round(kk / len(ast), 4) if ast else None,
                                       wilson68=wilson(kk, len(ast), 1.0), wilson95=wilson(kk, len(ast), 1.96))
     out["by_vmag"] = []
     for lo, hi in ((0, 16), (16, 17), (17, 18), (18, 19)):
         sub = [q for q in rows if lo <= q["vmag"] < hi]
-        out["by_vmag"].append(dict(vmag=[lo, hi], n=len(sub), **{m: sum(q[m] for q in sub) for m in ("M4", "M2")}))
+        out["by_vmag"].append(dict(vmag=[lo, hi], n=len(sub), **bin_stats(sub)))
+    out["by_detector_group"] = []
+    for name_, dets in (("D1-3", (1, 2, 3)), ("D4-6", (4, 5, 6))):
+        sub = [q for q in rows if q["detector"] in dets]
+        out["by_detector_group"].append(dict(group=name_, n=len(sub), **bin_stats(sub)))
+    out["bins_note"] = "by_vmag and by_detector_group are labelled secondaries (hits per bin; n = pairs in bin)"
     return out
 
 
-def gallery(misses, cache, path, n=24):
+def gallery(misses, cache, path, n=24, ncol=8):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     misses = sorted(misses, key=lambda q: q["vmag"])[:n]
     if not misses:
         return 0
-    fig, ax = plt.subplots(2, len(misses), figsize=(1.3 * len(misses), 3.0), squeeze=False)
+    nrow = -(-len(misses) // ncol)
+    fig, ax = plt.subplots(2 * nrow, ncol, figsize=(1.45 * ncol, 2.9 * nrow), squeeze=False)
+    for a in ax.ravel():
+        a.set_axis_off()
+    cm = plt.get_cmap("PuOr_r").copy(); cm.set_bad("#203050")
     for k_, q in enumerate(misses):
         r, v, v_raw, _ = cache[q["field"]]
-        e = q["frame"]
+        e, a0, a1 = q["frame"], ax[2 * (k_ // ncol), k_ % ncol], ax[2 * (k_ // ncol) + 1, k_ % ncol]
         raw = (v_raw[e] - r["bg"][e]) / r["sigma"][e]
-        ax[0, k_].imshow(np.arcsinh(raw / 3), cmap="gray", vmin=0, vmax=np.arcsinh(max(np.nanpercentile(raw, 99.5), 10) / 3))
-        cm = plt.get_cmap("PuOr_r").copy(); cm.set_bad("#203050")
-        ax[1, k_].imshow(r["corr"][e], cmap=cm, vmin=-8, vmax=8)
-        for a in ax[:, k_]:
-            a.plot(q["x"], q["y"], "o", mfc="none", mec="cyan", ms=9, mew=0.7)
+        a0.imshow(np.arcsinh(raw / 3), cmap="gray", vmin=0, vmax=np.arcsinh(max(np.nanpercentile(raw, 99.5), 10) / 3))
+        a1.imshow(r["corr"][e], cmap=cm, vmin=-8, vmax=8)
+        for a in (a0, a1):
+            a.set_axis_on()
+            a.plot(q["x"], q["y"], "o", mfc="none", mec="cyan", ms=10, mew=0.7)
             a.set_xlim(q["x"] - 8, q["x"] + 8); a.set_ylim(q["y"] + 8, q["y"] - 8)
             a.set_xticks([]); a.set_yticks([])
-        ax[0, k_].set_title(f"{q['name']}\nV{q['vmag']} {q['wl_um']}um", fontsize=5)
-        ax[1, k_].set_title(f"{q['field']} f{e}", fontsize=4.5)
-    fig.suptitle("E3 misses (M4, brightest first): raw (top, unmasked) and rev-2 corrected map +-8 sigma (bottom; "
-                 "navy = masked); cyan = SkyBoT position, 16 px boxes", fontsize=6)
+        a0.set_title(f"{q['name']} V{q['vmag']}\nD{q['detector']} {q['wl_um']} um", fontsize=6)
+        a1.set_title(f"{q['field']} frame {e}", fontsize=5.5)
+    fig.suptitle("E3 misses of M4 (brightest first). Per case: raw, unmasked (top) and rev-2 corrected map +-8 sigma "
+                 "(bottom; navy = masked hard-bad/OUTLIER). Cyan = SkyBoT position. 16 px boxes", fontsize=7)
     fig.tight_layout()
     fig.savefig(path, dpi=130)
     plt.close(fig)
     return len(misses)
+
+
+def gallery_only():
+    """Redraw data/findings/e3_misses.png from data/findings/e3.json (maps recomputed for the shown fields only)."""
+    out = json.load(open("data/findings/e3.json"))
+    misses = [q for q in out["rows"] if not q["M4"]]
+    names = {q["field"] for q in sorted(misses, key=lambda q: q["vmag"])[:24]}
+    k, f, cache = out["thresholds"], out["noise_floor_f"], {}
+    for nm in names:
+        d, ra0, dec0, src = load_e2(nm) if nm.startswith("e2_") else load_field(nm)
+        cache[nm] = run_field(nm, d, ra0, dec0, src, k, f)[2]
+    print(gallery(misses, cache, "data/findings/e3_misses.png"))
 
 
 def main():
@@ -178,6 +234,9 @@ def main():
         experiment="E3 recall of real movers", protocol="docs/PROTOCOLS.md#e3", method=" ".join(__doc__.split("Usage:")[0].split()),
         thresholds=k, thresholds_source=k_src, noise_floor_f=f, vmag_max=VMAX, edge_px=EDGE, match_radius_px=R_MATCH,
         frame_cap=CAP, index="data/index/frames_dr1.parquet",
+        primary_methods=["M4", "M2"], secondary_methods=["M4_rev2_k5", "M2_rev2_k5"],
+        diagnostic_note="diag_M4_unmasked is NOT a protocol result: k = 7.7 was frozen on masked maps, so its "
+                        "false-alarm rate on unmasked maps is not calibrated; it only shows what the OUTLIER mask costs",
         frame_cap_note="ecliptic fields: cap applied to index rows before reading (build_field.py --max-frames 250); "
                        "existing fields: cap applied to the cached frames sorted by MJD (cache = all index candidates "
                        "whose grid centre is on the frame, 0 read failures; rdra 1635 of 1637)",
@@ -221,4 +280,4 @@ def load_e2(name):
 
 
 if __name__ == "__main__":
-    main()
+    gallery_only() if "--gallery-only" in sys.argv else main()

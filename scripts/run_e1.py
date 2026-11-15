@@ -242,6 +242,7 @@ def figure(out):
     ax.set_xscale("log")
     ax.set_xticks(L)
     ax.set_xticklabels([str(x) for x in L])
+    ax.minorticks_off()
     ax.set_xlabel("planted S/N per frame")
     ax.set_ylabel("detection efficiency")
     ax.set_ylim(0, 1.02)

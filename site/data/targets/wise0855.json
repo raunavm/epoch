@@ -46,15 +46,15 @@
    "method": "science.html#e4"
   },
   {
-   "label": "Brightness at 4.4\u20135 \u00b5m, Nov\u2013Dec 2025",
+   "label": "Brightness at 4.4\u20135 \u00b5m, Nov\u2013Dec 2025 (error includes the short-wavelength control offset)",
    "value": 0.504,
-   "err": 0.029,
+   "err": 0.034,
    "kind": "derived",
    "unit": "mJy"
   },
   {
    "label": "Shift between visit windows: measured",
-   "value": "-3.3\u2033, +2.1\u2033",
+   "value": "-3.3 \u00b1 0.6\u2033, +2.1 \u00b1 1.1\u2033",
    "err": null,
    "kind": "derived",
    "unit": ""

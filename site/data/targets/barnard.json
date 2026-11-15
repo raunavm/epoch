@@ -1,6 +1,6 @@
 {
  "title": "Barnard's Star \u2014 the fastest-moving star in our sky",
- "plain_result": "This star is so bright that it saturates SPHEREx's detector, and our position measurement fails for it: from SPHEREx we get -5.0 \u00b1 1.9\u2033 and +5.6 \u00b1 1.5\u2033 per year, which disagrees with Gaia's -0.80\u2033 and +10.36\u2033. The picture of survey 1 minus survey 2 does show the star's light moving north, as Gaia predicts, but we do not turn that picture into a number.",
+ "plain_result": "Our position measurement fails for this star (likely cause, untested: it saturates SPHEREx's detector, so the fit rests on its outer light): from SPHEREx we get -5.0 \u00b1 1.9\u2033 and +5.6 \u00b1 1.5\u2033 per year, which disagrees with Gaia's -0.80\u2033 and +10.36\u2033. The picture of survey 1 minus survey 2 does show the star's light moving north, as Gaia predicts, but we do not turn that picture into a number.",
  "numbers": [
   {
    "label": "Motion east\u2013west (SPHEREx, fails)",
@@ -48,6 +48,6 @@
    "href": "timemachine.html?ra=269.4463&dec=4.7677&fov=2&mode=subtract"
   }
  ],
- "method_note": "Saturated pixels are masked, so the position rests on the star's outer light, which is not enough here.",
+ "method_note": "Likely cause (untested): saturation \u2014 saturated pixels are masked, so the position rests on the star's outer light.",
  "method_anchor": "failed.html"
 }
