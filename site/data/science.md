@@ -163,6 +163,16 @@ We then measured 11 faint objects listed as probable cold brown dwarfs from thei
 
 ###### E12 {#e12-label}
 
+## Hydrogen lines in emission-line stars {#e20}
+
+Gaia's DR3 software sorts stars into emission-line classes from their low-resolution optical spectra. SPHEREx covers two strong infrared hydrogen lines, Paschen-α at 1.875 µm and Brackett-α at 4.05 µm, so it can check those labels independently. Wolf–Rayet stars have been studied this way (Crowther & Smith 2026); we found no SPHEREx census of the other classes. We drew 60 candidates at random from two classes (30 Herbig Ae/Be, 30 Be stars; G 9.5–14) and 157 ordinary stars of similar brightness and colour 20–200″ away, so measured in the same pictures. The rules were written down before any of their pixels were read (`docs/protocols/E20.md`): in each visit, compare the channel containing the line with a straight line fitted to the neighbouring channels; calibrate on the controls; count a star if the excess reaches 5 times the controls' spread overall and at least 2 in two separate visits. The method counts as working only if at most 2% of controls pass.
+
+**Result.** 2 of 155 controls pass (1.3%; at most 4.0% at 95% confidence), so the method works by the rule we set. **SPHEREx shows Paα/Brα excess consistent with emission-line stars for 17 of 24 Herbig Ae/Be candidates and 20 of 30 Be candidates** (37 of 54 in all, with 0.7 expected by chance). The detected excess is typically 14% (Paα) and 20% (Brα) of the neighbouring brightness. Six Herbig candidates overload the detector and could not be measured; Brackett-γ (2.17 µm) is not detected in any star. In a tally made afterwards, SIMBAD lists no emission-line or young-star type for 20 of the 37 (10 are not in SIMBAD at all); for these, the SPHEREx lines add an independent infrared check of Gaia's label (we did not search the literature star by star).
+
+**Limits.** At SPHEREx's resolution one channel spans thousands of km/s, so it cannot tell whether the hydrogen glow comes from the star or from gas around it; 18 of the detections have a WISE mid-infrared excess, and both controls that pass lie in the bright Trumpler 16 nebula. Before the freeze, the crowding rule and the continuum window were changed using catalogue data and a calibration field only (logged). A check at a line-free wavelength, made afterwards, finds no excess for candidates (0 of 51), so the Brα detections are not a continuum-shape effect; detector 3 has no clean point for the same check at Paα.
+
+![Hydrogen-line excess](figs/e20_lines.png "Top: one candidate (orange) and a control in the same pictures, brightness divided by the local continuum, line positions marked. Bottom: line excess for candidates and controls.")
+
 ## A distance from one year of pictures {#e12}
 
 As Earth goes round the Sun, a nearby object seems to trace a small yearly loop against distant stars; the loop's size gives its distance (its parallax). We fitted Epsilon Indi B's SPHEREx positions with five free quantities — position, motion and parallax — taking nothing from Gaia for this object (`docs/protocols/E12.md`, written down before the fit).

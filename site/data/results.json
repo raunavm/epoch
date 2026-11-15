@@ -330,6 +330,22 @@
    "group": "other"
   },
   {
+   "id": "e20",
+   "claims": [
+    {
+     "id": "C26",
+     "verdict": "SUPPORTED",
+     "status": "SUPPORTED",
+     "late": true
+    }
+   ],
+   "science": "science.html#e20",
+   "failed": [],
+   "figure": "data/figs/e20_lines.png",
+   "extra": [],
+   "group": "other"
+  },
+  {
    "id": "e17",
    "claims": [
     {
