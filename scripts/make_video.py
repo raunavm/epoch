@@ -196,5 +196,5 @@ if __name__ == "__main__":
     ap.add_argument("--url", default="Orrery · SPHEREx Space Apps 2026")
     ap.add_argument("--field", default="ecliptic_control")
     ap.add_argument("--shift-shot", default="dist/barnard_sub.png")
-    ap.add_argument("--shift-crop", default="123,908,543,1328", help="x0,y0,x1,y1 of the subtract image in the screenshot")
+    ap.add_argument("--shift-crop", default="123,936,543,1356", help="x0,y0,x1,y1 of the subtract image in the screenshot")
     main(ap.parse_args())
