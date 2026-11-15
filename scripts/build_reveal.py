@@ -55,16 +55,22 @@ def items_for(pdes, df, offset=(0.0, 0.0)):
 
 
 def null_calibration(pdes, df):
-    """Empirical noise calibration on 24 empty tracks beside the orbit (6.5 and 8.5 px offsets).
-    Returns (stack_mean, stack_std, single_std): nominal S/N must be rescaled by these."""
-    stacks, singles = [], []
-    for rad in (6.5, 8.5):
+    """E5 (docs/PROTOCOLS.md): 24 off-path tracks; scale estimated on the 12 inner tracks (6.5 px), verified on
+    the 12 outer tracks (8.5 px): rescaled outer spread must be 0.9–1.1, else the larger scale is used.
+    Returns (stack_mean, stack_scale, single_std, all_null_snrs, check dict)."""
+    inner, outer, singles = [], [], []
+    for rad, dst in ((6.5, inner), (8.5, outer)):
         for a in np.arange(12) * np.pi / 6 + (0 if rad == 6.5 else np.pi / 12):
             it, _ = items_for(pdes, df, offset=(rad * np.cos(a), rad * np.sin(a)))
             _, _, A, E = combine(it, HALF)
-            stacks.append(A / E)
+            dst.append(A / E)
             singles += [i["snr"] for i in it if np.isfinite(i["snr"])]
-    return float(np.mean(stacks)), float(np.std(stacks, ddof=1)), float(np.std(singles)), stacks
+    m_in, s_in = float(np.mean(inner)), float(np.std(inner, ddof=1))
+    s_out_rescaled = float(np.std(outer, ddof=1) / s_in)
+    scale = s_in if 0.9 <= s_out_rescaled <= 1.1 else max(s_in, float(np.std(outer, ddof=1)))
+    check = dict(scale_inner=round(s_in, 3), outer_spread_after_rescale=round(s_out_rescaled, 3),
+                 passed=bool(0.9 <= s_out_rescaled <= 1.1), scale_used=round(scale, 3))
+    return m_in, scale, float(np.std(singles)), inner + outer, check
 
 
 def detection_image(arr, half=HALF):
@@ -108,7 +114,7 @@ def main(ids, pick):
                               med_single=float(np.nanmedian([i["snr"] for i in items])), stack=float(a / ae), V=float(df.V.median())))
             print(stats[-1], flush=True)
             continue
-        m0, s0, s1, _ = null_calibration(pdes, df)
+        m0, s0, s1, _, _ = null_calibration(pdes, df)
         stats.append(dict(pdes=pdes, n=len(items), max_single=float(np.nanmax([i["snr"] for i in items]) / s1),
                           med_single=float(np.nanmedian([i["snr"] for i in items]) / s1), stack=float((a / ae - m0) / s0),
                           stack_nominal=float(a / ae), null_std=s0, single_std=s1, V=float(df.V.median())))
@@ -160,7 +166,7 @@ def main(ids, pick):
             er.append(round(float(1 / np.sqrt(w_.sum())), 5))
         spec.append(dict(n_frames_used=n, wl_um=wl, flux_mJy=fl, err=er))
     # null test + noise calibration on 24 off-orbit tracks (static scene refit there)
-    m0, s0, s1, nulls = null_calibration(pick, df)
+    m0, s0, s1, nulls, e5 = null_calibration(pick, df)
     for stk in stacks:
         stk["snr_nominal"] = stk["snr"]
         stk["snr"] = round((stk["snr"] - m0) / s0, 2)  # calibrated significance
@@ -175,7 +181,7 @@ def main(ids, pick):
     n_all = len(pd.read_parquet(f"data/forced/{pick}.parquet"))
     rev = dict(object=meta["name"], designation=f"{pick}", n_frames_before_quality_cut=n_all, meta=meta, frames=frames, stack_pngs=stacks, spectrum_points=spec,
                depth_gain_mag=None if gain is None else round(float(gain), 2), ideal_gain_mag=round(float(ideal), 2),
-               noise_calibration=dict(stack_null_mean=round(m0, 2), stack_null_std=round(s0, 2), single_std=round(s1, 2), n_null_tracks=24),
+               noise_calibration=dict(stack_null_mean=round(m0, 2), stack_null_std=round(s0, 2), single_std=round(s1, 2), n_null_tracks=24, e5_check=e5),
                single_frame_snr_max=round(float(np.nanmax(single)), 2), single_frame_snr_median=round(float(np.median(single)), 2),
                stack_snr=stack_snr, null_snrs=[round(x, 2) for x in nulls], n_frames=N,
                order="pictures are combined in order of their expected signal-to-noise (brightness model and noise only; measured fluxes are not used to choose the order)",
@@ -185,7 +191,7 @@ def main(ids, pick):
     f2 = dict(object=meta["name"], designation=pick, n_frames=N, n_frames_dropped_quality=n_all - N, single_frame_snr_max=rev["single_frame_snr_max"],
               single_frame_snr_median=rev["single_frame_snr_median"], stack_snr=stack_snr,
               null_snr_mean=round(float((np.mean(nulls) - m0) / s0), 2), null_snr_std=1.0, null_nominal_std=round(s0, 2),
-              single_std=round(s1, 2), significance_note="calibrated on 24 empty tracks beside the orbit",
+              single_std=round(s1, 2), e5_check=e5, significance_note="scale from 12 inner empty tracks, verified on 12 outer tracks (docs/PROTOCOLS.md E5)",
               depth_gain_mag=rev["depth_gain_mag"], ideal_gain_mag=rev["ideal_gain_mag"])
     json.dump(f2, open("data/findings/f2.json", "w"), indent=1)
     print(json.dumps(f2, indent=1))

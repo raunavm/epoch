@@ -54,6 +54,11 @@ def release_of(key):
     return key.split("/")[0]
 
 
+def _timeout():
+    import aiohttp
+    return aiohttp.ClientTimeout(total=90, sock_read=45)  # a stalled S3 read must not hang a worker forever
+
+
 @lru_cache(None)
 def _calib(release, det):
     import os
@@ -69,7 +74,8 @@ class Frame:
         self.key = key
         self.url = f"{BUCKET}/{key}"
         self.hdul = fits.open(self.url, use_fsspec=True, lazy_load_hdus=True,
-                              fsspec_kwargs={"block_size": 2 ** 17, "cache_type": "bytes"})
+                              fsspec_kwargs={"block_size": 2 ** 17, "cache_type": "bytes",
+                                             "client_kwargs": {"timeout": _timeout()}})
         h = self.hdul["IMAGE"].header
         self.header = h
         self.wcs = WCS(h)

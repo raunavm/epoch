@@ -85,10 +85,20 @@ def run(pdes, index, workers, stamps, vmax, force=False, cap=0):
     rows = []
     sd = f"data/stamps/{pdes.replace(' ', '_')}" if stamps else None
     args = [(cand.loc[i, "key"], pe.loc[i].to_dict(), sd) for i in cand.index]
-    with ProcessPoolExecutor(workers) as ex:
-        for r in ex.map(_job, args, chunksize=2):
-            if r:
-                rows.append(r)
+    from concurrent.futures import wait
+    ex = ProcessPoolExecutor(workers)
+    futs = [ex.submit(_job, x) for x in args]
+    done, pending = wait(futs, timeout=max(600, 8 * len(args)))  # whole-object budget; stragglers are dropped
+    for f in done:
+        try:
+            r = f.result()
+        except Exception as e:
+            r = dict(error=repr(e))
+        if r:
+            rows.append(r)
+    if pending:
+        print(f"{pdes}: {len(pending)} frames timed out and were dropped", flush=True)
+    ex.shutdown(wait=False, cancel_futures=True)
     df = pd.DataFrame(rows)
     df["object"] = pdes
     df["release"] = "dr1"

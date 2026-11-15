@@ -132,7 +132,7 @@ def cut(key, gra, gdec):
     return out
 
 
-def gather(name, ra0, dec0, S, threads=4):
+def gather(name, ra0, dec0, S, threads=4, max_frames=None):
     cache = f"data/cache/fields/{name}_S{S}.npz"
     os.makedirs(os.path.dirname(cache), exist_ok=True)
     if os.path.exists(cache):
@@ -142,6 +142,10 @@ def gather(name, ra0, dec0, S, threads=4):
     df, src = load_index()
     cand = candidates(df, ra0, dec0)
     print(f"index {src}: {len(df)} frames, {len(cand)} polygon candidates")
+    n_cand_all = len(cand)
+    if max_frames and len(cand) > max_frames:   # docs/PROTOCOLS.md frame cap: index rows sorted by MJD, evenly spread
+        cand = cand.sort_values("mjd", kind="stable").iloc[np.linspace(0, len(cand) - 1, max_frames).round().astype(int)]
+        print(f"frame cap: {len(cand)} of {n_cand_all} candidates, evenly spread in time")
     gra, gdec = grid_world(S, ra0, dec0)
     res, fails = [], []
     t = time.time()
@@ -178,6 +182,7 @@ def gather(name, ra0, dec0, S, threads=4):
     d["flags"] = np.array([json.dumps(r["flags"]) for r in res])
     d["meta"] = np.array([json.dumps(r["meta"]) for r in res])
     d["n_candidates"] = np.array(len(cand))
+    d["n_candidates_before_cap"] = np.array(n_cand_all)
     d["n_fail"] = np.array(len(fails))
     d["index_src"] = np.array(src)
     np.savez_compressed(cache, **d)
@@ -553,7 +558,7 @@ def main(a):
         ra0, dec0 = float(np.ravel(ra0)[0]), float(np.ravel(dec0)[0])
     else:
         ra0, dec0 = a.ra, a.dec
-    d = gather(a.name, ra0, dec0, S)
+    d = gather(a.name, ra0, dec0, S, max_frames=a.max_frames)
     N = len(d["mjd"])
     print(f"{N} frames on the grid (of {int(d['n_candidates'])} candidates, {int(d['n_fail'])} read failures)")
     if N == 0:
@@ -692,6 +697,7 @@ def main(a):
                                naive_det=int(r["n_naive_det"][m].sum()), corrected=int(r["n_corr"][m].sum()))
     f1 = dict(field=a.name, name=title, ra=ra0, dec=dec0, size_px=S, n_frames=N, n_candidates=int(d["n_candidates"]),
               n_read_failures=int(d["n_fail"]), n_passes=len(P),
+              n_candidates_before_cap=int(d["n_candidates_before_cap"]) if "n_candidates_before_cap" in d else None,
               passes=[dict(n=len(p), start=Time(d["mjd"][p[0]], format="mjd").iso[:10],
                            end=Time(d["mjd"][p[-1]], format="mjd").iso[:10]) for p in P],
               f=f, n_naive_all=int(r["n_naive_all"].sum()), n_naive_det=int(r["n_naive_det"].sum()),
@@ -727,4 +733,5 @@ if __name__ == "__main__":
     ap.add_argument("--plx", type=float, default=0.0)
     ap.add_argument("--source", default="")
     ap.add_argument("--calibrate", action="store_true")
+    ap.add_argument("--max-frames", type=int, help="frame cap (docs/PROTOCOLS.md: 250 evenly spread in time)")
     main(ap.parse_args())

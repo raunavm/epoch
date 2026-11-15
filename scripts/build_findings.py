@@ -50,7 +50,7 @@ if f4 and f4.get("V50_stack") and abs(f4.get("null_snr_mean", 9)) < 2:
     out["f4"] = dict(title="Could we have seen it?", interaction="explorer", label="derived", unit="mag",
                      number=f4["V50_stack"], err=None,
                      sentence=f"Planted test objects in real SPHEREx pictures are recovered half the time down to visual "
-                              f"magnitude {f4['V50_stack']} when {f4['n_frames']} pictures are combined.",
+                              f"magnitude {f4['V50_stack']:.1f} when {f4['n_frames']} pictures are combined.",
                      detail=f4)
 else:
     log.append(f"f4 omitted: {f4}")

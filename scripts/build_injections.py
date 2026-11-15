@@ -85,8 +85,13 @@ def main(pdes):
     track = load_track(pdes)
     N = len(track)
     offsets = [(7.5 * np.cos(a), 7.5 * np.sin(a)) for a in np.arange(6) * np.pi / 3]
-    null = run_cell(track, 10.0, 0.25, 30.0, [(r * np.cos(a), r * np.sin(a)) for r in (6.5, 8.5) for a in np.arange(12) * np.pi / 6], plant=False)
-    thr = float(np.mean(null) + 5 * np.std(null, ddof=1))  # recovery threshold calibrated on 24 empty tracks
+    inner = run_cell(track, 10.0, 0.25, 30.0, [(6.5 * np.cos(a), 6.5 * np.sin(a)) for a in np.arange(12) * np.pi / 6], plant=False)
+    outer = run_cell(track, 10.0, 0.25, 30.0, [(8.5 * np.cos(a), 8.5 * np.sin(a)) for a in np.arange(12) * np.pi / 6 + np.pi / 12], plant=False)
+    s_in = float(np.std(inner, ddof=1)); s_out = float(np.std(outer, ddof=1) / s_in)
+    scale = s_in if 0.9 <= s_out <= 1.1 else max(s_in, float(np.std(outer, ddof=1)))
+    e5 = dict(scale_inner=round(s_in, 3), outer_spread_after_rescale=round(s_out, 3), passed=bool(0.9 <= s_out <= 1.1), scale_used=round(scale, 3))
+    null = np.concatenate([inner, outer])
+    thr = float(np.mean(inner) + 5 * scale)  # E5: recovery threshold = null mean + 5 × verified null scale
     os.makedirs("site/data/injections", exist_ok=True)
     cells = []
     for pV in PV:
@@ -111,10 +116,10 @@ def main(pdes):
         lim.append(float(np.nanmean([x for x in s if np.isfinite(x)])) if s else None)
     V50 = float(np.nanmedian([x for x in lim if x is not None]))
     inj = dict(grid=dict(D_km=D_KM, r_au=R_AU, pV=PV), cells=cells, track_object=pdes, n_frames=N,
-               null_snr=[round(float(x), 2) for x in null], threshold_nominal_snr=round(thr, 2), V50_stack=round(V50, 2),
+               null_snr=[round(float(x), 2) for x in null], threshold_nominal_snr=round(thr, 2), e5_check=e5, V50_stack=round(V50, 2),
                method="scripts/build_injections.py", geometry="Δ = r − 1 au, phase 0 (MODEL)")
     json.dump(inj, open("site/data/injections.json", "w"), indent=1)
-    f4 = dict(track=pdes, n_frames=N, V50_stack=round(V50, 2), threshold_nominal_snr=round(thr, 2), null_snr_mean=0.0,
+    f4 = dict(track=pdes, n_frames=N, V50_stack=round(V50, 2), threshold_nominal_snr=round(thr, 2), e5_check=e5, null_snr_mean=0.0,
               null_snr_std=round(float(np.std(null)), 2), n_cells=len(cells))
     json.dump(f4, open("data/findings/f4.json", "w"), indent=1)
     print(json.dumps(f4, indent=1))

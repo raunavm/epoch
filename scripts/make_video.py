@@ -114,7 +114,7 @@ def seg_numbers(fnd, frames_out, n_frames):
     if "f3" in fnd:
         lines.append((f"{fnd['f3']['detail']['n']}", f"asteroid sizes, typical {fnd['f3']['number']}% from NEOWISE"))
     if "f4" in fnd:
-        lines.append((f"V {fnd['f4']['number']}", "planted test objects recovered"))
+        lines.append((f"V {float(fnd['f4']['number']):.1f}", "faintest planted test objects recovered (half the time)"))
     for k in range(n_frames):
         im, d = canvas()
         shown = min(len(lines), 1 + int(k / n_frames * len(lines) * 1.3))
