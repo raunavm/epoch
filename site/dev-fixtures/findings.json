@@ -1,0 +1,25 @@
+{
+ "f1": {
+  "sentence": "Fixture: share of raw-blink changes that are only colour.",
+  "number": 0.0,
+  "err": 0.0,
+  "unit": "%"
+ },
+ "f2": {
+  "sentence": "Fixture: magnitudes gained by combining frames.",
+  "number": 1.7,
+  "err": 0.2,
+  "unit": "mag"
+ },
+ "f3": {
+  "sentence": "Fixture: median ratio of our size to the independent size.",
+  "number": 1.0,
+  "err": 0.1
+ },
+ "f4": {
+  "sentence": "Fixture: size found half the time at 2.5 AU.",
+  "number": 1.0,
+  "err": 0.5,
+  "unit": "km"
+ }
+}

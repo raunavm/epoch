@@ -1,0 +1,244 @@
+{
+ "id": "fx-1",
+ "name": "FX-1 (synthetic)",
+ "kind": "fixture",
+ "release": "fixture",
+ "code_version": "fixture",
+ "rerun_command": "echo fixture",
+ "track": [
+  {
+   "mjd": 60810.0,
+   "ra": 359.8,
+   "dec": -1.0
+  },
+  {
+   "mjd": 60810.5,
+   "ra": 359.85,
+   "dec": -0.97
+  },
+  {
+   "mjd": 60811.0,
+   "ra": 359.90000000000003,
+   "dec": -0.94
+  },
+  {
+   "mjd": 60811.5,
+   "ra": 359.95,
+   "dec": -0.91
+  },
+  {
+   "mjd": 60812.0,
+   "ra": 360.0,
+   "dec": -0.88
+  },
+  {
+   "mjd": 60812.5,
+   "ra": 360.05,
+   "dec": -0.85
+  },
+  {
+   "mjd": 60813.0,
+   "ra": 360.1,
+   "dec": -0.8200000000000001
+  },
+  {
+   "mjd": 60813.5,
+   "ra": 360.15000000000003,
+   "dec": -0.79
+  }
+ ],
+ "frames": [
+  {
+   "obs_id": "FIXTURE_OBJ_0",
+   "mjd": 60810.0,
+   "detector": 1,
+   "wl_um": 0.9,
+   "bw_um": 0.022,
+   "flux_mJy": 1.0,
+   "flux_err_mJy": 0.1,
+   "chi2_dof_local": 1.0,
+   "stamp_png": "png/obj/stamp_0.png",
+   "model_png": "png/obj/model_0.png",
+   "resid_png": "png/obj/resid_0.png",
+   "s3_url": "https://example.invalid/fixture.fits"
+  },
+  {
+   "obs_id": "FIXTURE_OBJ_1",
+   "mjd": 60810.5,
+   "detector": 2,
+   "wl_um": 1.6,
+   "bw_um": 0.04,
+   "flux_mJy": 1.2,
+   "flux_err_mJy": 0.1,
+   "chi2_dof_local": 1.0,
+   "stamp_png": "png/obj/stamp_1.png",
+   "model_png": "png/obj/model_1.png",
+   "resid_png": "png/obj/resid_1.png",
+   "s3_url": "https://example.invalid/fixture.fits"
+  },
+  {
+   "obs_id": "FIXTURE_OBJ_2",
+   "mjd": 60811.0,
+   "detector": 3,
+   "wl_um": 2.3,
+   "bw_um": 0.057,
+   "flux_mJy": 1.4,
+   "flux_err_mJy": 0.1,
+   "chi2_dof_local": 1.0,
+   "stamp_png": "png/obj/stamp_2.png",
+   "model_png": "png/obj/model_2.png",
+   "resid_png": "png/obj/resid_2.png",
+   "s3_url": "https://example.invalid/fixture.fits"
+  },
+  {
+   "obs_id": "FIXTURE_OBJ_3",
+   "mjd": 60811.5,
+   "detector": 4,
+   "wl_um": 3.0,
+   "bw_um": 0.075,
+   "flux_mJy": 1.6,
+   "flux_err_mJy": 0.1,
+   "chi2_dof_local": 1.0,
+   "stamp_png": "png/obj/stamp_3.png",
+   "model_png": "png/obj/model_3.png",
+   "resid_png": "png/obj/resid_3.png",
+   "s3_url": "https://example.invalid/fixture.fits"
+  },
+  {
+   "obs_id": "FIXTURE_OBJ_4",
+   "mjd": 60812.0,
+   "detector": 5,
+   "wl_um": 3.7,
+   "bw_um": 0.092,
+   "flux_mJy": 1.8,
+   "flux_err_mJy": 0.1,
+   "chi2_dof_local": 1.0,
+   "stamp_png": "png/obj/stamp_4.png",
+   "model_png": "png/obj/model_4.png",
+   "resid_png": "png/obj/resid_4.png",
+   "s3_url": "https://example.invalid/fixture.fits"
+  },
+  {
+   "obs_id": "FIXTURE_OBJ_5",
+   "mjd": 60812.5,
+   "detector": 6,
+   "wl_um": 4.4,
+   "bw_um": 0.11,
+   "flux_mJy": 2.0,
+   "flux_err_mJy": 0.1,
+   "chi2_dof_local": 1.0,
+   "stamp_png": "png/obj/stamp_5.png",
+   "model_png": "png/obj/model_5.png",
+   "resid_png": "png/obj/resid_5.png",
+   "s3_url": "https://example.invalid/fixture.fits"
+  }
+ ],
+ "spectrum": {
+  "wl_um": [
+   0.9,
+   1.1,
+   1.3,
+   1.5,
+   1.7000000000000002,
+   1.9,
+   2.1,
+   2.3000000000000003,
+   2.5,
+   2.7,
+   2.9,
+   3.1
+  ],
+  "refl": [
+   1.018,
+   0.982,
+   1.009,
+   1.017,
+   1.071,
+   1.141,
+   1.116,
+   1.19,
+   1.098,
+   1.197,
+   1.197,
+   1.254
+  ],
+  "refl_err": [
+   0.04,
+   0.04,
+   0.04,
+   0.04,
+   0.04,
+   0.04,
+   0.04,
+   0.04,
+   0.04,
+   0.04,
+   0.04,
+   0.04
+  ],
+  "gaia": {
+   "wl_um": [
+    0.4,
+    0.45,
+    0.5,
+    0.55,
+    0.6000000000000001,
+    0.65,
+    0.7000000000000001,
+    0.75,
+    0.8,
+    0.8500000000000001,
+    0.9,
+    0.9500000000000001
+   ],
+   "refl": [
+    0.9,
+    0.92,
+    0.9400000000000001,
+    0.96,
+    0.98,
+    1.0,
+    1.02,
+    1.04,
+    1.06,
+    1.08,
+    1.1,
+    1.12
+   ],
+   "err": [
+    0.02,
+    0.02,
+    0.02,
+    0.02,
+    0.02,
+    0.02,
+    0.02,
+    0.02,
+    0.02,
+    0.02,
+    0.02,
+    0.02
+   ]
+  }
+ },
+ "size": {
+  "D_km": 2.1,
+  "D_err_km": 0.3,
+  "pV": 0.2,
+  "eta": 1.0,
+  "truth": {
+   "D_km": 2.0,
+   "pV": 0.22,
+   "source": "fixture"
+  },
+  "familiar": {
+   "name": "a fixture landmark",
+   "km": 1.0
+  }
+ },
+ "composition_plain": "Fixture text: rocky, like many inner-belt asteroids.",
+ "labels": {
+  "D_km": "derived",
+  "eta": "model"
+ }
+}

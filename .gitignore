@@ -1,0 +1,14 @@
+.venv/
+data/raw/
+data/cache/
+data/test/*.fits
+__pycache__/
+*.pyc
+.DS_Store
+data/index/parts_*/
+data/index/frames_*.parquet
+data/index/logs/
+data/stamps/
+data/cache/
+data/sia_*.xml
+site/dev-fixtures/*.png

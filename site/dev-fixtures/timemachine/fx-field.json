@@ -1,0 +1,161 @@
+{
+ "field": "fx-field",
+ "name": "Synthetic field (fixture)",
+ "ra": 270.0,
+ "dec": 66.5,
+ "size_px": 64,
+ "frames": [
+  {
+   "obs_id": "FIXTURE_TM_0",
+   "mjd": 60800.0,
+   "date": "2026-03-03",
+   "wl_um": 0.8,
+   "img_png": "png/tm/raw_0.png",
+   "corr_png": "png/tm/corr_0.png",
+   "labels": [
+    {
+     "x": 10,
+     "y": 40,
+     "name": "FX-1 (synthetic)",
+     "kind": "mover",
+     "label": "known asteroid",
+     "confidence": 0.9
+    }
+   ]
+  },
+  {
+   "obs_id": "FIXTURE_TM_1",
+   "mjd": 60803.1,
+   "date": "2026-03-06",
+   "wl_um": 1.3,
+   "img_png": "png/tm/raw_1.png",
+   "corr_png": "png/tm/corr_1.png",
+   "labels": [
+    {
+     "x": 16,
+     "y": 37,
+     "name": "FX-1 (synthetic)",
+     "kind": "mover",
+     "label": "known asteroid",
+     "confidence": 0.9
+    }
+   ]
+  },
+  {
+   "obs_id": "FIXTURE_TM_2",
+   "mjd": 60806.2,
+   "date": "2026-03-09",
+   "wl_um": 1.8,
+   "img_png": "png/tm/raw_2.png",
+   "corr_png": "png/tm/corr_2.png",
+   "labels": [
+    {
+     "x": 22,
+     "y": 34,
+     "name": "FX-1 (synthetic)",
+     "kind": "mover",
+     "label": "known asteroid",
+     "confidence": 0.9
+    }
+   ]
+  },
+  {
+   "obs_id": "FIXTURE_TM_3",
+   "mjd": 60809.3,
+   "date": "2026-03-12",
+   "wl_um": 2.3,
+   "img_png": "png/tm/raw_3.png",
+   "corr_png": "png/tm/corr_3.png",
+   "labels": [
+    {
+     "x": 28,
+     "y": 31,
+     "name": "FX-1 (synthetic)",
+     "kind": "mover",
+     "label": "known asteroid",
+     "confidence": 0.9
+    },
+    {
+     "x": 50,
+     "y": 12,
+     "name": "",
+     "kind": "glint",
+     "label": "artifact",
+     "confidence": 0.6
+    }
+   ]
+  },
+  {
+   "obs_id": "FIXTURE_TM_4",
+   "mjd": 60812.4,
+   "date": "2026-03-15",
+   "wl_um": 2.8,
+   "img_png": "png/tm/raw_4.png",
+   "corr_png": "png/tm/corr_4.png",
+   "labels": [
+    {
+     "x": 34,
+     "y": 28,
+     "name": "FX-1 (synthetic)",
+     "kind": "mover",
+     "label": "known asteroid",
+     "confidence": 0.9
+    }
+   ]
+  },
+  {
+   "obs_id": "FIXTURE_TM_5",
+   "mjd": 60815.5,
+   "date": "2026-03-18",
+   "wl_um": 3.3,
+   "img_png": "png/tm/raw_5.png",
+   "corr_png": "png/tm/corr_5.png",
+   "labels": [
+    {
+     "x": 40,
+     "y": 25,
+     "name": "FX-1 (synthetic)",
+     "kind": "mover",
+     "label": "known asteroid",
+     "confidence": 0.9
+    }
+   ]
+  },
+  {
+   "obs_id": "FIXTURE_TM_6",
+   "mjd": 60818.6,
+   "date": "2026-03-21",
+   "wl_um": 3.8,
+   "img_png": "png/tm/raw_6.png",
+   "corr_png": "png/tm/corr_6.png",
+   "labels": [
+    {
+     "x": 46,
+     "y": 22,
+     "name": "FX-1 (synthetic)",
+     "kind": "mover",
+     "label": "known asteroid",
+     "confidence": 0.9
+    }
+   ]
+  },
+  {
+   "obs_id": "FIXTURE_TM_7",
+   "mjd": 60821.7,
+   "date": "2026-03-24",
+   "wl_um": 4.3,
+   "img_png": "png/tm/raw_7.png",
+   "corr_png": "png/tm/corr_7.png",
+   "labels": [
+    {
+     "x": 52,
+     "y": 19,
+     "name": "FX-1 (synthetic)",
+     "kind": "mover",
+     "label": "known asteroid",
+     "confidence": 0.9
+    }
+   ]
+  }
+ ]
+}

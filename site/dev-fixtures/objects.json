@@ -1,0 +1,30 @@
+[
+ {
+  "id": "fx-1",
+  "name": "FX-1 (synthetic)",
+  "number": 0,
+  "kind": "fixture",
+  "n_frames": 6,
+  "D_km": 2.1,
+  "D_err_km": 0.3,
+  "D_truth_km": 2.0,
+  "D_truth_source": "fixture",
+  "pV": 0.2,
+  "class_plain": "fixture rocky",
+  "page": "object.html?id=fx-1"
+ },
+ {
+  "id": "fx-missing",
+  "name": "FX-2 (no detail file)",
+  "number": 1,
+  "kind": "fixture",
+  "n_frames": 0,
+  "D_km": null,
+  "D_err_km": null,
+  "D_truth_km": null,
+  "D_truth_source": null,
+  "pV": null,
+  "class_plain": null,
+  "page": "object.html?id=fx-missing"
+ }
+]

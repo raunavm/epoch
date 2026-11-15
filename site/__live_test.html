@@ -1,0 +1,37 @@
+<!doctype html><body><pre id=out></pre><script type=module>
+const out = document.getElementById('out'), log = s => out.textContent += s + '\n';
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const q = new URLSearchParams(location.search).get('q');
+const f = document.createElement('iframe'); f.style.width = '390px'; f.style.height = '1200px'; document.body.append(f);
+const errs = [];
+f.src = 'timemachine.html?' + q; await new Promise(r => f.onload = r);
+f.contentWindow.addEventListener('error', e => errs.push(e.message));
+const d = f.contentDocument, t0 = performance.now();
+let firstSeen = null, last = '';
+for (let k = 0; k < 400; k++) {
+  await wait(500);
+  const st = d.querySelector('.live-status')?.textContent || '';
+  if (!firstSeen && d.querySelector('.frame-meta strong')) firstSeen = (performance.now() - t0) / 1000;
+  if (st !== last) { last = st; }
+  if (/after|none|None|not available|Could not|failed\./.test(st) && !/loaded/.test(st)) break;
+}
+log('status: ' + last);
+log('first frame visible (harness): ' + firstSeen);
+log('caption: ' + d.querySelector('.frame-meta')?.textContent);
+log('meta: ' + [...d.querySelectorAll('.live-meta dd')].map(x => x.textContent).join(' | '));
+log('changes: ' + d.querySelector('.finding')?.textContent);
+const segs = [...d.querySelectorAll('.seg')];
+segs.find(b => b.textContent === 'Corrected')?.click(); await wait(200);
+log('corrected badge: ' + d.querySelector('.frame-meta .badge')?.textContent + ' url: ' + f.contentWindow.location.search);
+segs.find(b => b.textContent === 'Add')?.click(); await wait(500);
+log('add panels: ' + d.querySelectorAll('.coadds figure').length + ' :: ' + [...d.querySelectorAll('.coadds figcaption')].map(x => x.textContent).join(' / '));
+segs.find(b => b.textContent === 'Subtract')?.click(); await wait(300);
+log('subtract: ' + d.querySelector('.subtract')?.textContent.slice(0, 300));
+segs.find(b => b.textContent === 'Blink')?.click(); await wait(100);
+const cv = d.querySelector('.live-canvas'), r = cv.getBoundingClientRect();
+cv.dispatchEvent(new MouseEvent('click', { clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, bubbles: true })); await wait(300);
+log('spectrum: ' + d.querySelector('.live-spec')?.textContent.slice(0, 200) + ' points=' + d.querySelectorAll('.live-spec circle').length + ' csv=' + !!d.querySelector('.live-spec a[download]'));
+log('hscroll: ' + (d.documentElement.scrollWidth > f.contentWindow.innerWidth));
+log('errors: ' + errs.join(' | '));
+log('DONE');
+</script></body>

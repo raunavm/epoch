@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orrery</title>
+<meta name="description" content="Orrery: everything that moves, in 102 colors. Public views of sky images from NASA's SPHEREx telescope and how they change over time.">
+<meta name="color-scheme" content="dark light">
+<link rel="stylesheet" href="css/style.css">
+<script type="module" src="js/timemachine.js"></script>
+</head>
+<body data-title="title.timemachine">
+<a class="skip" href="#main" data-i18n="nav.skip">Skip to content</a>
+<header id="site-header" class="site-header"></header>
+<main id="main" tabindex="-1">
+<h1 data-i18n="tm.h1">Time machine</h1>
+<form id="coord-form" class="panel coord-form" aria-labelledby="h-look">
+  <h2 id="h-look" data-i18n="live.form_h">Look anywhere in the sky</h2>
+  <p class="hint" data-i18n="live.form_hint"></p>
+  <div class="form-row"><label for="target" data-i18n="live.target">Famous targets</label> <select id="target"></select></div>
+  <div class="form-row coords">
+    <label><span data-i18n="live.ra">Right ascension</span> <input id="ra" inputmode="text" autocomplete="off" spellcheck="false" placeholder="08h55m10.8s or 133.795"></label>
+    <label><span data-i18n="live.dec">Declination</span> <input id="dec" inputmode="text" autocomplete="off" spellcheck="false" placeholder="-07d14m42.5s or -7.245"></label>
+  </div>
+  <div class="form-row"><label for="fov" data-i18n="live.fov">Field of view</label> <select id="fov"></select> <span id="fov-cost" class="muted small"></span></div>
+  <p><button class="btn primary" type="submit" data-i18n="live.go">Show this patch</button> <span id="form-error" class="form-error" role="alert"></span></p>
+  <p id="target-note" class="muted small"></p>
+</form>
+<div id="live" class="panel" hidden></div>
+<section id="showcase" aria-labelledby="h-showcase">
+<h2 id="h-showcase" data-i18n="live.showcase_h">Ready-made fields</h2>
+<p class="hint" data-i18n="tm.hint"></p>
+<div class="field-pick"><label for="field" data-i18n="tm.field">Sky field</label> <select id="field"></select></div>
+<div id="tm" class="panel"></div>
+<section id="tm-finding" class="finding-box" aria-labelledby="h-tmf" hidden><h2 id="h-tmf" data-i18n="tm.finding_h">How often raw blinking misleads</h2><div></div></section>
+</section>
+</main>
+<footer id="site-footer" class="site-footer"></footer>
+<noscript><p class="unavailable">This site needs JavaScript to draw the images and charts.</p></noscript>
+</body>
+</html>
