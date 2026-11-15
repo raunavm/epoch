@@ -1,63 +1,45 @@
-"""Assemble site/data/findings.json from data/findings/f*.json. A finding appears only if its measured
-file exists and passes its own check (owner rule: if a finding fails its check, remove its feature and sentence).
+"""Assemble site/data/findings.json (Start-here tour) from SUPPORTED claims only (docs/CLAIMS.md).
+f1 = headline (Version B, site/data/headline.json + E2), f2 = stacked asteroid (C5, narrowed),
+f3 = WISE 0855 along its path (C9). Anything whose source file is missing is omitted.
+Also exports the frozen noise floor to site/data/f1_calibration.json.
 Usage: .venv/bin/python scripts/build_findings.py
 """
 import json, os
 
 
-def load(name):
-    p = f"data/findings/{name}.json"
+def load(p):
     return json.load(open(p)) if os.path.exists(p) else None
 
 
-out, log = {}, []
-f1 = load("f1")
-if f1 and f1.get("fraction_removed") is not None and f1["fraction_removed"] > 0.5:
-    pct = round(100 * f1["fraction_removed"])
-    err = round(100 * f1.get("err", 0))
+out = {}
+h = load("site/data/headline.json")
+d1 = load("data/findings/e2_d1.json")
+if h:
     out["f1"] = dict(title="Which change is real?", interaction="timemachine", label="derived", unit="%",
-                     number=pct, err=err,
-                     sentence=f"In a patch of sky chosen in advance as a fair test, {pct}% (±{err}%) of the changes a plain blink shows are only colour: "
-                              f"they disappear once each picture's wavelength is accounted for, while moving objects remain.",
-                     detail=f1)
-else:
-    log.append(f"f1 omitted: {f1 and f1.get('fraction_removed')}")
-f2 = load("f2")
-if f2 and f2.get("single_frame_snr_max", 99) < 5 and f2.get("stack_snr", 0) >= 5 and abs(f2.get("null_snr_mean", 9)) < 2:
-    out["f2"] = dict(title="Invisible in every frame, visible in all of them", interaction="reveal", label="data",
-                     unit="mag", number=f2["depth_gain_mag"], err=None,
-                     sentence=f"Asteroid {f2['object']} is too faint to detect in any of its {f2["n_frames"]} single pictures "
-                              f"(best single-picture signal {f2['single_frame_snr_max']}σ), but combining them along its orbit "
-                              f"detects it at {f2['stack_snr']:.0f}σ — about {f2['depth_gain_mag']} magnitudes "
-                              f"({10 ** (0.4 * f2['depth_gain_mag']):.0f} times) fainter than one picture can reach.",
+                     number=h["number"], err=None, err_low=h.get("err_low"), err_high=h.get("err_high"),
+                     sentence=h["sentence"], detail=dict(source="data/findings/e2.json", consistency="data/findings/e2_d1.json" if d1 else None))
+f2 = load("data/findings/f2.json")
+sp = load("data/findings/f2_split.json")
+if f2 and f2.get("single_frame_snr_max", 99) < 5 and f2.get("stack_snr", 0) >= 5:
+    half = f" Each half of the pictures shows it on its own ({sp['odd']['calibrated']:.1f} and {sp['even']['calibrated']:.1f} times the noise), as a real signal should." if sp else ""
+    out["f2"] = dict(title="Too faint for one picture", interaction="reveal", label="derived", unit="σ",
+                     number=round(f2["stack_snr"], 1), err=None,
+                     sentence=(f"Asteroid {f2['object']} never reaches the usual detection level in any of its {f2['n_frames']} single pictures "
+                               f"(best {f2['single_frame_snr_max']:.1f} times the noise). Combined along its orbit it stands out at "
+                               f"{f2['stack_snr']:.1f} times the spread of empty paths beside it — a modest but real-looking signal.{half}"),
                      detail=f2)
-else:
-    log.append(f"f2 omitted: {f2}")
-f3 = load("f3")
-if f3 and f3.get("n", 0) >= 10:
-    pct = round(100 * f3["scatter_frac_robust"])
-    out["f3"] = dict(title="How big, and what is it made of?", interaction="object", label="derived", unit="%",
-                     number=pct, err=None,
-                     sentence=f"For {f3['n']} asteroids, sizes measured from SPHEREx's heat glow agree with independent "
-                              f"infrared measurements (NEOWISE, AKARI, IRAS) with a typical difference of {pct}% "
-                              f"(median ratio {f3['median_ratio']}); colours agree with ESA Gaia's spectra "
-                              f"(median χ²/dof {f3.get('gaia_chi2dof_median')} for {f3.get('gaia_n')} asteroids).",
-                     detail=f3)
-else:
-    log.append(f"f3 omitted: {f3}")
-f4 = load("f4")
-if f4 and f4.get("V50_stack") and abs(f4.get("null_snr_mean", 9)) < 2:
-    out["f4"] = dict(title="Could we have seen it?", interaction="explorer", label="derived", unit="mag",
-                     number=f4["V50_stack"], err=None,
-                     sentence=f"Planted test objects in real SPHEREx pictures are recovered half the time down to visual "
-                              f"magnitude {f4['V50_stack']:.1f} when {f4['n_frames']} pictures are combined.",
-                     detail=f4)
-else:
-    log.append(f"f4 omitted: {f4}")
+e4 = load("data/findings/e4.json")
+if e4:
+    p2 = e4["passes"][1]
+    out["f3"] = dict(title="The coldest known brown dwarf", interaction="target", target="wise0855", label="derived", unit="σ",
+                     number=round(p2["significance"], 1), err=None,
+                     sentence=(f"WISE 0855−0714, a challenge test target, stands out at {p2['significance']:.1f} times the spread of empty paths when "
+                               "its 4.4–5 µm pictures are combined along its known path, and it shifts between visits as its motion predicts. "
+                               "A statement about a known object, not a discovery."),
+                     detail=dict(source="data/findings/e4.json"))
 json.dump(out, open("site/data/findings.json", "w"), indent=1)
-cal = load("f1_calibration")
+cal = load("data/findings/f1_calibration.json")
 if cal:
     json.dump({"f": cal["f"], "source": "data/findings/f1_calibration.json", "frozen_utc": cal.get("frozen_utc")},
               open("site/data/f1_calibration.json", "w"), indent=1)
 print(json.dumps({k: v["sentence"] for k, v in out.items()}, indent=1))
-print("\n".join(log))

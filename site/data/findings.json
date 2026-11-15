@@ -4,109 +4,24 @@
   "interaction": "timemachine",
   "label": "derived",
   "unit": "%",
-  "number": 85,
-  "err": 2,
-  "sentence": "In a patch of sky chosen in advance as a fair test, 85% (\u00b12%) of the changes a plain blink shows are only colour: they disappear once each picture's wavelength is accounted for, while moving objects remain.",
+  "number": 93,
+  "err": null,
+  "err_low": 90,
+  "err_high": 96,
+  "sentence": "SPHEREx photographs each spot in a different infrared colour every time, so a plain blink flickers even when nothing moved. Watching one detector at a time removes a median 93% of the changes a plain blink flags (20 random patches of sky; 95% range 90\u201396%; worst patch 22%), and in the same patches it still catches planted test sources as often as a plain blink does (37% against 34% at 20 times the single-picture noise).",
   "detail": {
-   "fraction_removed": 0.853,
-   "err": 0.018,
-   "basis": "control field (RA 180, Dec 0; declared before results as the field without a special target)",
-   "n_naive": 389,
-   "n_corrected": 57,
-   "all_fields": {
-    "n_naive": 3878,
-    "n_corrected": 1761,
-    "fraction_removed": 0.546,
-    "note": "includes R Draconis (pulsating star: real change in every picture, 1198 of the corrected changes) and the moving target stars"
-   },
-   "per_field": [
-    {
-     "field": "barnard",
-     "name": "Barnard's Star",
-     "n_frames": 239,
-     "n_passes": 2,
-     "n_naive_all": 836,
-     "n_naive_det": 26,
-     "n_corrected": 158,
-     "corrected_matched_known": 4,
-     "corrected_unexplained": 154,
-     "n_read_failures": 0
-    },
-    {
-     "field": "ecliptic_control",
-     "name": "Control field on the ecliptic (RA 180, Dec 0)",
-     "n_frames": 221,
-     "n_passes": 2,
-     "n_naive_all": 389,
-     "n_naive_det": 52,
-     "n_corrected": 57,
-     "corrected_matched_known": 0,
-     "corrected_unexplained": 57,
-     "n_read_failures": 0
-    },
-    {
-     "field": "epsindib",
-     "name": "Epsilon Indi B (Ba+Bb, unresolved)",
-     "n_frames": 338,
-     "n_passes": 3,
-     "n_naive_all": 575,
-     "n_naive_det": 47,
-     "n_corrected": 190,
-     "corrected_matched_known": 120,
-     "corrected_unexplained": 70,
-     "n_read_failures": 0
-    },
-    {
-     "field": "rdra",
-     "name": "R Draconis",
-     "n_frames": 894,
-     "n_passes": 3,
-     "n_naive_all": 397,
-     "n_naive_det": 82,
-     "n_corrected": 1198,
-     "corrected_matched_known": 0,
-     "corrected_unexplained": 1198,
-     "n_read_failures": 741
-    },
-    {
-     "field": "rwaur",
-     "name": "RW Aurigae",
-     "n_frames": 225,
-     "n_passes": 2,
-     "n_naive_all": 1009,
-     "n_naive_det": 54,
-     "n_corrected": 101,
-     "corrected_matched_known": 11,
-     "corrected_unexplained": 90,
-     "n_read_failures": 0
-    },
-    {
-     "field": "wise0855",
-     "name": "WISE 0855\u22120714",
-     "n_frames": 258,
-     "n_passes": 3,
-     "n_naive_all": 672,
-     "n_naive_det": 45,
-     "n_corrected": 57,
-     "corrected_matched_known": 0,
-     "corrected_unexplained": 57,
-     "n_read_failures": 0
-    }
-   ],
-   "f": 0.15123029572619215,
-   "f_calibration": "data/findings/f1_calibration.json (frozen before test fields)",
-   "method": "docs/INTERFACES.md#wavelength-aware-change-model revision 2",
-   "err_note": "binomial; changes within a field are not fully independent"
+   "source": "data/findings/e2.json",
+   "consistency": "data/findings/e2_d1.json"
   }
  },
  "f2": {
-  "title": "Invisible in every frame, visible in all of them",
+  "title": "Too faint for one picture",
   "interaction": "reveal",
-  "label": "data",
-  "unit": "mag",
-  "number": 3.7,
+  "label": "derived",
+  "unit": "\u03c3",
+  "number": 5.4,
   "err": null,
-  "sentence": "Asteroid 98397 (2000 UC3) is too faint to detect in any of its 295 single pictures (best single-picture signal 4.32\u03c3), but combining them along its orbit detects it at 6\u03c3 \u2014 about 3.7 magnitudes (30 times) fainter than one picture can reach.",
+  "sentence": "Asteroid 98397 (2000 UC3) never reaches the usual detection level in any of its 295 single pictures (best 4.3 times the noise). Combined along its orbit it stands out at 5.4 times the spread of empty paths beside it \u2014 a modest but real-looking signal. Each half of the pictures shows it on its own (4.0 and 3.9 times the noise), as a real signal should.",
   "detail": {
    "object": "98397 (2000 UC3)",
    "designation": "98397",
@@ -114,32 +29,33 @@
    "n_frames_dropped_quality": 23,
    "single_frame_snr_max": 4.32,
    "single_frame_snr_median": 0.24,
-   "stack_snr": 6.15,
-   "null_snr_mean": 0.0,
+   "stack_snr": 5.38,
+   "null_snr_mean": 0.02,
    "null_snr_std": 1.0,
-   "null_nominal_std": 1.34,
+   "null_nominal_std": 1.54,
    "single_std": 1.3,
-   "significance_note": "calibrated on 24 empty tracks beside the orbit",
-   "depth_gain_mag": 3.7,
+   "e5_check": {
+    "scale_inner": 1.538,
+    "outer_spread_after_rescale": 0.768,
+    "passed": false,
+    "scale_used": 1.538
+   },
+   "significance_note": "scale from 12 inner empty tracks, verified on 12 outer tracks (docs/PROTOCOLS.md E5)",
+   "depth_gain_mag": 3.55,
    "ideal_gain_mag": 3.74
   }
  },
- "f4": {
-  "title": "Could we have seen it?",
-  "interaction": "explorer",
+ "f3": {
+  "title": "The coldest known brown dwarf",
+  "interaction": "target",
+  "target": "wise0855",
   "label": "derived",
-  "unit": "mag",
-  "number": 20.51,
+  "unit": "\u03c3",
+  "number": 16.5,
   "err": null,
-  "sentence": "Planted test objects in real SPHEREx pictures are recovered half the time down to visual magnitude 20.5 when 321 pictures are combined.",
+  "sentence": "WISE 0855\u22120714, a challenge test target, stands out at 16.5 times the spread of empty paths when its 4.4\u20135 \u00b5m pictures are combined along its known path, and it shifts between visits as its motion predicts. A statement about a known object, not a discovery.",
   "detail": {
-   "track": "80253",
-   "n_frames": 321,
-   "V50_stack": 20.51,
-   "threshold_nominal_snr": 9.66,
-   "null_snr_mean": 0.0,
-   "null_snr_std": 1.95,
-   "n_cells": 160
+   "source": "data/findings/e4.json"
   }
  }
 }

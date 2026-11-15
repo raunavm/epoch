@@ -1,7 +1,7 @@
 [
  {
   "field": "ecliptic_control",
-  "name": "Control field on the ecliptic (RA 180, Dec 0)",
+  "name": "Quiet patch near the asteroid belt's plane (control)",
   "ra": 180.0,
   "dec": 0.0
  },
@@ -37,61 +37,61 @@
  },
  {
   "field": "e3_ecl01",
-  "name": "E3 ecliptic field 01 (lon 86.70, lat -0.43)",
+  "name": "Asteroid lane 02 (known asteroids labelled)",
   "ra": 86.414521,
   "dec": 22.971956
  },
  {
   "field": "e3_ecl00",
-  "name": "E3 ecliptic field 00 (lon 70.40, lat -0.33)",
+  "name": "Asteroid lane 01 (known asteroids labelled)",
   "ra": 68.839988,
   "dec": 21.684231
  },
  {
   "field": "e3_ecl02",
-  "name": "E3 ecliptic field 02 (lon 140.15, lat -1.48)",
+  "name": "Asteroid lane 03 (known asteroids labelled)",
   "ra": 142.079011,
   "dec": 13.362679
  },
  {
   "field": "e3_ecl04",
-  "name": "E3 ecliptic field 04 (lon 55.38, lat -0.18)",
+  "name": "Asteroid lane 05 (known asteroids labelled)",
   "ra": 53.086886,
   "dec": 18.928244
  },
  {
   "field": "e3_ecl03",
-  "name": "E3 ecliptic field 03 (lon 305.13, lat -1.00)",
+  "name": "Asteroid lane 04 (known asteroids labelled)",
   "ra": 307.74118,
   "dec": -19.95707
  },
  {
   "field": "e3_ecl05",
-  "name": "E3 ecliptic field 05 (lon 49.54, lat -1.51)",
+  "name": "Asteroid lane 06 (known asteroids labelled)",
   "ra": 47.521656,
   "dec": 16.16057
  },
  {
   "field": "e3_ecl09",
-  "name": "E3 ecliptic field 09 (lon 27.24, lat +0.88)",
+  "name": "Asteroid lane 10 (known asteroids labelled)",
   "ra": 24.958453,
   "dec": 11.31401
  },
  {
   "field": "e3_ecl07",
-  "name": "E3 ecliptic field 07 (lon 317.20, lat +1.84)",
+  "name": "Asteroid lane 08 (known asteroids labelled)",
   "ra": 319.073237,
   "dec": -13.925455
  },
  {
   "field": "e3_ecl08",
-  "name": "E3 ecliptic field 08 (lon 348.87, lat -0.29)",
+  "name": "Asteroid lane 09 (known asteroids labelled)",
   "ra": 349.886356,
   "dec": -4.670648
  },
  {
   "field": "e3_ecl06",
-  "name": "E3 ecliptic field 06 (lon 78.30, lat +1.25)",
+  "name": "Asteroid lane 07 (known asteroids labelled)",
   "ra": 77.156914,
   "dec": 24.164161
  }
