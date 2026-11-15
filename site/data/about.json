@@ -26,6 +26,14 @@
    "url": "https://arxiv.org/abs/2603.29835"
   },
   {
+   "text": "Luhman & Esplin 2016, The Spectral Energy Distribution of the Coldest Known Brown Dwarf, AJ 152, 78 (WISE 0855−0714 position, motion, parallax and Spitzer brightness).",
+   "url": "https://arxiv.org/abs/1605.06655"
+  },
+  {
+   "text": "Gaia Collaboration, Vallenari et al. 2023, Gaia Data Release 3, A&A 674, A1.",
+   "url": "https://doi.org/10.1051/0004-6361/202243940"
+  },
+  {
    "text": "Harris 1998, A Thermal Model for Near-Earth Asteroids, Icarus 131, 291.",
    "url": "https://doi.org/10.1006/icar.1997.5865"
   },
@@ -69,11 +77,15 @@
    "url": "https://irsa.ipac.caltech.edu/Missions/spherex.html"
   },
   {
+   "text": "Spitzer and Hubble measurements of WISE 0855−0714, as published by Luhman & Esplin (2016): its predicted path and its 4.5 µm brightness.",
+   "url": "https://arxiv.org/abs/1605.06655"
+  },
+  {
    "text": "JPL Horizons, with SPHEREx as the observer (500@-163182): predicted asteroid positions.",
    "url": "https://ssd.jpl.nasa.gov/horizons/"
   },
   {
-   "text": "JPL Small-Body Database: H magnitudes, orbits, and reference diameters from NEOWISE, IRAS and AKARI.",
+   "text": "JPL Small-Body Database: H magnitudes, orbits, and reference diameters from NEOWISE, IRAS and AKARI (asteroid pages only).",
    "url": "https://ssd-api.jpl.nasa.gov/doc/sbdb.html"
   },
   {
@@ -81,7 +93,7 @@
    "url": "https://pds.nasa.gov/"
   },
   {
-   "text": "ESA Gaia DR3 stars and asteroid reflectance spectra, via the AIP mirror.",
+   "text": "ESA Gaia DR3 stars (for the pixel model and the motions of Epsilon Indi B and Barnard's Star) and asteroid reflectance spectra, via the AIP mirror.",
    "url": "https://gaia.aip.de/"
   },
   {

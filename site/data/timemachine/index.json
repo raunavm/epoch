@@ -64,5 +64,35 @@
   "name": "E3 ecliptic field 03 (lon 305.13, lat -1.00)",
   "ra": 307.74118,
   "dec": -19.95707
+ },
+ {
+  "field": "e3_ecl05",
+  "name": "E3 ecliptic field 05 (lon 49.54, lat -1.51)",
+  "ra": 47.521656,
+  "dec": 16.16057
+ },
+ {
+  "field": "e3_ecl09",
+  "name": "E3 ecliptic field 09 (lon 27.24, lat +0.88)",
+  "ra": 24.958453,
+  "dec": 11.31401
+ },
+ {
+  "field": "e3_ecl07",
+  "name": "E3 ecliptic field 07 (lon 317.20, lat +1.84)",
+  "ra": 319.073237,
+  "dec": -13.925455
+ },
+ {
+  "field": "e3_ecl08",
+  "name": "E3 ecliptic field 08 (lon 348.87, lat -0.29)",
+  "ra": 349.886356,
+  "dec": -4.670648
+ },
+ {
+  "field": "e3_ecl06",
+  "name": "E3 ecliptic field 06 (lon 78.30, lat +1.25)",
+  "ra": 77.156914,
+  "dec": 24.164161
  }
 ]

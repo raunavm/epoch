@@ -7,8 +7,8 @@
  "err_low": 90,
  "err_high": 96,
  "kind": "derived",
- "number_label": "of the changes a plain blink shows are only colour",
- "sentence": "SPHEREx photographs each spot in a different infrared colour every time, so a plain blink flickers even when nothing moved. Watching one detector at a time removes a median 93% of those changes (20 random patches of sky; 95% range 90\u201396%; worst patch 22%).",
+ "number_label": "of the changes a plain blink flags disappear when you watch one detector at a time",
+ "sentence": "SPHEREx photographs each spot in a different infrared colour every time, so a plain blink flickers even when nothing moved. Watching one detector at a time removes a median 93% of the changes a plain blink flags (20 random patches of sky; 95% range 90\u201396%; worst patch 22%), and in the same patches it still catches planted test sources as often as a plain blink does (37% against 34% at 20 times the single-picture noise).",
  "modes": [
   {
    "id": "all",
@@ -107,5 +107,9 @@
    "text": "e2_19 (|b| 5\u00b0): 613 \u2192 33",
    "href": "science.html#which-change-is-real"
   }
- ]
+ ],
+ "consistency_check": {
+  "source": "data/findings/e2_d1.json",
+  "note": "secondary, same rules for both views at k = 5"
+ }
 }

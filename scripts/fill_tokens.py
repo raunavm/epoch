@@ -1,7 +1,9 @@
 """Fill [[file.key]] number tokens in the submission texts from the measured findings.
 
-Sources: f1..f4 = data/findings/f<n>.json, meta = site/data/index/dr1/meta.json.
-A token is [[file.dotted.path]] or [[file.dotted.path|fmt]], fmt in {pct, int, date, raw}.
+Sources: <name> = data/findings/<name>.json (every file there, e.g. f1, e2, e4, motion_epsindib),
+meta = site/data/index/dr1/meta.json, headline = site/data/headline.json.
+A token is [[file.dotted.path]] or [[file.dotted.path|fmt]], fmt in {pct, int, date, raw, f0-f3, k0-k3}
+(fN: N decimals; kN: value/1000 with N decimals). List items are addressed by index (passes.1.x).
 Default format: key containing "frac", "fraction" or "pct" -> percentage; int -> 1,234; float -> 2 significant
 figures; string -> as is. `date` turns an MJD into YYYY-MM-DD.
 Any sentence holding a token that cannot be filled (file or key missing, null, NaN) is deleted; a table row
@@ -10,14 +12,15 @@ or caption line is deleted whole. Keep each numbered sentence on one line and se
 The first run copies each target to <target>.tmpl; every run fills from the .tmpl, so edit the .tmpl and re-run.
 Usage: python3 scripts/fill_tokens.py
 """
-import json, math, os, re, shutil, sys
+import glob, json, math, os, re, shutil, sys
 from datetime import datetime, timedelta
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-SOURCES = {f"f{i}": f"data/findings/f{i}.json" for i in range(1, 5)} | {"meta": "site/data/index/dr1/meta.json"}
+SOURCES = {os.path.basename(p)[:-5]: os.path.relpath(p, ROOT) for p in sorted(glob.glob(os.path.join(ROOT, "data/findings/*.json")))} \
+    | {"meta": "site/data/index/dr1/meta.json", "headline": "site/data/headline.json"}
 TARGETS = ["docs/READY_TO_SEND.md", "docs/video_script.md", "docs/slides.md", "docs/video_captions.srt",
            "site/data/science.md", "site/data/about.json"]
-TOKEN = re.compile(r"\[\[([A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)+)(?:\|(pct|int|date|raw))?\]\]")
+TOKEN = re.compile(r"\[\[([A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)+)(?:\|(pct|int|date|raw|[fk][0-3]))?\]\]")
 ABBREV = re.compile(r"(?:\b(?:al|e\.g|i\.e|vs|No|St|cf|approx)\.)$")
 
 
@@ -44,6 +47,8 @@ def fmt(v, key, how):
         return None
     if how == "raw" or isinstance(v, str):
         return str(v)
+    if how and how[0] in "fk":
+        return f"{float(v) / (1000 if how[0] == 'k' else 1):.{int(how[1])}f}"
     if how == "date":
         return (datetime(1858, 11, 17) + timedelta(days=float(v))).strftime("%Y-%m-%d")
     if how == "pct" or (how is None and re.search(r"frac|pct", key)):
