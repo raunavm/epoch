@@ -200,6 +200,55 @@ def committed(path):
     return bool(r.stdout.strip())
 
 
+CURVE_KMIN = 1.0
+
+
+def count_curve(maps, kmin=CURVE_KMIN):
+    """Exact step function of the total number of components (e1.n_components) over maps vs grid k >= kmin.
+    The count can only change where k crosses a pixel value, so it is evaluated at those grid points only.
+    Returns [[k, total], ...] change points (total holds from k up to the next k)."""
+    j0 = int(np.searchsorted(e1.K_GRID, kmin - 1e-9))
+    steps = {}
+    for m in maps:
+        if m is None:
+            continue
+        a = np.nan_to_num(m, nan=0.0)
+        vals = a[a > e1.K_GRID[j0]]
+        js = np.unique(np.searchsorted(e1.K_GRID, vals, side="left"))
+        prev = 0
+        for j in [j0] + [j for j in js if j > j0 and j < len(e1.K_GRID)]:
+            c = e1.n_components(m, e1.K_GRID[j])
+            if c != prev:
+                steps[j] = steps.get(j, 0) + c - prev
+                prev = c
+    tot, out = 0, []
+    for j in sorted(steps):
+        tot += steps[j]
+        if steps[j]:
+            out.append([float(e1.K_GRID[j]), int(tot)])
+    return out
+
+
+def curve_at(curve, k):
+    """Total components at grid k from count_curve change points (k >= CURVE_KMIN)."""
+    t = 0
+    for kk, c in curve:
+        if kk <= k + 1e-9:
+            t = c
+        else:
+            break
+    return t
+
+
+def fp_curves(fd, m6_maps):
+    """SECONDARY (coordinator request after the referee): unplanted component-count curves on this test field for
+    M6 and for M1-M5 (orrery.e1.method_maps exactly as scripts/e1_test_false_rates.py; nothing planted)."""
+    v, lam, det, mjd = e1.frame_arrays(fd)
+    maps, _ = e1.method_maps(v, lam, det, mjd, json.load(open(run_e1.THR))["f"])
+    maps["M6"] = m6_maps
+    return {m: dict(n_maps=sum(x is not None for x in ms), curve=count_curve(ms)) for m, ms in maps.items()}
+
+
 def run_field(name):
     p = f"{RUNS6}/{name}.json"
     if os.path.exists(p):
@@ -216,11 +265,17 @@ def run_field(name):
         pi = [e1.plant(fr, *pos[li][e], e1.LEVELS[li]) for li in range(nl)]
         planted.append([a for a, _ in pi])
         info.append([b for _, b in pi])
-    fits_ = fit_all(fd, planted)
-    fp, levels = [], [[] for _ in range(nl)]
+    # a source off the (detector-clipped) cutout has sum P^2 = 0 -> e1.plant returns an all-NaN image; E1 counts no
+    # trial there (has_data False). Such images are not fitted (the cutout itself stands in; asserted unused below).
+    subst = [[not np.array_equal(np.isfinite(a), np.isfinite(fr["img"])) for a in planted[e]]
+             for e, fr in enumerate(fd["frames"])]
+    fits_ = fit_all(fd, [[fr["img"] if subst[e][li] else a for li, a in enumerate(planted[e])]
+                         for e, fr in enumerate(fd["frames"])])
+    fp, levels, m0s = [], [[] for _ in range(nl)], []
     for e, (fr, (r, s, m)) in enumerate(zip(fd["frames"], fits_)):
         m0 = e6.m6_grid(e6.native_z(r[0], s[0], m, fr["sigma_native"], f6), fr)
         fp.append(e1.n_components(m0, k6))
+        m0s.append(m0)
         for li in range(nl):
             x, y = pos[li][e]
             v = e1.resample(planted[e][li], fr["flg"], fr["gx"], fr["gy"])[0].astype(np.float32)   # as frame_arrays
@@ -228,6 +283,7 @@ def run_field(name):
             rec = dict(x=round(float(x), 3), y=round(float(y), 3), has_data=bool(np.isfinite(v[iy, ix])),
                        flux=info[e][li]["flux"], sumP2=info[e][li]["sumP2"], sigma_native=fr["sigma_native"])
             if rec["has_data"]:
+                assert not subst[e][li]
                 mm = e6.m6_grid(e6.native_z(r[li + 1], s[li + 1], m, fr["sigma_native"], f6), fr)
                 rec["M6"] = e1.detected(mm, k6, x, y)
                 rec["M6_kmax"] = e1.kmax_detected(mm, x, y)
@@ -242,7 +298,7 @@ def run_field(name):
                frames_dropped_centre_off_detector=len(fd["dropped"]), obs=[fr["key"] for fr in fd["frames"]],
                stars_per_frame=[len(fr["star_xy"]) for fr in fd["frames"]],
                false_alarm=dict(n_components=int(sum(fp)), n_maps=len(fp), n_frames_with_component=int(sum(c > 0 for c in fp))),
-               levels=res, runtime_s=round(time.time() - t, 1))
+               levels=res, secondary_fp_curves=fp_curves(fd, m0s), runtime_s=round(time.time() - t, 1))
     json.dump(rec, open(p + ".tmp", "w"), separators=(",", ":"))
     os.replace(p + ".tmp", p)
     print(f"{name}: " + " ".join(f"L{li} {x['M6']['n_detected']}/{x['M6']['n_trials']}" for li, x in enumerate(res))
@@ -305,13 +361,16 @@ def summary():
         return dict(ci68=[e1.q(d, .16), e1.q(d, .84)], ci95=[e1.q(d, .025), e1.q(d, .975)])
 
     pt = {m: e1.s50(eff[m])[0] for m in methods}
+
+    def dpt(a, b):     # point difference of S/N50; None when both are censored above the top level
+        return None if np.isinf(a) and np.isinf(b) else a - b
     comp = [m for m in others if m != "M4"]
     best_b = np.min([s50_b[m] for m in comp], 0)
     comparisons = dict(
-        M6_minus_M4=dict(point=pt["M6"] - pt["M4"], **diff(s50_b["M6"], s50_b["M4"])),
-        M6_minus_best_of_M1_M2_M3_M5=dict(point=pt["M6"] - min(pt[m] for m in comp), **diff(s50_b["M6"], best_b),
+        M6_minus_M4=dict(point=dpt(pt["M6"], pt["M4"]), **diff(s50_b["M6"], s50_b["M4"])),
+        M6_minus_best_of_M1_M2_M3_M5=dict(point=dpt(pt["M6"], min(pt[m] for m in comp)), **diff(s50_b["M6"], best_b),
                                           note="per replicate min over M1, M2, M3, M5 (conservative), as e1.json"),
-        M6_minus_best_of_M1_to_M5=dict(point=pt["M6"] - min(pt[m] for m in others),
+        M6_minus_best_of_M1_to_M5=dict(point=dpt(pt["M6"], min(pt[m] for m in others)),
                                        **diff(s50_b["M6"], np.min([s50_b[m] for m in others], 0))),
         eff5_M6_minus_M4=dict(point=float(eff["M6"][i5] - eff["M4"][i5]),
                               ci95=[e1.q(eff_b["M6"][:, i5] - eff_b["M4"][:, i5], .025),
@@ -338,12 +397,75 @@ def summary():
                                         calib_rate_at_k=thr["M6"]["rate_at_k"],
                                         per_field={n: [R6[n]["false_alarm"]["n_components"], R6[n]["false_alarm"]["n_maps"]] for n in fields},
                                         others_from_e1_test_false_rates={m: v["rate_per_frame"] for m, v in fp_e1.items()}),
+               secondary_equal_test_false_rate=secondary(fields, R6, methods, idx, per),
                code_sha256=code_sha(), generated_local=time.strftime("%Y-%m-%dT%H:%M:%S%z"))
     json.dump(out, open(OUT6, "w"), indent=1)
     figure(out)
     print(json.dumps({m: dict(k=v["k"], eff=v["efficiency"], s50=v["snr50"], ci95=v["snr50_ci95"]) for m, v in per.items()}, indent=1))
     print(json.dumps(comparisons, indent=1))
     print(json.dumps({k: v for k, v in out["M6_test_false_alarm"].items() if k != "per_field"}, indent=1))
+
+
+KS_MAX = 2000.0
+
+
+def secondary(fields, R6, methods, idx, per, li=4):
+    """SECONDARY, post hoc, clearly not the protocol metric (coordinator request after the referee found a 5x
+    spread of test-field false-alarm rates at the calib-frozen k): per method, k_test = smallest 0.05-grid k >= 1
+    with pooled unplanted test-field components / maps <= 0.01, and efficiency at S/N_frame = 20 at k_test from
+    the per-trial 'highest k still detected' records (detected at k iff kmax >= k; no planting rerun).
+    Same field-bootstrap indices as the primary; k_test is re-chosen in every replicate."""
+    K = e1.K_GRID[(e1.K_GRID >= CURVE_KMIN - 1e-9) & (e1.K_GRID <= KS_MAX + 1e-9)]
+    out = dict(label="SECONDARY, post hoc (requested after the referee's 5x false-alarm spread); thresholds "
+                     "chosen ON THE TEST FIELDS, so this is not a protocol result and not a sensitivity claim",
+               rule="per method k_test = smallest grid k (0.05 step, k >= 1) with pooled unplanted test-field "
+                    "components per map <= 0.01 (D1 rules, positive, despiked, 8-conn, >= 2 px); efficiency at "
+                    f"S/N_frame = {e1.LEVELS[li]} = pooled trials with kmax >= k_test / pooled trials",
+               source="unplanted curves: data/findings/e6_runs/<field>.json secondary_fp_curves (M1-M5 maps from "
+                      "orrery.e1.method_maps exactly as scripts/e1_test_false_rates.py); kmax: data/findings/e1_runs "
+                      "(M1-M5), data/findings/e6_runs (M6)",
+               snr_frame=e1.LEVELS[li], methods={})
+    for m in methods:
+        tot = np.zeros((len(fields), len(K)))
+        nm = np.zeros(len(fields))
+        kmax = []
+        for a, n in enumerate(fields):
+            c = R6[n]["secondary_fp_curves"][m]
+            nm[a] = c["n_maps"]
+            ks = np.array([x[0] for x in c["curve"]] + [np.inf])
+            vs = np.array([0] + [x[1] for x in c["curve"]])
+            tot[a] = vs[np.searchsorted(ks, K + 1e-9, side="right")]
+            if m == "M6":
+                pf = R6[n]["levels"][li]["per_frame"]
+            else:
+                pf = json.load(open(f"{run_e1.RUNS}/{n}_L{li}.json"))["per_frame"]
+            kmax.append(np.sort([q[m + "_kmax"] for q in pf if q.get(m) is not None]))
+        assert per[m]["n_trials"][li] == sum(len(x) for x in kmax)
+
+        def at(sel):
+            rate = tot[sel].sum(0) / nm[sel].sum()
+            ok = np.flatnonzero(rate <= e1.TARGET_RATE)
+            if not len(ok):
+                return np.nan, np.nan
+            k = K[ok[0]]
+            det = sum(len(kmax[a]) - np.searchsorted(kmax[a], k - 1e-9) for a in sel)
+            return float(k), det / sum(len(kmax[a]) for a in sel)
+
+        k_pt, e_pt = at(np.arange(len(fields)))
+        B = np.array([at(i) for i in idx])
+        out["methods"][m] = dict(k_test=k_pt, k_frozen=per[m]["k"], eff=round(e_pt, 4),
+                                 eff_ci68=[round(e1.q(B[:, 1], .16), 4), round(e1.q(B[:, 1], .84), 4)],
+                                 eff_ci95=[round(e1.q(B[:, 1], .025), 4), round(e1.q(B[:, 1], .975), 4)],
+                                 k_test_ci95=[e1.q(B[:, 0], .025), e1.q(B[:, 0], .975)],
+                                 eff_at_frozen_k=per[m]["efficiency"][li],
+                                 test_rate_at_frozen_k=round(curve_total(tot, nm, K, per[m]["k"]), 5),
+                                 n_trials=int(sum(len(x) for x in kmax)), n_maps=int(nm.sum()),
+                                 boot_frac_no_k=float(np.mean(np.isnan(B[:, 0]))))
+    return out
+
+
+def curve_total(tot, nm, K, k):
+    return float(tot[:, int(np.searchsorted(K, k - 1e-9))].sum() / nm.sum())
 
 
 def figure(out):

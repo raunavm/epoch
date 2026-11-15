@@ -7,7 +7,6 @@
  "nav.start": "Start here",
  "nav.timemachine": "Time machine",
  "nav.objects": "Objects",
- "nav.explorer": "Could we have seen it?",
  "nav.science": "Science",
  "nav.about": "About",
  "title.home": "At this spot in the sky, what really changed?",
@@ -75,7 +74,6 @@
  "start.title_timemachine": "Most changes in raw blinking are only color",
  "start.title_reveal": "Faint movers appear when pictures are combined",
  "start.title_object": "Check our numbers against independent ones",
- "start.title_explorer": "Could we have seen it?",
  "tm.h1": "Time machine",
  "tm.hint": "The same patch of sky on different days. Compare the plain blink with one detector at a time. Use ← → to step.",
  "tm.field": "Sky field",
@@ -341,5 +339,8 @@
  "home.faint_asteroid": "An asteroid, combined along its orbit: slide to add pictures.",
  "home.faint_bd": "The brown dwarf WISE 0855, combined along its path across the sky: slide to add pictures.",
  "reveal.snr_null": "Signal {snr}σ against empty paths.",
- "tr.slider_caption": "The brown dwarf appears as pictures are combined along its path"
+ "tr.slider_caption": "The brown dwarf appears as pictures are combined along its path",
+ "tr.method_h": "How this was measured and its caveats",
+ "tm.asteroids_here": "Known asteroids in this picture: {list}.",
+ "ev.target_card": "Its measured result"
 }

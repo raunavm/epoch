@@ -1,5 +1,5 @@
 import { init, getJSON, h, t, fmt, unavailable } from './core.js';
-import { findingLine } from './components/evidence.js';
+import { headlineLine } from './components/evidence.js';
 import { mountBlink } from './components/blink.js';
 import { mountLive, loadIndex, bytesPerFrame, mjdDate } from './live/live.js';
 import { parseRA, parseDec, gridSize } from './live/grid.js';
@@ -123,9 +123,9 @@ async function loadField() {
   showcase = mountBlink(box, field);
 }
 
-const findings = await getJSON('findings.json');
-if (findings?.f1) {
+const headline = await getJSON('headline.json');
+if (headline?.sentence) {
   const sec = $('tm-finding');
   sec.hidden = false;
-  sec.querySelector('div').append(findingLine(findings.f1, 'f1'));
+  sec.querySelector('div').append(headlineLine(headline));
 }

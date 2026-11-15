@@ -7,7 +7,6 @@
  "nav.start": "Empieza aquí",
  "nav.timemachine": "Máquina del tiempo",
  "nav.objects": "Objetos",
- "nav.explorer": "¿Lo habríamos visto?",
  "nav.science": "Ciencia",
  "nav.about": "Acerca de",
  "title.home": "En este punto del cielo, ¿qué cambió de verdad?",
@@ -75,7 +74,6 @@
  "start.title_timemachine": "La mayoría de los cambios en el parpadeo sin corregir son solo color",
  "start.title_reveal": "Los objetos débiles aparecen al combinar imágenes",
  "start.title_object": "Compara nuestros números con otros independientes",
- "start.title_explorer": "¿Lo habríamos visto?",
  "tm.h1": "Máquina del tiempo",
  "tm.hint": "El mismo trozo de cielo en días distintos. Compara el parpadeo simple con un detector cada vez. Usa ← → para avanzar.",
  "tm.field": "Campo del cielo",
@@ -341,5 +339,8 @@
  "home.faint_asteroid": "Un asteroide, combinando imágenes a lo largo de su órbita: desliza para sumar imágenes.",
  "home.faint_bd": "La enana marrón WISE 0855, combinando imágenes a lo largo de su camino por el cielo: desliza para sumar imágenes.",
  "reveal.snr_null": "Señal de {snr}σ frente a caminos vacíos.",
- "tr.slider_caption": "La enana marrón aparece al combinar imágenes a lo largo de su camino"
+ "tr.slider_caption": "La enana marrón aparece al combinar imágenes a lo largo de su camino",
+ "tr.method_h": "Cómo se midió y sus salvedades",
+ "tm.asteroids_here": "Asteroides conocidos en esta imagen: {list}.",
+ "ev.target_card": "Su resultado medido"
 }

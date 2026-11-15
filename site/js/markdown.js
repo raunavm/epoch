@@ -1,5 +1,5 @@
 // Minimal, safe Markdown → HTML. All text is escaped; only the constructs below produce tags.
-// Supports: # headings, paragraphs, - / 1. lists, > quotes, ``` code, ---, | tables |, images, links, **bold**, *em*, `code`.
+// Supports: # headings (optional {#id}), paragraphs, - / 1. lists, > quotes, ``` code, ---, | tables |, images, links, **bold**, *em*, `code`.
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const okUrl = u => !/^\s*(javascript|data|vbscript):/i.test(u);
 
@@ -30,8 +30,9 @@ export function renderMarkdown(src, resolve = u => u) {
       while (i < lines.length && !lines[i].startsWith('```')) buf.push(lines[i++]);
       i++; out.push(`<pre><code>${esc(buf.join('\n'))}</code></pre>`);
     } else if ((m = l.match(/^(#{1,6})\s+(.*)$/))) {
-      const lv = m[1].length;
-      out.push(`<h${lv} id="${slug(m[2])}">${inline(m[2])}</h${lv}>`); i++;
+      const lv = m[1].length, idm = m[2].match(/\s*\{#([\w-]+)\}\s*$/); // optional explicit id: "## Heading {#id}"
+      const text = idm ? m[2].slice(0, idm.index) : m[2];
+      out.push(`<h${lv} id="${idm ? idm[1] : slug(text)}">${inline(text)}</h${lv}>`); i++;
     } else if (/^(-{3,}|\*{3,})\s*$/.test(l)) { out.push('<hr>'); i++; }
     else if (l.startsWith('>')) {
       const buf = []; while (i < lines.length && lines[i].startsWith('>')) buf.push(lines[i++].replace(/^>\s?/, ''));

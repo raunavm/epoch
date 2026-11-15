@@ -45,28 +45,35 @@ async function fill(panel, ev) {
         t('ev.show_all', { n: frames.length }));
       parts.push(more);
     }
-  } else parts.push(h('p', { class: 'muted small' }, t('ev.no_frames')));
+  } else if (!ev.links?.length) parts.push(h('p', { class: 'muted small' }, t('ev.no_frames')));
   if (ev.nulls?.length) {
     parts.push(h('h4', {}, t('ev.nulls')),
       h('p', { class: 'small' }, ev.nulls.map(v => (typeof v === 'object' ? `${v.label}: ${fmt(v.value, 3)}` : fmt(v, 3))).join(' · ')));
     if (ev.nullsNote) parts.push(h('p', { class: 'muted small' }, ev.nullsNote));
   }
-  const links = [...(ev.method ? [{ text: t('ev.method'), href: ev.method }] : []), ...(ev.links || [])];
-  if (links.length) parts.push(h('p', { class: 'small' }, links.flatMap((l, i) => [i ? ' · ' : '', h('a', { href: /^https?:/.test(l.href) ? l.href : link(l.href) }, l.text)])));
+  const a = l => h('a', { href: /^https?:/.test(l.href) ? l.href : link(l.href) }, l.text);
+  if (ev.links?.length > 3) parts.push(h('ul', { class: 'ev-frames' }, ev.links.map(l => h('li', {}, a(l)))));
+  const links = [...(ev.method ? [{ text: t('ev.method'), href: ev.method }] : []), ...(ev.links?.length > 3 ? [] : ev.links || [])];
+  if (links.length) parts.push(h('p', { class: 'small' }, links.flatMap((l, i) => [i ? ' · ' : '', a(l)])));
   panel.replaceChildren(...parts);
 }
 
 // Frames of a precomputed field, for evidence panels.
 export const fieldFrames = getJSON => async field => (await getJSON(`timemachine/${String(field).replace(/[^\w.-]/g, '')}.json`))?.frames || null;
 
-const METHOD = { f1: 'science.html#which-change-is-real', f2: 'science.html#stacking-along-an-orbit', f3: 'science.html#sizes-and-colours' };
+const METHOD = { f1: 'science.html#which-change-is-real', f2: 'science.html#stacking-along-an-orbit' };
 
 // One finding from findings.json: {sentence, number, err, unit?, label?, detail?}; its number opens the evidence.
 // f1: per-field counts link to each prepared field; detail.all_fields adds one line about all fields.
 // f2: frames of the stack and the off-orbit null stacks from reveal.json.
 export function findingLine(f, key) {
   const d = f.detail || {};
-  const ev = { method: METHOD[key] };
+  const ev = { method: f.method || METHOD[key] };
+  if (f.target) { // a finding about a challenge target: its prepared field's pictures and its result card
+    const id = String(f.target).replace(/[^\w.-]/g, '');
+    ev.loadFrames = () => fieldFrames(getJSON)(id);
+    ev.links = [{ text: t('ev.target_card'), href: `timemachine.html?target=${id}` }];
+  }
   if (d.per_field) {
     ev.note = t('ev.per_field');
     ev.links = d.per_field.map(p => ({ text: `${p.name}: ${p.n_naive_all} → ${p.n_corrected}`, href: `timemachine.html?field=${p.field}#showcase` }));
@@ -79,9 +86,23 @@ export function findingLine(f, key) {
     return r?.frames?.map(x => ({ ...x, date: x.mjd ? new Date((x.mjd - 40587) * 864e5).toISOString().slice(0, 10) : null })) || null;
   };
   const num = f.number != null ? evidenceNum(h('strong', { class: 'num' }, fmtPM(f.number, f.err), f.unit ? ` ${f.unit}` : ''), ev) : [null, null];
-  const main = h('p', { class: 'finding' }, f.sentence || '', ' ', num[0], ' ', badge(f.label || 'derived'));
+  const range = f.err_low != null && f.err_high != null && Number.isFinite(+f.err_low) ? ` (${t('home.range', { lo: fmt(f.err_low), hi: fmt(f.err_high), unit: f.unit || '' })})` : '';
+  const main = h('p', { class: 'finding' }, f.sentence || '', ' ', num[0], range, ' ', badge(f.label || 'derived'));
   const a = d.all_fields;
   return h('div', {}, main, num[1], a?.fraction_removed != null ? h('p', { class: 'muted small' },
     t('finding.all_fields', { n: d.per_field?.length ?? '', pct: fmt(100 * a.fraction_removed, 2), naive: a.n_naive, corr: a.n_corrected }),
     a.note ? ` (${a.note})` : '', ' ', badge('derived')) : null);
+}
+
+// The measured headline (headline.json): number with its range, opening the per-patch evidence list.
+export function headlineNumber(hd, big = false) {
+  const unit = hd.unit || '';
+  const range = hd.err_low != null && hd.err_high != null ? t('home.range', { lo: fmt(hd.err_low), hi: fmt(hd.err_high), unit }) : null;
+  return evidenceNum(h('span', { class: big ? 'big-figure' : 'num' }, hd.err != null ? fmtPM(hd.number, hd.err) : fmt(hd.number), unit), {
+    note: hd.evidence_note, links: hd.evidence, method: hd.method || 'science.html#which-change-is-real', nulls: hd.nulls, nullsNote: hd.nulls_note,
+  }).concat(range);
+}
+export function headlineLine(hd) {
+  const [btn, panel, range] = headlineNumber(hd);
+  return h('div', {}, h('p', { class: 'finding' }, hd.sentence || '', ' ', btn, range ? ` (${range})` : '', ' ', badge(hd.kind || 'derived')), panel);
 }

@@ -1,8 +1,8 @@
 // Landing: the question, one interaction (raw <-> corrected on a real field), one measured number.
-import { init, getJSON, h, put, t, link, badge, fmtPM, unavailable, REDUCED_MOTION } from './core.js';
+import { init, getJSON, h, put, t, link, badge, unavailable, REDUCED_MOTION } from './core.js';
 import { mountBlink } from './components/blink.js';
 import { mountReveal } from './components/reveal.js';
-import { evidenceNum, fieldFrames } from './components/evidence.js';
+import { headlineNumber } from './components/evidence.js';
 
 await init();
 const $ = id => document.getElementById(id);
@@ -23,27 +23,24 @@ if (field?.frames?.length) {
 } else put(box, unavailable(t('what.field')));
 
 if (headline?.number != null) {
-  const [btn, panel] = evidenceNum(h('span', { class: 'big-figure' }, fmtPM(headline.number, headline.err), headline.unit ? ` ${headline.unit}` : ''), {
-    loadFrames: () => fieldFrames(getJSON)(fieldId),
-    nulls: headline.nulls, nullsNote: headline.nulls_note,
-    method: headline.method || 'science.html#which-change-is-real',
-    note: headline.evidence_note,
-  });
-  put($('headline-number'), h('p', { class: 'figure-line' }, btn, ' ', h('span', { class: 'figure-label' }, headline.number_label || ''), ' ', badge(headline.kind || 'derived')), panel);
+  const [btn, panel, range] = headlineNumber(headline, true);
+  put($('headline-number'), h('p', { class: 'figure-line' }, btn, ' ',
+    h('span', { class: 'figure-label' }, headline.number_label || '', range ? h('span', { class: 'muted' }, ` (${range})`) : null), ' ', badge(headline.kind || 'derived')), panel);
 }
 
-// Below the fold: the stacking reveal, played once when it scrolls into view.
-const rv = $('reveal'), data = await getJSON('reveal.json');
-if (!data?.frames?.length) rv.replaceChildren(unavailable(t('what.reveal')));
-else {
-  const body = h('div');
-  put(rv, h('h3', { class: 'object-name' }, data.designation || data.object), body);
-  const play = () => mountReveal(body, data, { autoplay: !REDUCED_MOTION });
-  if (!('IntersectionObserver' in window)) play();
-  else {
-    let done = false;
-    const io = new IntersectionObserver(es => { if (!done && es.some(e => e.isIntersecting)) { done = true; io.disconnect(); play(); } }, { threshold: 0.3 });
-    mountReveal(body, data, { autoplay: false });
-    io.observe(rv);
+// Below the fold: two objects too faint for one picture, each played once when it scrolls into view.
+const examples = [['reveal.json', 'home.faint_asteroid'], ['e4/reveal.json', 'home.faint_bd']];
+const rv = $('reveal');
+const datas = await Promise.all(examples.map(([f]) => getJSON(f)));
+if (!datas.some(d => d?.frames?.length)) rv.replaceChildren(unavailable(t('what.reveal')));
+else put(rv, ...datas.map((data, k) => {
+  if (!data?.frames?.length) return null;
+  const body = h('div'), wrap = h('div', { class: 'example' }, h('h3', { class: 'object-name' }, data.object || data.designation),
+    h('p', { class: 'hint' }, t(examples[k][1])), body);
+  mountReveal(body, data, { autoplay: false });
+  if (!REDUCED_MOTION && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); mountReveal(body, data, { autoplay: true }); } }, { threshold: 0.4 });
+    io.observe(wrap);
   }
-}
+  return wrap;
+}));

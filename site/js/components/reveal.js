@@ -47,7 +47,7 @@ export function mountReveal(el, data, { compact = false, autoplay = false } = {}
     cap.replaceChildren(t('reveal.caption', { n: label, N }));
     if (label === 1 && frames[0]) cap.append(' · ', t('reveal.frame_meta', { wl: fmt(frames[0].wl_um, 3) }));
     snr.replaceChildren();
-    if (st && st.snr != null) snr.append(t('reveal.snr', { snr: fmt(st.snr, 2) }), ' ', badge('derived'));
+    if (st && st.snr != null) snr.append(t(data.noise_calibration ? 'reveal.snr_null' : 'reveal.snr', { snr: fmt(st.snr, 3) }), ' ', badge('derived'));
 
     const sp = specs.filter(s => s.n_frames_used <= n).pop();
     specBox.replaceChildren();
@@ -64,9 +64,9 @@ export function mountReveal(el, data, { compact = false, autoplay = false } = {}
     return h('div', {}, h('p', { class: 'gain' }, t('reveal.gain', { x: fmt(10 ** (0.4 * gain), 2), N }), ' ', btn, ' ', badge('derived')), panel);
   };
   put(el,
-    h('div', { class: 'reveal' + (compact ? ' compact' : '') },
+    h('div', { class: 'reveal' + (compact ? ' compact' : '') + (specs.length ? '' : ' no-spec') },
       h('figure', { class: 'imgpanel' }, h('div', { class: 'imgwrap' }, img, imgBadge), cap, snr),
-      h('figure', { class: 'specpanel' }, specBox)),
+      specs.length ? h('figure', { class: 'specpanel' }, specBox) : null),
     h('div', { class: 'reveal-controls' },
       h('label', { for: slider.id }, t('reveal.slider')), slider, play),
     Number.isFinite(gain) ? gainLine() : null,

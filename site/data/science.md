@@ -45,7 +45,7 @@ The term f · |S_p| is a noise floor proportional to each star's brightness. SPH
 
 ###### E2
 
-## Which change is real
+## Which change is real {#which-change-is-real}
 
 **Test E2: how many of a plain blink's changes are only colour?** Written down before the data were analysed (`docs/PROTOCOLS.md`, E2).
 
@@ -79,7 +79,7 @@ The term f · |S_p| is a noise floor proportional to each star's brightness. SPH
 
 ###### E4
 
-## WISE 0855−0714, the coldest known brown dwarf
+## WISE 0855−0714, the coldest known brown dwarf {#e4}
 
 **Test E4: is WISE 0855−0714 visible in SPHEREx pictures combined along its known path?** WISE 0855 is one of the challenge's five test targets. It is so cold that it shines mainly at the longest SPHEREx wavelengths, and it is too faint for most single pictures. Written down before the data were analysed (`docs/PROTOCOLS.md`, E4).
 
@@ -118,7 +118,7 @@ Survey 1 (2025 May) has only 3 usable pictures, one of them badly fitted, and is
 
 ###### Motion
 
-## Measuring how a star moves, from SPHEREx alone
+## Measuring how a star moves, from SPHEREx positions {#motion}
 
 **Epsilon Indi B**, a pair of brown dwarfs 12 light-years away, is one of the challenge's test targets. In each of 140 pictures we fit its position freely (saturated pixels masked, Gaia neighbours modelled), average positions in four time windows over 374 days, and fit a straight-line motion with Gaia's parallax held fixed.
 
@@ -131,7 +131,7 @@ Survey 1 (2025 May) has only 3 usable pictures, one of them badly fitted, and is
 
 **Barnard's Star did not work this way.** The same method on Barnard's Star gives a north–south motion of 5.6 ± 1.5 ″/yr, far from Gaia's 10.4 (`data/findings/motion_barnard.json`). It is a bright star (Gaia G = 8.2) and only two time windows are available; we have not checked the cause. We make no numeric motion claim for it. Its motion is still plain to see in the tool: subtracting survey 2 from survey 1 shows it as an orange–blue pair (`timemachine.html?target=barnard&mode=subtract`).
 
-## Stacking along an orbit
+## Stacking along an orbit {#stacking-along-an-orbit}
 
 For an asteroid with a known orbit, we predict where it is in every picture (JPL Horizons, SPHEREx as observer). We subtract the fitted stars and background, centre each leftover picture on the predicted position, and add them with weights proportional to the expected brightness divided by the noise squared (a matched filter).
 
@@ -146,6 +146,10 @@ For an asteroid with a known orbit, we predict where it is in every picture (JPL
 **Not new.** Stacking along known orbits is established: NEOWISE (Masiero et al.), the KBMOD shift-and-stack search (Whidden et al. 2019), IRSA's MOST tutorial, and other Space Apps 2026 teams. We use it as a measured demonstration, not as a new method.
 
 ###### E5
+
+## A scene model built only from Gaia stars {#e6}
+
+We also tried modelling every picture star by star, using ESA Gaia's catalogue (one brightness per star per picture), and treating whatever is left as change. Measured on the calibration patch, its noise allowance was small (4.1% of a star's brightness), so we ran it through the same planted-source test. It found essentially nothing at its frozen alarm threshold, and on the 20 test patches it raised far more false alarms than allowed. The likely reason: infrared sources that Gaia does not list (Gaia sees visible light) stay in every picture. Details: `data/findings/e6.json`.
 
 ## Are the error bars right?
 

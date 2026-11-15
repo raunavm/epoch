@@ -1,16 +1,25 @@
 // Result cards for the five challenge targets, read from data/targets/<id>.json:
 // {title, plain_result, numbers:[{label, value, err, unit?, kind, nulls?, method?}], evidence_links:[{text, href}], method_note}
-import { h, put, t, link, badge, fmtPM } from '../core.js';
+import { h, put, t, link, badge, fmt, fmtPM } from '../core.js';
 import { evidenceNum, fieldFrames } from './evidence.js';
+import { mountReveal } from './reveal.js';
 import { TARGETS } from '../live/targets.js';
 
-const value = n => (Number.isFinite(+n.value) ? fmtPM(n.value, n.err) : String(n.value ?? '—')) + (n.unit ? ` ${n.unit}` : '');
+// Strings are shown exactly as written in the file; numbers are formatted with their uncertainty.
+const value = n => (typeof n.value !== 'number' ? String(n.value ?? '—') : n.err != null ? fmtPM(n.value, n.err) : fmt(n.value, 6)) + (n.unit ? ` ${n.unit}` : '');
 
 export async function renderTargetCard(el, id, getJSON) {
   const tg = TARGETS.find(x => x.id === id);
   const r = await getJSON(`targets/${id}.json`);
   if (!r) { put(el, h('p', { class: 'eyebrow' }, t('tr.eyebrow')), h('h2', { id: 'h-result' }, tg?.name || id), h('p', { class: 'muted' }, t('tr.pending'))); return; }
   const frames = fieldFrames(getJSON);
+  const slider = h('div', { class: 'card-slider' });
+  if (r.slider) getJSON(String(r.slider).replace(/[^\w./-]|\.\./g, '')).then(d => {
+    if (!d?.frames?.length) return slider.replaceChildren();
+    const body = h('div');
+    put(slider, h('h3', {}, r.slider_caption || t('tr.slider_caption')), body);
+    mountReveal(body, d, { compact: true, autoplay: false });
+  });
   put(el,
     h('p', { class: 'eyebrow' }, t('tr.eyebrow')),
     h('h2', { id: 'h-result' }, r.title || tg?.name || id),
@@ -22,7 +31,8 @@ export async function renderTargetCard(el, id, getJSON) {
       });
       return [h('dt', {}, n.label), h('dd', {}, btn, ' ', badge(n.kind || 'derived'), panel)];
     })) : null,
-    r.method_note ? h('p', { class: 'muted small' }, r.method_note) : null,
+    r.slider ? slider : null,
+    r.method_note ? h('details', { class: 'method-note' }, h('summary', {}, t('tr.method_h')), h('p', { class: 'small' }, r.method_note)) : null,
     r.evidence_links?.length ? h('p', { class: 'small' }, t('tr.evidence'), ' ',
       r.evidence_links.flatMap((l, i) => [i ? ' · ' : '', h('a', { href: /^https?:/.test(l.href) ? l.href : link(l.href) }, l.text)])) : null,
   );

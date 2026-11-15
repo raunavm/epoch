@@ -1,6 +1,7 @@
 // Live mode: any RA/Dec -> SPHEREx DR1 frames read straight from the public S3 bucket in the browser.
 import { h, put, t, fmt, badge, wlColor, REDUCED_MOTION, getJSON } from '../core.js';
-import { findingLine, evidenceNum } from '../components/evidence.js';
+import { headlineLine, evidenceNum } from '../components/evidence.js';
+import { viewControls, detectorInfo, busiestDetector, VIEWS } from '../components/blink.js';
 import { plot, s as svg } from '../plot.js';
 import { findFrames, spreadInTime } from './index.js';
 import { readHeader, readRows } from './fits.js';
@@ -35,7 +36,11 @@ export function mountLive(el, target, onState) {
   const ctl = new AbortController(), signal = ctl.signal;
   const fetchFn = (u, o) => fetch(u, { ...o, signal });
   const S = gridSize(target.fov), c = (S - 1) / 2;
-  const st = { frames: [], i: 0, playing: !REDUCED_MOTION, fps: 2, corrected: target.mode === 'corrected', view: ['add', 'subtract'].includes(target.mode) ? target.mode : 'blink', cm: null, sel: null, bytes: 0 };
+  const LEGACY = { raw: 'all', corrected: 'corr' }, m0 = LEGACY[target.mode] || target.mode;
+  // st.mode: which pictures/images the blink shows (all | det | corr); st.view: blink | add | subtract.
+  const st = { frames: [], i: 0, playing: !REDUCED_MOTION, fps: 2, mode: VIEWS.includes(m0) ? m0 : 'all', det: null, detChosen: false,
+    view: ['add', 'subtract'].includes(target.mode) ? target.mode : 'blink', cm: null, sel: null, bytes: 0 };
+  const list = () => (st.mode === 'det' ? st.frames.filter(f => f.det === st.det) : st.frames);
   let timer = null;
 
   const status = h('p', { class: 'live-status', role: 'status', 'aria-live': 'polite' }, t('live.searching'));
@@ -46,8 +51,8 @@ export function mountLive(el, target, onState) {
   const metaBox = h('dl', { class: 'facts small live-meta' });
   const scrub = h('input', { type: 'range', class: 'scrub', min: 0, max: 0, value: 0, id: 'live-scrub', 'aria-label': t('tm.timeline') });
   const playBtn = h('button', { type: 'button', class: 'btn', onclick: () => { st.playing = !st.playing; schedule(); draw(); } });
-  const sw = ['raw', 'corrected'].map(k => h('button', { type: 'button', class: 'seg', onclick: () => setCorrected(k === 'corrected') }, t(`live.${k}`)));
-  const swExplain = h('p', { class: 'hint' });
+  let info = {};
+  const controls = viewControls({}, st, (m, d) => setMode(m, d));
   const views = ['blink', 'add', 'subtract'].map(k => h('button', { type: 'button', class: 'seg', onclick: () => { st.view = k; emit(); draw(); } }, t(`live.view_${k}`)));
   const addBox = h('div', { class: 'coadds', hidden: true });
   const subBox = h('div', { class: 'subtract', hidden: true });
@@ -57,11 +62,15 @@ export function mountLive(el, target, onState) {
   const findingBox = h('div', { class: 'finding-box' });
   const subsetNote = h('p', { class: 'hint' });
 
-  function setCorrected(on) {
-    if (on && !st.cm) return;
-    st.corrected = on; emit(); draw();
+  function setMode(m, d) {
+    if (m === 'corr' && !st.cm) return;
+    const cur = list()[st.i];
+    st.mode = m; if (d != null && d !== st.det) { st.det = d; st.detChosen = true; }
+    const L = list();
+    st.i = cur ? Math.max(0, L.reduce((best, f, k) => (Math.abs(f.mjd - cur.mjd) < Math.abs(L[best].mjd - cur.mjd) ? k : best), 0)) : 0;
+    emit(); draw();
   }
-  function emit() { onState?.({ mode: st.view === 'blink' ? (st.corrected ? 'corrected' : 'raw') : st.view }); }
+  function emit() { onState?.({ mode: st.view === 'blink' ? st.mode : st.view }); }
 
   canvas.addEventListener('click', e => {
     const r = canvas.getBoundingClientRect();
@@ -77,35 +86,38 @@ export function mountLive(el, target, onState) {
     if (e.target.closest?.('input, select, textarea')) return;
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { step(e.key === 'ArrowRight' ? 1 : -1); e.preventDefault(); }
     else if (e.key === ' ') { st.playing = !st.playing; schedule(); draw(); e.preventDefault(); }
-    else if (e.key === 'c' || e.key === 'C') setCorrected(!st.corrected);
+    else if (e.key === 'c' || e.key === 'C') setMode(st.mode === 'corr' ? 'all' : 'corr', st.det);
   };
   document.addEventListener('keydown', onKey);
 
-  function step(d) { if (!st.frames.length) return; st.i = (st.i + d + st.frames.length) % st.frames.length; st.playing = false; schedule(); draw(); }
+  function step(d) { const n = list().length; if (!n) return; st.i = (st.i + d + n) % n; st.playing = false; schedule(); draw(); }
   function schedule() {
     clearInterval(timer);
-    if (st.playing && st.view === 'blink') timer = setInterval(() => { if (st.frames.length) { st.i = (st.i + 1) % st.frames.length; draw(); } }, 1000 / st.fps);
+    if (st.playing && st.view === 'blink') timer = setInterval(() => { const n = list().length; if (n) { st.i = (st.i + 1) % n; draw(); } }, 1000 / st.fps);
   }
 
   function paint(cv, rgba) { cv.getContext('2d').putImageData(new ImageData(rgba, S, S), 0, 0); }
 
   function draw() {
-    sw.forEach((b, k) => { b.setAttribute('aria-pressed', String((k === 1) === st.corrected)); b.disabled = k === 1 && !st.cm; });
-    swExplain.textContent = !st.cm ? t('live.corrected_wait') : t(st.corrected ? 'tm.corrected_explain' : 'tm.raw_explain');
+    info = detectorInfo(st.frames, 'det', 'wl');
+    if (!st.detChosen) st.det = busiestDetector(info) || null;
+    controls.update(st.mode, st.det, !st.cm, info);
     views.forEach((b, k) => { b.setAttribute('aria-pressed', String(['blink', 'add', 'subtract'][k] === st.view)); b.disabled = k > 0 && !st.cm; });
     blinkBox.hidden = st.view !== 'blink'; addBox.hidden = st.view !== 'add'; subBox.hidden = st.view !== 'subtract';
     playBtn.textContent = t(st.playing ? 'tm.pause' : 'tm.play');
     if (st.view === 'add') drawAdd();
     if (st.view === 'subtract') drawSubtract();
-    const f = st.frames[st.i];
+    const L = list();
+    st.i = Math.max(0, Math.min(st.i, L.length - 1));
+    const f = L[st.i];
     if (!f) return;
-    scrub.max = st.frames.length - 1; scrub.value = st.i;
+    scrub.max = L.length - 1; scrub.value = st.i;
     scrub.setAttribute('aria-valuetext', `${f.date}, ${fmt(f.wl, 3)} µm, ${t('live.detector')} ${f.det}`);
-    scrub.style.setProperty('--track', `linear-gradient(90deg, ${st.frames.map((g, k) => `${wlColor(g.wl)} ${k / st.frames.length * 100}% ${(k + 1) / st.frames.length * 100}%`).join(', ')})`);
-    const useCorr = st.corrected && st.cm;
+    scrub.style.setProperty('--track', `linear-gradient(90deg, ${L.map((g, k) => `${wlColor(g.wl)} ${k / L.length * 100}% ${(k + 1) / L.length * 100}%`).join(', ')})`);
+    const useCorr = st.mode === 'corr' && st.cm;
     paint(canvas, useCorr ? divergingRGBA(st.cm.corr[f.idx]) : f.rgba);
     caption.replaceChildren(h('span', { class: 'swatch', style: `background:${wlColor(f.wl)}`, 'aria-hidden': 'true' }),
-      h('strong', {}, f.date), ` · ${fmt(f.wl, 3)} µm · ${t('live.detector')} ${f.det} · ${st.i + 1}/${st.frames.length} · `, badge(useCorr ? 'resid' : 'data'));
+      h('strong', {}, f.date), ` · ${fmt(f.wl, 3)} µm · ${t('live.detector')} ${f.det} · ${st.i + 1}/${L.length} · `, badge(useCorr ? 'resid' : 'data'));
     put(metaBox, ...META_KEYS.flatMap(([k, key]) => [h('dt', {}, t(key)), h('dd', {}, f.hdr[k] ?? '—')]),
       h('dt', {}, t('live.meta_file')), h('dd', {}, h('a', { href: f.url, rel: 'noopener' }, f.obs_id + ` D${f.det}`)));
     markers(ov, f.mjd);
@@ -181,7 +193,7 @@ export function mountLive(el, target, onState) {
   // ---- loading ----
   put(el,
     h('div', { class: 'live-head' }, status, prog, subsetNote),
-    h('div', { class: 'segmented big', role: 'group', 'aria-label': t('tm.switch_label') }, sw), swExplain,
+    controls,
     h('div', { class: 'segmented', role: 'group', 'aria-label': t('live.view_label') }, views),
     blinkBox, addBox, subBox, findingBox, specBox);
   blinkBox.append(
@@ -240,9 +252,9 @@ export function mountLive(el, target, onState) {
           const fr = { ...f, url, hdr: head.hdr, v, lam, wl: tab ? waveAt(tab, p0[0], p0[1])[0] : NaN, omega: head.hdr.OMEGA_MEDIAN,
             date: (head.hdr['DATE-AVG'] || mjdDate(f.mjd)).slice(0, 16).replace('T', ' '), rgba: asinhRGBA(v), det: f.det, obs_id: f.obs_id };
           const pos = st.frames.findIndex(g => g.mjd > fr.mjd);
-          const cur = st.frames[st.i];
+          const cur = list()[st.i];
           st.frames.splice(pos < 0 ? st.frames.length : pos, 0, fr);
-          if (cur) st.i = st.frames.indexOf(cur);
+          if (cur) st.i = Math.max(0, list().indexOf(cur));
           if (!first) { first = (performance.now() - t0) / 1000; schedule(); }
         } catch (err) { if (signal.aborted) return; failed++; }
         done++; prog.value = done;
@@ -257,14 +269,14 @@ export function mountLive(el, target, onState) {
     st.frames.forEach((f, k) => { f.idx = k; });
     st.cm = changeModel(st.frames.map(f => ({ v: f.v, lam: f.lam, det: f.det, mjd: f.mjd })), S, fFloor);
     status.textContent = t('live.done', { n: st.frames.length, failed, mb: fmt(st.bytes / 1e6, 3), first: fmt(first, 2), total: fmt(total, 2) });
-    const headline = (await getJSON('findings.json'))?.f1;
+    const headline = await getJSON('headline.json');
     const liveEv = evidenceNum(t('live.changes_ev', { n: st.frames.length }), {
       frames: st.frames.map(f => ({ obs_id: f.obs_id, date: f.date, wl_um: f.wl, detector: f.det, s3_url: f.url })),
       method: 'science.html#which-change-is-real',
     });
     put(findingBox,
       h('h3', {}, t('live.changes_h')),
-      headline ? findingLine(headline, 'f1') : null,
+      headline?.sentence ? headlineLine(headline) : null,
       h('p', {}, h('strong', {}, t('live.changes_view')), ' ', t('live.changes', { all: st.cm.nNaiveAll, det: st.cm.nNaiveDet, corr: st.cm.nCorr }), ' ', badge('derived'), ' ', liveEv[0]),
       liveEv[1],
       h('p', { class: 'muted small' }, t('live.changes_method', { f: fFloor }), fProvisional ? [' ', h('strong', {}, t('live.provisional', { f: fFloor }))] : null));

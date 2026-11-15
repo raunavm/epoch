@@ -229,7 +229,7 @@ th[aria-sort="descending"] .sort::after { content: " ▼"; }
 .ev-frames { max-height: 220px; overflow: auto; margin: 0; padding-left: 2.2em; font-size: 0.85rem; }
 
 /* Landing: one question, one interaction, one number */
-.hero2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); grid-template-areas: "q field" "s field" "n field" "c field" "x field"; grid-template-rows: auto auto auto auto 1fr; gap: 0 32px; align-items: start; }
+.hero2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 340px); grid-template-areas: "q field" "s field" "n field" "c field" "x field"; grid-template-rows: auto auto auto auto 1fr; gap: 0 32px; align-items: start; }
 .hero2 h1 { grid-area: q; font-size: clamp(1.8rem, 4.2vw, 3rem); }
 .hero2 #headline-sentence { grid-area: s; }
 .hero2 .hero-field { grid-area: field; margin-top: 1.2em; padding: 12px; }
@@ -266,3 +266,19 @@ th[aria-sort="descending"] .sort::after { content: " ▼"; }
 .checklist li { margin: 0.5em 0; }
 .tick { color: #009E73; font-weight: 800; }
 .checklist pre { margin: 6px 0 0; }
+.reveal.no-spec { grid-template-columns: minmax(0, 340px); }
+.views .seg { text-align: left; }
+.hero-field .views { display: flex; flex-direction: column; width: 100%; }
+.hero-field .views .seg { font-size: 0.95rem; padding: 7px 12px; min-height: 38px; }
+.hero-field .hint { margin: 4px 0 6px; font-size: 0.85rem; }
+.det-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 4px 0; }
+.det-row[hidden] { display: none; }
+.small-seg .seg { min-height: 34px; min-width: 36px; padding: 2px 8px; font-size: 0.9rem; }
+.small-seg .seg:disabled { opacity: 0.35; }
+.example + .example { margin-top: 2em; padding-top: 1em; border-top: 1px solid var(--line); }
+.card-slider { margin: 12px 0; }
+.method-note summary { cursor: pointer; color: var(--muted); }
+.overlay .mk { pointer-events: all; cursor: pointer; }
+.overlay .mk .hit { pointer-events: all; }
+.marker-tip { min-height: 1.2em; margin: 2px 0; color: var(--ink); }
+.asteroid-list:empty { display: none; }
