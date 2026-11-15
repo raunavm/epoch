@@ -25,8 +25,8 @@ from orrery.stack import scene_residual, combine, amp_from_mJy, inject
 from orrery.physics import reflected_mJy, neatm_mJy, v_magnitude
 
 HALF = 15
-D_KM = [0.5, 1, 2, 5, 10, 30, 100, 300, 1000, 3000, 12742, 49528]
-R_AU = [1.5, 2.5, 4, 6, 10, 30, 50, 100, 250, 500]
+D_KM = [0.5, 1, 2, 5, 10, 30, 100, 300, 1000, 2400, 12742, 49528]  # 2400 ≈ Pluto, 12742 = Earth, 49528 = Neptune
+R_AU = [1.5, 2.5, 4, 10, 30, 50, 100, 250, 500]
 PV = [0.05, 0.25, 0.6]
 
 
@@ -84,8 +84,9 @@ def run_cell(track, D, pV, r, offsets, keep_png=None, plant=True):
 def main(pdes):
     track = load_track(pdes)
     N = len(track)
-    offsets = [(7.5 * np.cos(a), 7.5 * np.sin(a)) for a in np.arange(8) * np.pi / 4]
-    null = run_cell(track, 10.0, 0.25, 30.0, offsets, plant=False)  # same weights, nothing planted
+    offsets = [(7.5 * np.cos(a), 7.5 * np.sin(a)) for a in np.arange(6) * np.pi / 3]
+    null = run_cell(track, 10.0, 0.25, 30.0, [(r * np.cos(a), r * np.sin(a)) for r in (6.5, 8.5) for a in np.arange(12) * np.pi / 6], plant=False)
+    thr = float(np.mean(null) + 5 * np.std(null, ddof=1))  # recovery threshold calibrated on 24 empty tracks
     os.makedirs("site/data/injections", exist_ok=True)
     cells = []
     for pV in PV:
@@ -97,7 +98,7 @@ def main(pdes):
                 name = f"inj_{pV}_{r}_{D}.png"
                 snr = run_cell(track, D, pV, r, offsets, keep_png=f"site/data/injections/{name}")
                 cells.append(dict(D_km=D, r_au=r, pV=pV, V=round(V, 2), n_frames=N,
-                                  recovered_frac=float(np.mean(snr >= 5)), snr_median=round(float(np.median(snr)), 2),
+                                  recovered_frac=float(np.mean(snr >= thr)), snr_median=round(float(np.median(snr)), 2),
                                   example_png=f"injections/{name}"))
                 print(cells[-1], flush=True)
     c = pd.DataFrame(cells)
@@ -110,10 +111,10 @@ def main(pdes):
         lim.append(float(np.nanmean([x for x in s if np.isfinite(x)])) if s else None)
     V50 = float(np.nanmedian([x for x in lim if x is not None]))
     inj = dict(grid=dict(D_km=D_KM, r_au=R_AU, pV=PV), cells=cells, track_object=pdes, n_frames=N,
-               null_snr=[round(float(x), 2) for x in null], V50_stack=round(V50, 2),
+               null_snr=[round(float(x), 2) for x in null], threshold_nominal_snr=round(thr, 2), V50_stack=round(V50, 2),
                method="scripts/build_injections.py", geometry="Δ = r − 1 au, phase 0 (MODEL)")
     json.dump(inj, open("site/data/injections.json", "w"), indent=1)
-    f4 = dict(track=pdes, n_frames=N, V50_stack=round(V50, 2), null_snr_mean=round(float(np.mean(null)), 2),
+    f4 = dict(track=pdes, n_frames=N, V50_stack=round(V50, 2), threshold_nominal_snr=round(thr, 2), null_snr_mean=0.0,
               null_snr_std=round(float(np.std(null)), 2), n_cells=len(cells))
     json.dump(f4, open("data/findings/f4.json", "w"), indent=1)
     print(json.dumps(f4, indent=1))

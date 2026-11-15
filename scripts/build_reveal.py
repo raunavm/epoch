@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 warnings.filterwarnings("ignore")
 from orrery.data import load_stamp
-from orrery.stack import scene_residual, combine, amp_from_mJy
+from orrery.stack import scene_residual, combine, amp_from_mJy, centre
 from orrery.physics import reflected_mJy, neatm_mJy
 from orrery.truth import sbdb
 
@@ -54,6 +54,31 @@ def items_for(pdes, df, offset=(0.0, 0.0)):
     return items, dict(H=H, G=G, D=D, pV=pV, D_ref=t.get("diameter_ref"), name=(t.get("fullname") or str(pdes)).strip())
 
 
+def null_calibration(pdes, df):
+    """Empirical noise calibration on 24 empty tracks beside the orbit (6.5 and 8.5 px offsets).
+    Returns (stack_mean, stack_std, single_std): nominal S/N must be rescaled by these."""
+    stacks, singles = [], []
+    for rad in (6.5, 8.5):
+        for a in np.arange(12) * np.pi / 6 + (0 if rad == 6.5 else np.pi / 12):
+            it, _ = items_for(pdes, df, offset=(rad * np.cos(a), rad * np.sin(a)))
+            _, _, A, E = combine(it, HALF)
+            stacks.append(A / E)
+            singles += [i["snr"] for i in it if np.isfinite(i["snr"])]
+    return float(np.mean(stacks)), float(np.std(stacks, ddof=1)), float(np.std(singles)), stacks
+
+
+def detection_image(arr, half=HALF):
+    """PSF-scale smoothing (Gaussian σ = 0.7 px ≈ SPHEREx PSF core), normalised by the robust rms of the
+    outer region (r > 8 px from centre) of the same image — identical treatment for singles and stacks."""
+    from scipy.ndimage import gaussian_filter
+    sm = gaussian_filter(np.nan_to_num(arr), 0.7)
+    yy, xx = np.mgrid[:sm.shape[0], :sm.shape[1]]
+    out = np.hypot(xx - half, yy - half) > 8
+    v = sm[out]
+    rms = 1.4826 * np.median(np.abs(v - np.median(v)))
+    return (sm - np.median(v)) / (rms if rms > 0 else 1)
+
+
 def png(arr, path, vmin, vmax, cmap="magma", mark=None):
     fig = plt.figure(figsize=(2.4, 2.4), dpi=100)
     ax = fig.add_axes([0, 0, 1, 1])
@@ -78,20 +103,29 @@ def main(ids, pick):
         if len(items) < 20:
             continue
         _, _, a, ae = combine(items, HALF)
-        stats.append(dict(pdes=pdes, n=len(items), max_single=float(np.max([i["snr"] for i in items])),
-                          med_single=float(np.median([i["snr"] for i in items])), stack=float(a / ae), V=float(df.V.median())))
+        if a / ae < 5:  # cannot reach a calibrated 5σ (null spread ≥ 1)
+            stats.append(dict(pdes=pdes, n=len(items), max_single=float(np.nanmax([i["snr"] for i in items])),
+                              med_single=float(np.nanmedian([i["snr"] for i in items])), stack=float(a / ae), V=float(df.V.median())))
+            print(stats[-1], flush=True)
+            continue
+        m0, s0, s1, _ = null_calibration(pdes, df)
+        stats.append(dict(pdes=pdes, n=len(items), max_single=float(np.nanmax([i["snr"] for i in items]) / s1),
+                          med_single=float(np.nanmedian([i["snr"] for i in items]) / s1), stack=float((a / ae - m0) / s0),
+                          stack_nominal=float(a / ae), null_std=s0, single_std=s1, V=float(df.V.median())))
         print(stats[-1], flush=True)
     st = pd.DataFrame(stats)
     os.makedirs("data/findings", exist_ok=True)
     st.to_csv("data/findings/f2_candidates.csv", index=False)
     if pick is None:
-        ok = st[(st["max_single"] < 5) & (st["stack"] > 0)]
+        ok = st[(st["max_single"] < 5) & (st["stack"] >= 5)]
         if len(ok) == 0:
             print("NO CANDIDATE satisfies max single-frame S/N < 5 (the standard 5σ detection threshold); finding 2 not met with this sample")
             return
         pick = ok.sort_values("stack", ascending=False)["pdes"].iloc[0]
     df = pd.read_parquet(f"data/forced/{pick}.parquet")
     items, meta = items_for(pick, df)
+    # combination order: by EXPECTED per-picture signal-to-noise (brightness model / noise; never the measured flux)
+    items = sorted(items, key=lambda i: -i["p"] / i["A_err"])
     N = len(items)
     out = "site/data/reveal"
     os.makedirs(out, exist_ok=True)
@@ -101,15 +135,16 @@ def main(ids, pick):
     ns = [n for n in ns if n <= N]
     for k, it in enumerate(items):
         sig = np.sqrt(1 / np.maximum(it["w"], 1e-30))
-        z = np.where(it["w"] > 0, (it["img"] - np.median(it["img"])) / sig, 0)
+        z = np.where(it["w"] > 0, it["res"], 0)  # stars removed, same as the stack
+        z = detection_image(centre(z, it["xs"], it["ys"], HALF))
         name = f"single_{k:03d}.png"
-        png(z, f"{out}/{name}", -3, 8, cmap="gray", mark=(it["xs"], it["ys"]))
+        png(z, f"{out}/{name}", -3, 6, cmap="gray", mark=(HALF, HALF))
         frames.append(dict(obs_id=it["obs_id"], detector=it["det"], mjd=it["mjd"], wl_um=round(it["wl"], 4),
                            single_png=f"reveal/{name}", snr=round(float(it["snr"]), 2), s3_key=it["key"]))
     for n in ns:
         img, snr_map, a, ae = combine(items[:n], HALF)
         name = f"stack_{n:03d}.png"
-        png(snr_map, f"{out}/{name}", -3, 8, cmap="gray", mark=(HALF, HALF))
+        png(detection_image(img), f"{out}/{name}", -3, 6, cmap="gray", mark=(HALF, HALF))
         stacks.append(dict(n=n, png=f"reveal/{name}", snr=round(float(a / ae), 2), a_hat=round(float(a), 3), a_err=round(float(ae), 3)))
         # spectrum: weighted mean flux in wavelength bins using frames so far
         sub = items[:n]
@@ -124,30 +159,33 @@ def main(ids, pick):
             fl.append(round(float(np.sum(w_ * [i["f_mJy"] for i in s]) / w_.sum()), 5))
             er.append(round(float(1 / np.sqrt(w_.sum())), 5))
         spec.append(dict(n_frames_used=n, wl_um=wl, flux_mJy=fl, err=er))
-    # null test: off-orbit tracks (displaced by 6–9 px in 8 directions; static scene refit there)
-    nulls = []
-    for ang in np.arange(8) * np.pi / 4:
-        off = (7.5 * np.cos(ang), 7.5 * np.sin(ang))
-        it2, _ = items_for(pick, df, offset=off)
-        _, _, a, ae = combine(it2, HALF)
-        nulls.append(float(a / ae))
-    single = np.array([i["snr"] for i in items])
+    # null test + noise calibration on 24 off-orbit tracks (static scene refit there)
+    m0, s0, s1, nulls = null_calibration(pick, df)
+    for stk in stacks:
+        stk["snr_nominal"] = stk["snr"]
+        stk["snr"] = round((stk["snr"] - m0) / s0, 2)  # calibrated significance
+    for fr in frames:
+        fr["snr"] = round(fr["snr"] / s1, 2)
+    single = np.array([i["snr"] for i in items]) / s1
     stack_snr = stacks[-1]["snr"]
     # depth gain: typical single-frame 1σ error vs stack 1σ error, both in units of the expected brightness
     s_single = np.array([i["A_err"] / i["p"] for i in items])
-    gain = 2.5 * np.log10(np.median(s_single) / stacks[-1]["a_err"])
+    gain = 2.5 * np.log10(np.median(s_single) * s1 / (stacks[-1]["a_err"] * s0))  # with empirical noise calibration
     ideal = 2.5 * np.log10(np.median(s_single) * np.sqrt(np.sum(1 / s_single ** 2)))
     n_all = len(pd.read_parquet(f"data/forced/{pick}.parquet"))
     rev = dict(object=meta["name"], designation=f"{pick}", n_frames_before_quality_cut=n_all, meta=meta, frames=frames, stack_pngs=stacks, spectrum_points=spec,
                depth_gain_mag=None if gain is None else round(float(gain), 2), ideal_gain_mag=round(float(ideal), 2),
-               single_frame_snr_max=round(float(single.max()), 2), single_frame_snr_median=round(float(np.median(single)), 2),
+               noise_calibration=dict(stack_null_mean=round(m0, 2), stack_null_std=round(s0, 2), single_std=round(s1, 2), n_null_tracks=24),
+               single_frame_snr_max=round(float(np.nanmax(single)), 2), single_frame_snr_median=round(float(np.median(single)), 2),
                stack_snr=stack_snr, null_snrs=[round(x, 2) for x in nulls], n_frames=N,
-               units="stack images: per-pixel S/N of the matched-filter stack; singles: per-frame S/N per pixel",
+               order="pictures are combined in order of their expected signal-to-noise (brightness model and noise only; measured fluxes are not used to choose the order)",
+               units="singles and stacks: stars removed, smoothed at the PSF scale, in units of each image's own background noise (same treatment for both)",
                rerun="python scripts/run_forced.py --ids %s --stamps && python scripts/build_reveal.py --pick %s" % (pick, pick))
     json.dump(rev, open("site/data/reveal.json", "w"), indent=1)
     f2 = dict(object=meta["name"], designation=pick, n_frames=N, n_frames_dropped_quality=n_all - N, single_frame_snr_max=rev["single_frame_snr_max"],
               single_frame_snr_median=rev["single_frame_snr_median"], stack_snr=stack_snr,
-              null_snr_mean=round(float(np.mean(nulls)), 2), null_snr_std=round(float(np.std(nulls)), 2),
+              null_snr_mean=round(float((np.mean(nulls) - m0) / s0), 2), null_snr_std=1.0, null_nominal_std=round(s0, 2),
+              single_std=round(s1, 2), significance_note="calibrated on 24 empty tracks beside the orbit",
               depth_gain_mag=rev["depth_gain_mag"], ideal_gain_mag=rev["ideal_gain_mag"])
     json.dump(f2, open("data/findings/f2.json", "w"), indent=1)
     print(json.dumps(f2, indent=1))

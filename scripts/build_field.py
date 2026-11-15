@@ -9,7 +9,7 @@ Pixels come from the public S3 bucket (one range request per IMAGE row block, tw
 
 --ra/--dec are ICRS at epoch J2000.0 when proper motions are given (mas/yr, pmra includes cos dec).
 Outputs: site/data/timemachine/<name>.json + <name>/*.png, site/data/timemachine/index.json,
-data/findings/f1_<name>.json, data/findings/contact_<name>.png; --calibrate writes data/findings/f1_calibration.json.
+data/findings/f1_<name>.json, data/findings/contact_<name>.png (labelled frames), contact_passes_<name>.png; --calibrate writes data/findings/f1_calibration.json.
 """
 import argparse, json, os, sys, time
 from concurrent.futures import ThreadPoolExecutor
@@ -201,6 +201,7 @@ def gaia(name, ra0, dec0, S):
 SKYBOT = "https://ssp.imcce.fr/webservices/skybot/api/conesearch.php"
 SKYBOT_SR_DEG = 240 / 3600     # cone radius; the 48 px field's half-diagonal is 209"
 VMAG_MAX = 21.0                # asteroids fainter than this are neither labelled nor cross-matched
+VMAG_MISS = 19.0               # missed_known_asteroids: V brighter than this, inside the grid, no corrected change within 2 px
 
 
 def _skybot_query(jd, ra0, dec0):
@@ -294,6 +295,13 @@ def asteroid_summary(rows, n_groups):
                              "PSF_FWHM; expected if the second-brightest predicted pixel has S/N >= thr against the "
                              "corrected-map noise and both pixels have data")
     lim = [r_["vmag"] + 2.5 * np.log10(r_["snr2_pred"] / 5) for r_ in rows if r_["has_data"] and r_["snr2_pred"] > 0]
+    miss = [r_ for r_ in rows if r_["vmag"] < VMAG_MISS and not r_["flagged"]]
+    out["missed_rule"] = (f"missed_known_asteroids: (asteroid, frame) pairs with SkyBoT V < {VMAG_MISS:g} inside the grid "
+                          "and no corrected change within 2 px")
+    out["n_instances_v_lt_19"] = sum(r_["vmag"] < VMAG_MISS for r_ in rows)
+    out["missed_known_asteroids"] = len(miss)
+    out["missed_known_asteroids_no_data"] = sum(not r_["has_data"] for r_ in miss)
+    out["missed_known_asteroids_unique"] = len({r_["name"] for r_ in miss})
     out["vmag_limit_snr2_5_median"] = round(float(np.median(lim)), 2) if lim else None
     for thr in (5, 10):
         exp = [r_ for r_ in rows if r_["has_data"] and r_["snr2_pred"] >= thr]
@@ -626,7 +634,7 @@ def main(a):
                 ix, iy = int(np.clip(round(o["x"]), 0, S - 1)), int(np.clip(round(o["y"]), 0, S - 1))
                 wl = float(d["lam"][e][iy, ix]) if np.isfinite(d["lam"][e][iy, ix]) else float(np.nanmean(d["lam"][e]))
                 snr2, has = predicted_snr2(o["vmag"], wl, o["x"], o["y"], fwhm, denom)
-                lab.update(confidence=round(min(1.0, SCALE_ARCSEC / max(o["err"], 1e-9)), 3), vmag=o["vmag"],
+                lab.update(confidence=1, vmag=o["vmag"], pos_err_arcsec=o["err"],
                            orbit_class=o["cls"], snr2_pred=round(snr2, 1))
                 if 0 <= o["x"] <= S - 1 and 0 <= o["y"] <= S - 1:
                     box = r["corr"][e][max(0, iy - 1):iy + 2, max(0, ix - 1):ix + 2]
@@ -660,10 +668,12 @@ def main(a):
     field = dict(field=a.name, name=title, ra=round(ra0, 6), dec=round(dec0, 6), size_px=S, scale_arcsec=SCALE_ARCSEC,
                  release="dr1", noise_floor_f=f, method="docs/INTERFACES.md#wavelength-aware-change-model (revision 2)",
                  corr_colormap="blue #56B4E9 (negative) - black - orange #E69F00 (positive), clipped at +-8 sigma",
-                 confidence_rule="unexplained: clip(0.5 + (|peak| - 5)/20, 0, 1); known asteroid: min(1, 6.15 / "
-                                 "SkyBoT position error in arcsec)",
+                 confidence_rule="unexplained: clip(0.5 + (|peak| - 5)/20, 0, 1); known asteroid: 1 (catalogued "
+                                 "orbit; SkyBoT position error in pos_err_arcsec)",
                  asteroid_labels=f"IMCCE SkyBoT cone search (geocentric, LOC=500), V < {VMAG_MAX:g}, "
-                                 f"{n_groups} queries; positions moved to each frame time with SkyBoT rates",
+                                 f"{n_groups} queries; positions moved to each frame time with SkyBoT rates. "
+                                 "Approximation: geocentric positions; SPHEREx's low-Earth-orbit view differs by "
+                                 "<~1 arcsec for main-belt asteroids (more for near-Earth objects)",
                  rerun_command=" ".join(["scripts/build_field.py"] + sys.argv[1:]),
                  n_passes=len(P), frames=frames)
     if has_t:
@@ -688,14 +698,15 @@ def main(a):
               n_corrected=int(r["n_corr"].sum()), corrected_matched_known=sum(n_match.values()),
               corrected_matched_target=n_match["target"], corrected_matched_hpm_star=n_match["star"],
               corrected_matched_asteroids=n_match["asteroid"], corrected_unexplained=n_unexp,
+              missed_known_asteroids=sum(r_["vmag"] < VMAG_MISS and not r_["flagged"] for r_ in ast_rows),
               known_asteroids=asteroid_summary(ast_rows, n_groups),
               n_gaia_hpm=len(hpos), by_detector=by_det, index_src=str(d["index_src"]),
               method="docs/INTERFACES.md#wavelength-aware-change-model (revision 2)")
     if tpos is not None:
         f1["target_check"] = target_check(d, r, tpos, P)
     json.dump(f1, open(f"data/findings/f1_{a.name}.json", "w"), indent=1)
-    contact_sheet(a.name, title, d, r, tpos, f"data/findings/contact_{a.name}.png")
-    labels_sheet(title, d, r, frames, f"data/findings/contact_labels_{a.name}.png")
+    contact_sheet(a.name, title, d, r, tpos, f"data/findings/contact_passes_{a.name}.png")
+    labels_sheet(title, d, r, frames, f"data/findings/contact_{a.name}.png")
     print(json.dumps({k: v for k, v in f1.items() if k not in ("target_check", "known_asteroids")}, indent=1))
     print(json.dumps({k: v for k, v in f1["known_asteroids"].items() if k != "rows"}, indent=1))
     if tpos is not None:

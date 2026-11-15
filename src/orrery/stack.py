@@ -39,6 +39,8 @@ def combine(items, half):
     den = np.zeros_like(num)
     sa = sb = 0.0
     for it in items:
+        if not (np.isfinite(it["A"]) and np.isfinite(it["A_err"]) and it["A_err"] > 0 and np.isfinite(it["p"])):
+            continue  # fully masked patch (e.g. bad pixels at an off-orbit test position)
         r = centre(it["res"], it["xs"], it["ys"], half)
         w = centre(it["w"], it["xs"], it["ys"], half).clip(0)
         p = it["p"]
