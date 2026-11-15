@@ -35,7 +35,9 @@
     -0.275
    ],
    "nulls_note": "same pictures, path shifted 6\u20139 px",
-   "method": "science.html#e4"
+   "method": "science.html#e4",
+   "label_es": "Se\u00f1al, visitas de nov\u2013dic 2025, frente a 24 caminos vac\u00edos",
+   "nulls_note_es": "mismas im\u00e1genes, camino desplazado 6\u20139 px"
   },
   {
    "label": "Signal, Apr\u2013May 2026 visits (a neighbouring star restored to the model)",
@@ -43,42 +45,51 @@
    "err": null,
    "kind": "derived",
    "unit": "\u03c3",
-   "method": "science.html#e4"
+   "method": "science.html#e4",
+   "label_es": "Se\u00f1al, visitas de abr\u2013may 2026 (con una estrella vecina devuelta al modelo)"
   },
   {
    "label": "Brightness at 4.4\u20135 \u00b5m, Nov\u2013Dec 2025 (error includes the short-wavelength control offset)",
    "value": 0.504,
    "err": 0.034,
    "kind": "derived",
-   "unit": "mJy"
+   "unit": "mJy",
+   "label_es": "Brillo a 4.4\u20135 \u00b5m, nov\u2013dic 2025 (el error incluye el desplazamiento del control en longitudes de onda cortas)"
   },
   {
    "label": "Shift between visit windows: measured",
    "value": "-3.3 \u00b1 0.6\u2033, +2.1 \u00b1 1.1\u2033",
    "err": null,
    "kind": "derived",
-   "unit": ""
+   "unit": "",
+   "label_es": "Desplazamiento entre ventanas de visitas: medido",
+   "value_es": "-3.3 \u00b1 0.6\u2033, +2.1 \u00b1 1.1\u2033"
   },
   {
    "label": "Shift between visit windows: predicted",
    "value": "-4.5\u2033, +0.6\u2033",
    "err": null,
    "kind": "model",
-   "unit": ""
+   "unit": "",
+   "label_es": "Desplazamiento entre ventanas de visitas: previsto",
+   "value_es": "-4.5\u2033, +0.6\u2033"
   },
   {
    "label": "Match to prediction (p-value)",
    "value": 0.08,
    "err": null,
    "kind": "derived",
-   "unit": ""
+   "unit": "",
+   "label_es": "Concordancia con la predicci\u00f3n (valor p)"
   },
   {
    "label": "Same test for a source standing still (p-value)",
    "value": "3 \u00d7 10\u207b\u2077",
    "err": null,
    "kind": "derived",
-   "unit": ""
+   "unit": "",
+   "label_es": "La misma prueba para una fuente quieta (valor p)",
+   "value_es": "3 \u00d7 10\u207b\u2077"
   },
   {
    "label": "Spectrum 3.8\u20135 \u00b5m vs JWST: average ratio over the 10 detected colour steps",
@@ -86,17 +97,20 @@
    "err": 0.03,
    "kind": "derived",
    "unit": "",
-   "method": "science.html#e11"
+   "method": "science.html#e11",
+   "label_es": "Espectro de 3.8\u20135 \u00b5m frente a JWST: cociente medio en los 10 pasos de color detectados"
   }
  ],
  "evidence_links": [
   {
    "text": "All 46 pictures at 4.4\u20135 \u00b5m used for the numbers above",
-   "href": "science.html#e4"
+   "href": "science.html#e4",
+   "text_es": "Las 46 im\u00e1genes a 4.4\u20135 \u00b5m usadas para los n\u00fameros de arriba"
   },
   {
    "text": "Astrometry: Luhman & Esplin 2016, AJ 152, 78",
-   "href": "https://arxiv.org/abs/1605.06655"
+   "href": "https://arxiv.org/abs/1605.06655",
+   "text_es": "Astrometr\u00eda: Luhman & Esplin 2016, AJ 152, 78"
   }
  ],
  "method_note": "Position from proper motion and parallax (Luhman & Esplin 2016); each picture fitted with Gaia stars; pictures at 4.4\u20135 \u00b5m combined per visit window; significance against the same path shifted to 24 empty positions. Caveats: a G = 16.3 star sits 0.7\u20131.4 pixels away (our code first dropped it; restored \u2014 see What failed); at short wavelengths, where the brown dwarf is invisible, the Nov\u2013Dec 2025 control is -0.018 \u00b1 0.003 mJy, not zero, likely the neighbour's model; the May 2025 window has only 3 usable pictures and is not informative.",
@@ -109,8 +123,14 @@
    "src": "data/figs/e11_wise0855.png",
    "href": "science.html#e11",
    "alt": "SPHEREx spectrum of WISE 0855 from 3.8 to 5 micrometres, following the JWST spectrum",
-   "caption": "SPHEREx spectrum (91 pictures at 3.8\u20135 \u00b5m; blue) next to JWST (Luhman et al. 2024; orange). The two reddest points are lower than JWST; we do not know why."
+   "caption": "SPHEREx spectrum (91 pictures at 3.8\u20135 \u00b5m; blue) next to JWST (Luhman et al. 2024; orange). The two reddest points are lower than JWST; we do not know why.",
+   "alt_es": "Espectro de SPHEREx de WISE 0855 de 3.8 a 5 micr\u00f3metros, que sigue al espectro de JWST",
+   "caption_es": "Espectro de SPHEREx (91 im\u00e1genes a 3.8\u20135 \u00b5m; azul) junto al de JWST (Luhman et al. 2024; naranja). Los dos puntos m\u00e1s rojos est\u00e1n por debajo de JWST; no sabemos por qu\u00e9."
   }
  ],
- "generated_with": "scripts in this repository"
+ "generated_with": "scripts in this repository",
+ "title_es": "WISE 0855\u22120714 \u2014 la enana marr\u00f3n m\u00e1s fr\u00eda conocida",
+ "plain_result_es": "A 4.4\u20135 \u00b5m, combinar im\u00e1genes de SPHEREx a lo largo de su camino conocido da una se\u00f1al clara donde deber\u00eda estar: 0.50 \u00b1 0.03 mJy en las visitas de nov\u2013dic 2025, compatible con Spitzer (0.48\u20130.54 mJy) y WISE (0.41\u20130.50 mJy) en bandas m\u00e1s anchas. Entre visitas se desplaza como predice su movimiento conocido, y una fuente quieta encaja mucho peor con las posiciones. Es una afirmaci\u00f3n sobre un objeto conocido, no un objeto nuevo.",
+ "method_note_es": "Posici\u00f3n a partir del movimiento propio y el paralaje (Luhman & Esplin 2016); cada imagen ajustada con estrellas de Gaia; im\u00e1genes a 4.4\u20135 \u00b5m combinadas por ventana de visitas; significancia frente al mismo camino desplazado a 24 posiciones vac\u00edas. Salvedades: una estrella de G = 16.3 est\u00e1 a 0.7\u20131.4 p\u00edxeles (nuestro c\u00f3digo primero la descart\u00f3; restaurada \u2014 ver Qu\u00e9 fall\u00f3); en longitudes de onda cortas, donde la enana marr\u00f3n es invisible, el control de nov\u2013dic 2025 es -0.018 \u00b1 0.003 mJy, no cero, probablemente por el modelo de la vecina; la ventana de mayo de 2025 solo tiene 3 im\u00e1genes utilizables y no es informativa.",
+ "slider_caption_es": "Solo las visitas de nov\u2013dic 2025: desliza desde una imagen hasta las 22 combinadas a lo largo de su camino. Cada paso se mide frente a las mismas im\u00e1genes combinadas a lo largo de 24 caminos vac\u00edos."
 }

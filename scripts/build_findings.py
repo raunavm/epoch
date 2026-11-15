@@ -50,6 +50,16 @@ if e13 and "f2" in out and e13.get("n_combined_ge5"):
         f"Measured against the brightness predicted from each one's catalogued magnitude they give " + ", ".join(f"{r['amp_ratio_measured_over_predicted']:.2f} ± {r['amp_ratio_err']:.2f}" for r in ok) + " (the comparison code was corrected after its first run). "
         f"The slider shows {out['f2']['detail']['object']}, picked by hand and not the highest-scoring of the three. "
         "The stack numbers were computed before the split test was written down, so this is a check, not a blind test.")
+    e13b, e14 = load("data/findings/e13b.json"), load("data/findings/e14.json")
+    if e13b:
+        z = [r["z"] for r in e13b["results"]]
+        out["f2"]["sentence"] += (f" Against 200 empty paths each, all {len(z)} stacks at 4σ or more beat every path "
+                                  f"({min(z):.1f}–{max(z):.1f} times their spread).")
+    if e14:
+        out["f2"]["sentence"] += (f" A blind test on {e14['n_analysed']} new, randomly drawn asteroids failed its main criterion: "
+                                  f"{e14['n_eligible_ge5']} of {e14['n_eligible']} expected to show clearly did, against 70% required, because our noise "
+                                  f"estimate was too small (flagged before the run); their brightness matched the prediction "
+                                  f"({e14['median_amp_ratio']:.2f} times) and none of {e14['false_alarm']['n_tracks']} empty paths gave a false alarm.")
     out["f2"]["detail"] = dict(out["f2"]["detail"], e13="data/findings/e13.json")
     out["f2"].update(title="Too faint for one picture", number=e13["n_combined_ge5"], unit=f"of {e13['n_no_single_5sigma']}")
 e4 = load("data/findings/e4.json")

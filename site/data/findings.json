@@ -23,7 +23,7 @@
   "unit": "of 7",
   "number": 3,
   "err": null,
-  "sentence": "Of the 8 faint asteroids we could stack, 7 never reach the usual detection level (5 times the noise) in any single picture. Combined along their known orbits, 3 of those stand out above 5 times the spread of empty paths beside them, and all 3 still show up when their pictures are split in half. Measured against the brightness predicted from each one's catalogued magnitude they give 0.98 \u00b1 0.05, 1.20 \u00b1 0.07, 0.48 \u00b1 0.06 (the comparison code was corrected after its first run). The slider shows 98397 (2000 UC3), picked by hand and not the highest-scoring of the three. The stack numbers were computed before the split test was written down, so this is a check, not a blind test.",
+  "sentence": "Of the 8 faint asteroids we could stack, 7 never reach the usual detection level (5 times the noise) in any single picture. Combined along their known orbits, 3 of those stand out above 5 times the spread of empty paths beside them, and all 3 still show up when their pictures are split in half. Measured against the brightness predicted from each one's catalogued magnitude they give 0.98 \u00b1 0.05, 1.20 \u00b1 0.07, 0.48 \u00b1 0.06 (the comparison code was corrected after its first run). The slider shows 98397 (2000 UC3), picked by hand and not the highest-scoring of the three. The stack numbers were computed before the split test was written down, so this is a check, not a blind test. Against 200 empty paths each, all 4 stacks at 4\u03c3 or more beat every path (5.9\u20138.6 times their spread). A blind test on 12 new, randomly drawn asteroids failed its main criterion: 3 of 5 expected to show clearly did, against 70% required, because our noise estimate was too small (flagged before the run); their brightness matched the prediction (0.92 times) and none of 288 empty paths gave a false alarm.",
   "detail": {
    "object": "98397 (2000 UC3)",
    "designation": "98397",
@@ -63,7 +63,8 @@
    "ideal_gain_mag": 3.74,
    "e13": "data/findings/e13.json"
   },
-  "title_es": "Demasiado d\u00e9bil para una sola imagen"
+  "title_es": "Demasiado d\u00e9bil para una sola imagen",
+  "sentence_es": "De los 8 asteroides d\u00e9biles que pudimos apilar, 7 nunca alcanzan el nivel habitual de detecci\u00f3n (5 veces el ruido) en ninguna imagen individual. Combinadas a lo largo de sus \u00f3rbitas conocidas, 3 de ellos destacan por encima de 5 veces la dispersi\u00f3n de los caminos vac\u00edos a su lado, y los 3 siguen apareciendo cuando sus im\u00e1genes se dividen en dos mitades. Frente al brillo predicho por la magnitud catalogada de cada uno dan 0,98 \u00b1 0,05, 1,20 \u00b1 0,07, 0,48 \u00b1 0,06 (el c\u00f3digo de comparaci\u00f3n se corrigi\u00f3 tras su primera ejecuci\u00f3n). El control deslizante muestra 98397 (2000 UC3), elegido a mano y no el de mayor puntuaci\u00f3n de los tres. Las cifras del apilado se calcularon antes de escribir la prueba de las mitades, as\u00ed que es una comprobaci\u00f3n, no una prueba a ciegas. Frente a 200 caminos vac\u00edos cada uno, los 4 apilados de 4\u03c3 o m\u00e1s superan todos los caminos (5,9\u20138,6 veces su dispersi\u00f3n). Una prueba a ciegas con 12 asteroides nuevos elegidos al azar no cumpli\u00f3 su criterio principal: 3 de 5 que deb\u00edan verse claramente se vieron, frente al 70 % exigido, porque nuestra estimaci\u00f3n del ruido era demasiado peque\u00f1a (lo advertimos antes de ejecutarla); su brillo coincidi\u00f3 con la predicci\u00f3n (0,92 veces) y ninguno de 288 caminos vac\u00edos dio una falsa alarma."
  },
  "f3": {
   "title": "The coldest known brown dwarf",
@@ -92,6 +93,7 @@
   "detail": {
    "source": "data/findings/e12.json"
   },
-  "title_es": "Una distancia a partir de un a\u00f1o de im\u00e1genes"
+  "title_es": "Una distancia a partir de un a\u00f1o de im\u00e1genes",
+  "sentence_es": "Epsilon Indi B, un par de enanas marrones y objetivo de prueba del desaf\u00edo, traza un peque\u00f1o bucle anual mientras la Tierra orbita el Sol. Ajustando sus posiciones en SPHEREx, sin tomar nada de Gaia para este objeto, se obtiene una paralaje de 243 \u00b1 53 mil\u00e9simas de segundo de arco: unos 13 a\u00f1os luz (11\u201317); Gaia da 12. La barra de error la fijan estrellas ordinarias medidas de la misma forma, que muestran todas un peque\u00f1o bamboleo falso propio (sin corregir)."
  }
 }
