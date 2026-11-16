@@ -339,6 +339,8 @@ $$
 
 **Selection by held-out χ².** Only the 992 calibration-half null stars train the model, split by star into two folds; every choice is scored on the fold not used to learn it. Among eight picture models, held-out per-picture $\chi^2$ chose the zero point with brightness term plus the detector map. $K$ is the smallest value within 1% of the minimum held-out day-binned $\chi^2$. For that score, vectors are learned on one fold, and each held-out star's coefficients are fitted on even days and scored on odd days, then the reverse. The result is $K = $ 7. A calibration star is corrected by the model from the other fold. Injections go only into test-half stars, in the order inject, correct, compute statistics. The only quantities fitted to an injected light curve are its own $K$ coefficients, so any signal they absorb is counted in the measured recovery.
 
+**Real variable stars.** Tested on real stars across the sky, SPHEREx alone recovers 47 of 96 catalogued variable stars that it can test (long-period variables: 16 of 24), while flagging 2 of 246 steady comparison stars. R Draconis (below) peaked 2.5 days from the date predicted from earlier pictures. The per-star test is described in Section 10. Variations planted into real light curves, below, only set the depth.
+
 **Floors before and after.** Test-half false alarms are 3/992 before and 3/992 after (0.30%). Sinusoid floors:
 
 | AB magnitude | 15–16 | 16–17 | 17–18 | 18–19 | 19–20 |
@@ -348,7 +350,7 @@ $$
 
 At 12–15 mag the floor is 1.0% before and after, the smallest amplitude tested. Of identical injections, 350 were recovered only after correction and 0 only before. No floor rose; eclipse floors did not change. Catalogued variables above threshold went from 4/86 to 5/86; most are rotating or solar-like stars whose infrared amplitudes, near 0.1%, are below the floor. A shared signal at 79 and 95 days is reduced (136 → 103 sources peaking there) but not removed, so such periods are not treated as candidates.
 
-![Recovery of planted variations](figs/v2/e26_floor.svg "Fraction of planted sinusoidal variations recovered against source brightness, without (a) and with (b) the correction for shared errors, for amplitudes of 1% to 20%. Shaded bands are 95% intervals; the dotted line marks half recovered.")
+![Depth limit for variability](figs/v2/e26_floor.svg "Depth limit: fraction of planted sinusoidal variations recovered against source brightness, without (a) and with (b) the correction for shared errors, for amplitudes of 1% to 20%. Shaded bands are 95% intervals; the dotted line marks half recovered.")
 
 **A periodic test: R Draconis.** This Mira variable (catalogued period 246 d) saturates the detector. It is therefore measured from unsaturated pixels 7–12 pixels from its centre, with errors from 43 comparison stars measured the same way. A sine fit to an earlier set of pictures predicted a 4.4–5.0 µm maximum on 2026-02-02; the test uses only pictures outside that set. Per detector, 30-day bins are fitted as
 

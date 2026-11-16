@@ -50,13 +50,15 @@ We applied the same methane test, unchanged, to 985 objects that earlier surveys
 
 ![Methane index of brown-dwarf candidates](figs/v2/e22_methane_census.svg "Methane index (flux at 3.2–3.4 µm relative to the neighbouring wavelengths; lower means deeper methane absorption) against WISE W2 magnitude, for the 985 objects and the known L dwarfs. Stars are the candidates; the dashed line is the dividing value. Objects with no defined index are not shown, and the axis is cut at −1.5 and 2. Bars are 1σ.")
 
-## Variability at the north ecliptic pole {#e18}
+## Variable stars {#e18}
 
-SPHEREx observes the north ecliptic pole on almost every orbit. Within 0.4° of the pole, 2,701 catalogued sources were measured in 17,832 pictures. The measurements of all stars share small errors: calibration offsets that differ from picture to picture, a dependence on position on the detector, and slow drifts over the year. We fit a correction for these to half of the non-variable stars and test it on the other half. With the correction, half of planted sinusoidal variations are recovered at an amplitude of 1% for sources of AB magnitude 12–16, 2% at 16–17 and 5% at 17–19, at a false-alarm rate of 0.30%. Most catalogued variables in the field vary by less than this; 5 of 86 pass the threshold.
+Tested on real stars across the sky, SPHEREx alone recovers 47 of 96 catalogued variable stars that it can test (long-period variables: 16 of 24), while flagging 2 of 246 steady comparison stars. R Draconis peaked 2.5 days from the date predicted from earlier pictures.
+
+SPHEREx observes the north ecliptic pole on almost every orbit. Within 0.4° of the pole, 2,701 catalogued sources were measured in 17,832 pictures. The measurements of all stars share small errors: calibration offsets that differ from picture to picture, a dependence on position on the detector, and slow drifts over the year. We fit a correction for these to half of the non-variable stars and test it on the other half. Variations planted into real light curves set the depth: with the correction, half are recovered at an amplitude of 1% for sources of AB magnitude 12–16, 2% at 16–17 and 5% at 17–19, at a false-alarm rate of 0.30%. Most catalogued variables in the field vary by less than this; 5 of 86 pass the threshold.
 
 [Download the table (CSV)](products/epoch_nep_variability.csv) · [Column descriptions](products/README.md) · [Methods, section 7](methods.html#variability)
 
-![Recovery of planted brightness variations](figs/v2/e26_floor.svg "Fraction of planted sinusoidal variations recovered against source brightness, without (a) and with (b) the correction for shared errors, for amplitudes of 1% to 20%. Shaded bands are 95% intervals; the dotted line marks half recovered.")
+![Depth limit for variability](figs/v2/e26_floor.svg "Depth limit: fraction of planted sinusoidal variations recovered against source brightness, without (a) and with (b) the correction for shared errors, for amplitudes of 1% to 20%. Shaded bands are 95% intervals; the dotted line marks half recovered.")
 
 ## Pulsation of R Draconis {#rdra}
 
