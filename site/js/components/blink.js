@@ -84,6 +84,10 @@ export function mountBlink(el, field, { compact = false, minimal = false, view =
   const labelList = h('ul', { class: 'labels' });
   const counter = h('p', { class: 'flag-counter', 'aria-live': 'off' });
   const COUNT_KEY = { all: 'n_changes_naive_all', det: 'n_changes_naive_det', corr: 'n_changes_corr' };
+  // The two comparable totals side by side (the colour-aware count uses another noise model and is not compared).
+  const sum = k => frames.reduce((a, f) => a + (f[k] || 0), 0);
+  const compare = frames.some(f => f.n_changes_naive_all != null) && frames.some(f => f.n_changes_naive_det != null)
+    ? h('p', { class: 'small muted' }, t('view.compare', { N: frames.length, all: sum(COUNT_KEY.all), det: sum(COUNT_KEY.det) })) : null;
   const astList = h('p', { class: 'small asteroid-list' });
   const flagBox = h('dl', { class: 'facts small' });
   const hasGaia = Array.isArray(field.gaia) && field.gaia.length > 0;
@@ -229,7 +233,7 @@ export function mountBlink(el, field, { compact = false, minimal = false, view =
       minimal ? null : [blinkCtl, sideCtl,
         h('div', { class: 'scrub-wrap' }, h('label', { for: scrub.id, class: 'sr-only' }, t('tm.timeline')), scrub, ends),
         h('div', { class: 'controls film-row' }, contrast.el, film)],
-      counter, controls,
+      counter, small ? null : compare, controls,
       small ? null : h('div', { class: 'segmented', role: 'group', 'aria-label': t('tm.mode_label') }, layoutBtns),
       small ? null : [astList, legend, hasGaia ? h('p', {}, gaiaBtn) : gaiaLive ? h('p', { class: 'small' }, gaiaLive) : null, labelList,
         h('details', { class: 'flags', id: 'tm-flags' }, h('summary', {}, t('tm.flags_h')), flagBox)])));

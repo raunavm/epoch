@@ -1,6 +1,6 @@
 {
  "title": "WISE 0855−0714",
- "plain_result": "Combining the pictures of the November–December 2025 visits along its predicted path detects WISE 0855−0714 at 12.1σ against 200 empty paths, with a flux density of 0.50 ± 0.03 mJy at 4.4–5.0 µm. Its position changes between visits as its known proper motion and parallax predict.",
+ "plain_result": "Combining the pictures of the November–December 2025 visits along its predicted path detects WISE 0855−0714 at 12.1σ, about 12 times the scatter of the same pictures combined along 200 empty paths, with a flux density of 0.50 ± 0.03 mJy at 4.4–5.0 µm. Its position changes between visits as its known proper motion and parallax predict.",
  "numbers": [
   {
    "label": "Detection against 200 empty paths, Nov–Dec 2025 visits",
@@ -50,6 +50,6 @@
   }
  ],
  "title_es": "WISE 0855−0714",
- "plain_result_es": "Al sumar las imágenes de las visitas de noviembre y diciembre de 2025 a lo largo de su trayectoria prevista, WISE 0855−0714 se detecta a 12,1σ frente a 200 trayectorias vacías, con una densidad de flujo de 0,50 ± 0,03 mJy a 4,4–5,0 µm. Su posición cambia entre visitas como predicen su movimiento propio y su paralaje conocidos.",
+ "plain_result_es": "Al sumar las imágenes de las visitas de noviembre y diciembre de 2025 a lo largo de su trayectoria prevista, WISE 0855−0714 se detecta a 12,1σ, unas 12 veces la dispersión de las mismas imágenes sumadas a lo largo de 200 trayectorias vacías, con una densidad de flujo de 0,50 ± 0,03 mJy a 4,4–5,0 µm. Su posición cambia entre visitas como predicen su movimiento propio y su paralaje conocidos.",
  "slider_caption_es": "Visitas de noviembre y diciembre de 2025: de una imagen a todas las imágenes sumadas a lo largo de la trayectoria."
 }

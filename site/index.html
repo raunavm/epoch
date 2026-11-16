@@ -17,8 +17,11 @@
 <a class="skip" href="#main" data-i18n="nav.skip">Skip to content</a>
 <header id="site-header" class="site-header"></header>
 <main id="main" tabindex="-1">
+<section class="intro">
+<div class="intro-text">
 <h1 data-i18n="tm.h1">SPHEREx time machine</h1>
 <p class="lede" data-i18n="tm.lede"></p>
+<h2 class="form-h" data-i18n="tm.form_h">Look at any position</h2>
 <form id="coord-form" class="coord-form" aria-label="Position">
   <div class="form-row coords">
     <label><span data-i18n="live.ra">Right ascension</span> <input id="ra" inputmode="text" autocomplete="off" spellcheck="false" aria-describedby="coord-eg"></label>
@@ -32,6 +35,9 @@
   <div class="form-row" hidden><label for="target" class="small" data-i18n="live.target">More fields</label> <select id="target"></select></div>
   <p id="target-note" class="muted small"></p>
 </form>
+</div>
+<figure id="intro-fig" class="intro-fig"></figure>
+</section>
 <div id="live" hidden></div>
 <section id="showcase" aria-labelledby="h-showcase">
 <h2 id="h-showcase" data-i18n="live.showcase_h">Prepared field</h2>

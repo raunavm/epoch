@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Build-time LaTeX to MathML for the site's Methods page (not deployed).",
+  "dependencies": { "temml": "0.14.0" }
+}

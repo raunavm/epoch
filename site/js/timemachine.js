@@ -4,9 +4,11 @@ import { mountLive, loadIndex, bytesPerFrame, mjdDate } from './live/live.js';
 import { parseRA, parseDec, gridSize } from './live/grid.js';
 import { TARGETS, propagate, movedTarget, J2000_MJD } from './live/targets.js';
 import { renderTargetCard } from './components/targets.js';
+import { mountIntro } from './components/intro.js';
 
 await init();
 const $ = id => document.getElementById(id);
+mountIntro($('intro-fig'));
 const FOVS = [1, 2, 4, 8];
 const params = new URLSearchParams(location.search);
 

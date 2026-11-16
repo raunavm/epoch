@@ -486,3 +486,11 @@ main > h1 { margin-top: var(--s4); }
   .intro { grid-template-columns: minmax(0, 1fr); }
   .intro-fig { margin-top: 0; max-width: 320px; }
 }
+.intro-controls .segmented { display: inline-flex; flex-direction: row; width: auto; }
+.intro .coord-form .form-row.coords { flex-wrap: wrap; }
+@media (max-width: 760px) {
+  .intro { row-gap: 0; }
+  .intro-text { display: contents; }
+  .intro-fig { order: 1; max-width: 260px; margin: var(--s2) 0 0; }
+  .intro .form-h, .intro .coord-form { order: 2; }
+}

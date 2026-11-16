@@ -1,7 +1,7 @@
 {
  "title": "RW Aurigae",
- "status": "no significant change detected",
- "plain_result": "RW Aurigae saturates the detector and is measured from the halo of light around it. Between September 2025 and March 2026 no change exceeds the threshold set by 41 comparison stars of similar brightness measured the same way.",
+ "status": "possible change, a lead only",
+ "plain_result": "RW Aurigae saturates the detector and is measured from the halo of light around it. Between September 2025 and March 2026 no change in a single wavelength band exceeds the threshold set by 41 comparison stars of similar brightness measured the same way. Combining five bands, the change is larger than in any of those comparison stars, but this second test re-used pictures that had already been examined, so it is a lead to check with new pictures, not a result.",
  "numbers": [
   {
    "label": "Change at 0.93 µm",
@@ -56,6 +56,6 @@
   }
  ],
  "title_es": "RW Aurigae",
- "plain_result_es": "RW Aurigae satura el detector y se mide a partir del halo de luz que la rodea. Entre septiembre de 2025 y marzo de 2026 ningún cambio supera el umbral fijado por 41 estrellas de comparación de brillo similar medidas de la misma forma.",
- "status_es": "no se detecta un cambio significativo"
+ "plain_result_es": "RW Aurigae satura el detector y se mide en el halo de luz que la rodea. Entre septiembre de 2025 y marzo de 2026 ningún cambio en una sola banda de longitud de onda supera el umbral fijado por 41 estrellas de comparación de brillo similar medidas de la misma manera. Al combinar cinco bandas, el cambio es mayor que en cualquiera de esas estrellas de comparación, pero esta segunda prueba reutilizó imágenes ya examinadas, así que es un indicio que hay que comprobar con imágenes nuevas, no un resultado.",
+ "status_es": "posible cambio, solo un indicio"
 }

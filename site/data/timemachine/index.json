@@ -1,10 +1,10 @@
 [
  {
   "field": "ecliptic_control",
-  "name": "Quiet patch near the asteroid belt's plane (control)",
+  "name": "Quiet patch near the plane of the asteroid belt",
   "ra": 180.0,
   "dec": 0.0,
-  "name_es": "Trozo de cielo tranquilo cerca del plano del cintur\u00f3n de asteroides (control)"
+  "name_es": "Zona tranquila cerca del plano del cintur\u00f3n de asteroides"
  },
  {
   "field": "rdra",

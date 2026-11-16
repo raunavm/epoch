@@ -1,6 +1,6 @@
 # Epoch site
 
-Static site: plain HTML, CSS and JavaScript modules. No build step and no framework; it uses system fonts only. Pixels come from NASA's public SPHEREx bucket on AWS. Two optional overlays, only when switched on, also call outside services: the Gaia DR3 overlay (VizieR `I/355/gaiadr3` on the CfA mirror, falling back to GAVO's `gaia.dr3lite` TAP) and the WISE comparison (AllWISE W2 HiPS tiles from NASA/IPAC IRSA's mirror of the CDS HiPS).
+Static site: plain HTML, CSS and JavaScript modules, no framework and no build step for visitors. Fonts are Inter, Public Sans and DM Mono from Google Fonts. Pixels come from NASA's public SPHEREx bucket on AWS. Two optional overlays, only when switched on, also call outside services: the Gaia DR3 overlay (VizieR `I/355/gaiadr3` on the CfA mirror, falling back to GAVO's `gaia.dr3lite` TAP) and the WISE comparison (AllWISE W2 HiPS tiles from NASA/IPAC IRSA's mirror of the CDS HiPS).
 
 ## Run
 
@@ -13,72 +13,73 @@ python3 -m http.server 8000
 
 Opening the files with `file://` does not work, because browsers block module and `fetch` loads from `file://`. Use any static server.
 
-## Data
+## Pages
 
-Pages read only the JSON files in `site/data/` and the PNGs those files reference. `scripts/build_site_data.py` writes them. PNG and markdown figure paths are **relative to `site/data/`**. Absolute `http(s)` URLs are also accepted.
+| Page | What it shows | Reads |
+|---|---|---|
+| `index.html` | Time machine: opening picture (Barnard's Star, WISE 2010 and SPHEREx 2025), any position live, prepared fields, challenge-target result cards | `hero/*.png`, `index/dr1/*` + S3 pixels, `timemachine/index.json`, `timemachine/<field>.json`, `targets/<id>.json` |
+| `results.html` | Results, one short section per result | `science.md` |
+| `methods.html` | Methods, written like a paper, with equations | `methods.md`, `methods.math.json` |
+| `about.html` | Data sources, data products, credits, references | `about.json`, `products/` |
 
-If a file is missing or malformed, the part of the page that needs it shows "Not yet available". A finding missing from `findings.json` is left out of the Start-here tour.
+`timemachine.html`, `science.html`, `objects.html` and `object.html` only redirect, keeping the query and hash, so old links still work.
 
-| Page | Reads |
-|---|---|
-| `index.html` | `headline.json` `{field, question, number, err?, unit?, number_label, sentence, kind?, version, nulls?, method?}`, `timemachine/<field>.json`, `reveal.json` (below the fold) |
-| `start.html` | `findings.json` (f1–f3; f4 is no longer on the main path), plus each step's demo data |
-| `timemachine.html` | live: `index/dr1/*` + S3 pixels; `?target=<id>`: `targets/<id>.json` `{title, plain_result, numbers:[{label, value, err, unit?, kind, nulls?, method?}], evidence_links:[{text, href}], method_note}` and `timemachine/<id>.json`; prepared fields: `timemachine/index.json`, `timemachine/<field>.json` (optional `gaia: [{x, y, g}]`, per-frame `flags`, `meta`, `s3_url`); `findings.json` (f1) |
-| `objects.html` ("Evidence") | `objects.json` |
-| `object.html?id=<id>` | `objects/<id>.json` (`id` is restricted to `[A-Za-z0-9_.-]`) |
-| `science.html`, `failed.html` | `science.md`, `failed.md` (rendered by `js/markdown.js`, which escapes all text) |
-| `about.html` | `about.json` |
-| `results.html` | `results.json` (`scripts/build_results.py`: verdicts from `docs/CLAIMS.md`, extra numbers from `data/findings/*.json`), `targets/<id>.json`, `findings.json` |
-| `explorer.html` (not linked) | `injections.json` |
+Paths in data files (figures, products) are relative to `site/data/`. If a file is missing or malformed, the part of the page that needs it shows "Not yet available".
 
-Every number on the landing page, the target cards and the findings is a button that opens its evidence (`js/components/evidence.js`): the pictures behind it with links to the original S3 files, any null tests, and the method section on `science.html`.
+## Text and numbers
 
-`data/i18n/en.json` and `data/i18n/es.json` hold every UI string. These two files belong to the site, not the pipeline: **`build_site_data.py` must not delete `data/i18n/`.** To add a language, add `data/i18n/<code>.json` and an entry in `LANGS` in `js/core.js`. The chosen language is kept in `localStorage`, and `?lang=es` also works.
+- `data/i18n/en.json` and `es.json` hold every interface string. To add a language, add `data/i18n/<code>.json` and an entry in `LANGS` in `js/core.js`. The chosen language is kept in `localStorage`; `?lang=es` also works. `data/i18n/data_es.json` translates text that comes from data files.
+- `science.md` and `about.json` are made from `science.md.tmpl` and `about.json.tmpl` by `scripts/fill_tokens.py`, which replaces each `[[file.key|format]]` with the value in `data/findings/<file>.json`. Edit the `.tmpl`, then refill; never type a number into the filled file.
+- Target cards (`data/targets/<id>.json`) are edited by hand. `scripts/build_targets.py` would overwrite them.
+
+## Equations (Methods page)
+
+`js/markdown.js` turns `$…$` and `$$…$$` into MathML taken from a map built in advance, so no maths code runs in the visitor's browser. Display equations are numbered in order. To rebuild the map after editing `methods.md`:
+
+```bash
+cd tools/math && npm install && cd ../..        # once; Temml (MIT) is a build tool and is not deployed
+node tools/math/build.mjs site/data/methods.md site/data/methods.math.json
+```
+
+The build stops on any TeX error. TeX with no entry in the map is shown as code.
+
+## Figures
+
+`data/figs/v2/*.svg` (with PDF and PNG) are drawn by `figures/plot_<name>.py` with the shared style in `figures/style.mplstyle` and `figures/common.py`: Okabe–Ito colours in fixed roles (SPHEREx, reference, model, control, highlight), no text inside the axes, legends outside. Run from the repo root, for example `.venv/bin/python figures/plot_e28_rdra.py`.
 
 ## Live mode (any coordinates)
 
-`timemachine.html?ra=<deg|hms>&dec=<deg|dms>&fov=<1|2|4|8>&mode=<raw|corrected|add|subtract|track>` (or `?target=barnard|epsindib|wise0855|rwaur|rdra`). Positions covered by more than 400 frames load 300 frames spread evenly in time by default; `&all=1` (or the "Load all" button) loads every frame. The page then reads SPHEREx DR1 pixels **directly from the public S3 bucket in the browser**. The bucket allows cross-origin requests and the `Range` header. IRSA services are never called.
+`index.html?ra=<deg|hms>&dec=<deg|dms>&fov=<1|2|4|8>` (or `?target=barnard|epsindib|wise0855|rwaur|rdra|nep`). Positions covered by more than 400 pictures load 300 spread evenly in time by default; `&all=1` (or the "Load all" button) loads every picture. The page reads SPHEREx DR1 pixels **directly from the public S3 bucket in the browser**. The bucket allows cross-origin requests and the `Range` header. IRSA services are never called for pixels.
 
-1. The page loads `data/index/dr1/meta.json` and the 3×3 neighbourhood of sky tiles (`js/live/index.js`, the same rule as `scripts/build_tiles.py`). It keeps frames whose footprint contains the target with a margin of FOV/2.
-2. For each frame, at most 6 at a time, it makes two range requests: the header (bytes 0–28799), then the needed full-width image rows. Each frame costs about `rows × 8160` bytes (`js/live/fits.js`).
-3. It applies TAN-SIP world→pixel (`js/live/wcs.js`: inverse SIP, then Newton iterations on the forward SIP). It resamples bilinearly onto a north-up 6.15″ grid centred on the target and takes the wavelength from `wave_tables.json` (`js/live/grid.js`).
-4. When all frames are in, it runs the change model, revision 2 in `docs/INTERFACES.md` (`js/live/change.js`). The noise floor `f` is read from `data/f1_calibration.json` `{f}`; until that file exists the page uses 0.1 and marks it provisional. Live mode has no FLAGS plane, so single-pixel spikes are removed with a 3×3 median test. This step enables Corrected, Add (per-detector co-adds) and Subtract (earlier pictures minus later ones, split at the largest gap in time; made from the colour-aware pictures). The finding-1 headline comes only from `findings.json` f1; the live counts are labelled "this view (live)".
-5. Clicking a pixel gives quick aperture photometry for every frame, with a CSV download.
-6. `&gaia=1` (button "Show Gaia DR3 stars", `js/live/gaia.js`): Gaia DR3 stars moved from J2016.0 to each picture's date; arrows show 10 years of motion for stars faster than 0.3″/yr; click a circle for its Gaia id, G and motion.
-7. `&wise=1` (view "Compare with WISE", `js/live/wise.js`): AllWISE W2 (2010) resampled onto the same grid, beside and blinking with the SPHEREx detector-6 median; with `wise=1` only detector-6 pictures are loaded unless "Load all" is pressed.
-8. `&mode=track&rate=<″/h>&pa=<deg east of north>&t0=<mjd>&span=<h>` (view "Follow a mover", `js/live/track.js`): every picture within ±span/2 of t0 (default: the busiest 24 h) is shifted back along a straight-line motion to t0 (whole-pixel copy, bilinear for fractional shifts) and added, beside the plain stack. Both use the colour-aware residual maps (despiked, each picture capped at ±5), summed / √n, optionally 3×3-smoothed, and scaled by their own robust scatter. Motion can also come from marking the object in two pictures. The example link comes from `data/track_example.json` (`scripts/build_track_example.py`, from `data/forced/<id>.parquet`).
-8. `&exact=1` keeps a typed position even when it lies on the path of a fast-moving challenge target (otherwise the page re-centres on the target's current position and says so).
+1. The page loads `data/index/dr1/meta.json` and the 3×3 neighbourhood of sky tiles (`js/live/index.js`, the same rule as `scripts/build_tiles.py`). It keeps pictures whose footprint contains the target with a margin of FOV/2.
+2. For each picture, at most 6 at a time, it makes two range requests: the header (bytes 0–28799), then the needed full-width image rows (`js/live/fits.js`).
+3. It applies TAN-SIP world→pixel (`js/live/wcs.js`), resamples bilinearly onto a north-up 6.15″ grid centred on the target, and takes the wavelength from `wave_tables.json` (`js/live/grid.js`).
+4. It counts changes for the plain blink and for one detector at a time (`js/live/change.js`), with the noise floor `f` from `data/f1_calibration.json`. Live mode has no flag plane, so single-pixel spikes are removed with a 3×3 median test.
+5. Clicking a pixel gives quick aperture photometry for every picture, with a CSV download (a quick look; IRSA's SPHEREx Spectrophotometry Tool is the reference).
+6. `&gaia=1`: Gaia DR3 stars moved from J2016.0 to each picture's date (`js/live/gaia.js`).
+7. `&wise=1`: AllWISE W2 (2010) on the same grid, beside and blinking with the SPHEREx detector-6 median (`js/live/wise.js`).
+8. `&mode=track&rate=<″/h>&pa=<deg east of north>&t0=<mjd>&span=<h>`: pictures shifted along a straight-line motion and added (`js/live/track.js`).
+9. `&exact=1` keeps a typed position even when it lies on the path of a fast-moving challenge target.
 
-A new data release needs new index files in `data/index/<release>/`, written by `scripts/build_tiles.py --release <name>`, and a one-line change: set `RELEASE` in `js/live/live.js` to `<name>`. Live mode shows one release at a time.
+Both viewers have a contrast control and "Save film", which saves the pictures as an animated PNG encoded in the browser (`js/components/film.js`).
 
-Tests (pure functions; the WCS test reads real headers from S3, set `OFFLINE=1` to skip it; network tests also touch IRSA and VizieR):
+A new data release needs new index files in `data/index/<release>/`, written by `scripts/build_tiles.py --release <name>`, and one change: set `RELEASE` in `js/live/live.js`.
+
+## Tests and checks
 
 ```bash
-node --test site/tests/live.test.mjs
+node --test site/tests/live.test.mjs        # pure functions; the WCS test reads real headers from S3 (OFFLINE=1 skips it)
+for f in site/js/*.js site/js/components/*.js site/js/live/*.js; do node --check "$f"; done
 ```
-
-Object pages accept `&check=all` to open every "Check it" panel on load (for screenshots).
 
 ## Dev fixtures
 
-`dev-fixtures/` holds small **synthetic** files that match the contract. Every page loaded with `?fixtures=1` shows a "DEV FIXTURE — NOT DATA" banner. To regenerate them (standard library only):
-
-```bash
-python3 site/dev-fixtures/make_fixtures.py
-```
-
-Never copy anything from `dev-fixtures/` into `data/`.
-
-## Checks
-
-```bash
-for f in site/js/*.js site/js/components/*.js; do node --check "$f"; done
-```
+`dev-fixtures/` holds small **synthetic** files for development. Every page loaded with `?fixtures=1` shows a "DEV FIXTURE — NOT DATA" banner. Never copy anything from `dev-fixtures/` into `data/`.
 
 ## Layout
 
-- `js/core.js`: data loading (`?fixtures=1` switch), i18n, DOM builder, DATA/MODEL/DERIVED/RESIDUAL badges, colour scales (viridis for wavelength, Okabe-Ito for categories)
-- `js/plot.js`: small SVG plotting
-- `js/components/`: the four interactions (`reveal`, `blink`, `injgrid`), shared by the full pages and the Start-here tour
-- `js/markdown.js`: minimal Markdown renderer for `science.md`
-- `js/live/`: live mode (`index`, `fits`, `wcs`, `grid`, `change`, `targets`, and the UI `live.js`)
+- `js/core.js`: data loading, i18n, navigation, DOM builder, number formatting, colour scales
+- `js/timemachine.js`: the home page; `js/science.js`: Markdown pages (Results, Methods); `js/about.js`
+- `js/components/`: `intro` (opening picture), `blink` (prepared-field viewer), `film` (contrast and Save film), `targets` (result cards), `reveal`, `evidence`, `injgrid`
+- `js/markdown.js`: small Markdown renderer that escapes all text; equations from the prebuilt map
+- `js/live/`: live mode (`index`, `fits`, `wcs`, `grid`, `change`, `targets`, `gaia`, `wise`, `track`, and the interface `live.js`)
