@@ -7,7 +7,7 @@ import { plot, s as svg } from '../plot.js';
 import { findFrames, spreadInTime } from './index.js';
 import { readHeader, readRows } from './fits.js';
 import { makeWCS, waveAt } from './wcs.js';
-import { gridSize, rowsNeeded, resample, aperture, toMJy, asinhRGBA, divergingRGBA, SCALE_ARCSEC } from './grid.js';
+import { gridSize, rowsNeeded, resample, aperture, apCorr, toMJy, asinhRGBA, divergingRGBA, SCALE_ARCSEC } from './grid.js';
 import { changeModel, median, despike } from './change.js';
 import { trackShift, motionFromMarks, shiftImage, stackSN, busiestSpan, peakNear } from './track.js';
 import { fetchGaia, starXY, starRadius, starPM, MAX_STARS } from './gaia.js';
@@ -379,11 +379,11 @@ export function mountLive(el, target, onState) {
     if (!st.sel || !st.frames.length) return;
     const [i, j] = st.sel, { split } = passes();
     const rows = st.frames.map((f, k) => {
-      const a = aperture(f.v, S, i, j);
-      return { obs_id: f.obs_id, mjd: f.mjd, det: f.det, wl: f.lam[j * S + i], flux: toMJy(a.flux, f.omega), err: toMJy(a.err, f.omega), pass: k < split || !split ? 1 : 2 };
+      const a = aperture(f.v, S, i, j), k3 = apCorr(S, i, j, f.det);
+      return { obs_id: f.obs_id, mjd: f.mjd, det: f.det, wl: f.lam[j * S + i], flux: k3 * toMJy(a.flux, f.omega), err: k3 * toMJy(a.err, f.omega), apcorr: k3, pass: k < split || !split ? 1 : 2 };
     }).filter(r => Number.isFinite(r.flux) && Number.isFinite(r.wl));
     const series = [1, 2].map(pn => { const r = rows.filter(x => x.pass === pn); return { x: r.map(x => x.wl), y: r.map(x => x.flux), err: r.map(x => x.err), kind: 'points', color: PASS_COLORS[pn - 1], label: t(`live.pass_${pn}`) }; }).filter(s => s.x.length);
-    const csv = ['obs_id,mjd,detector,wavelength_um,flux_mJy,flux_err_mJy,group_1_earlier_2_later', ...rows.map(r => [r.obs_id, r.mjd, r.det, r.wl.toFixed(4), r.flux.toPrecision(5), r.err.toPrecision(3), r.pass].join(','))].join('\n');
+    const csv = ['obs_id,mjd,detector,wavelength_um,flux_mJy,flux_err_mJy,aperture_correction,group_1_earlier_2_later', ...rows.map(r => [r.obs_id, r.mjd, r.det, r.wl.toFixed(4), r.flux.toPrecision(5), r.err.toPrecision(3), r.apcorr, r.pass].join(','))].join('\n');
     const dl = h('a', { class: 'btn small', download: `epoch_spectrum_${target.ra.toFixed(5)}_${target.dec.toFixed(5)}_px${i}_${j}.csv`, href: URL.createObjectURL(new Blob([csv], { type: 'text/csv' })) }, t('live.csv'));
     const [sra, sdec] = [target.ra, target.dec];
     put(specBox, h('h3', { id: 'h-live-spec' }, t('live.spec_h')),

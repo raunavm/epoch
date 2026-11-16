@@ -9,7 +9,7 @@ import { tileOf, neighbourTiles, containsWithMargin, footprintContains, s3Key, s
 import { makeWCS, project, deproject, waveAt } from '../js/live/wcs.js';
 import { readHeader, parseCards } from '../js/live/fits.js';
 import { changeModel, countChanges, despike } from '../js/live/change.js';
-import { parseRA, parseDec, aperture, gridSize } from '../js/live/grid.js';
+import { parseRA, parseDec, aperture, apCorr, APCORR, gridSize } from '../js/live/grid.js';
 import { TARGETS, propagate, movedTarget } from '../js/live/targets.js';
 import { parseStars, starXY, starRadius, starPM, fetchGaia, GAIA_EPOCH_MJD } from '../js/live/gaia.js';
 import { healpix, tilePixel, tileUrl, parseTile, wiseStamp, hipsDates, HIPS } from '../js/live/wise.js';
@@ -157,6 +157,19 @@ test('aperture photometry subtracts the annulus', () => {
   const a = aperture(v, S, 7, 7);
   assert.ok(Math.abs(a.flux - 10) < 1e-6);
   assert.equal(a.err, 0);
+});
+
+test('quick-look aperture corrections match E31 and follow the star geometry', () => {
+  const e31 = JSON.parse(readFileSync(fileURLToPath(new URL('../../data/findings/e31s.json', import.meta.url)), 'utf8'));
+  for (let d = 1; d <= 6; d++) {
+    assert.ok(Math.abs(APCORR.corner[d - 1] - e31[`ql_fov2_D${d}_irsa_r5_correction`]) < 6e-4);
+    assert.ok(Math.abs(APCORR.centred[d - 1] - e31[`ql_fov4_D${d}_irsa_r5_correction`]) < 6e-4);
+  }
+  const S2 = gridSize(2), S4 = gridSize(4);
+  assert.equal(S2 % 2, 0); assert.equal(S4 % 2, 1);
+  assert.equal(apCorr(S2, S2 / 2, S2 / 2 - 1, 6), APCORR.corner[5]);   // one of the four central pixels: star on a corner
+  assert.equal(apCorr(S2, 2, 3, 6), APCORR.centred[5]);                // elsewhere: centred value
+  assert.equal(apCorr(S4, (S4 - 1) / 2, (S4 - 1) / 2, 1), APCORR.centred[0]);
 });
 
 test('spreadInTime keeps n distinct frames spanning the whole time range', () => {

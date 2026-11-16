@@ -38,6 +38,17 @@ export function resample(wcs, rows, waveTab, S, ra, dec) {
 
 // 3x3 aperture sum minus 9 x median of the annulus 3 <= r <= 5 px (grid pixels), in units of v.
 // err: annulus robust scatter x sqrt(9 + 81 (pi/2) / n_annulus); ignores the pixel-to-pixel correlation from resampling.
+// Aperture corrections for the 3 x 3 quick look, per detector D1-D6: IRSA's published r = 5 aperture recipe divided by
+// our 3 x 3 sum on 5 isolated stars (data/findings/e31s.json, ql_fov2_D<n>_irsa_r5_correction for a star on a pixel corner,
+// ql_fov4_D<n>_irsa_r5_correction for a star centred on a pixel; per-picture scatter 3-4%).
+export const APCORR = { corner: [1.106, 1.118, 1.142, 1.226, 1.209, 1.254], centred: [1.051, 1.066, 1.079, 1.129, 1.126, 1.144] };
+// The target sits on a pixel corner when the grid has an even number of pixels, so a click on one of the four central
+// pixels gets the corner value; every other click gets the centred value (a star between pixels then reads up to ~10% low).
+export function apCorr(S, i, j, det) {
+  const c = (S - 1) / 2, corner = S % 2 === 0 && Math.abs(i - c) === 0.5 && Math.abs(j - c) === 0.5;
+  return APCORR[corner ? 'corner' : 'centred'][det - 1] ?? 1;
+}
+
 export function aperture(v, S, i, j) {
   let sum = 0, n = 0; const ann = [];
   for (let y = j - 5; y <= j + 5; y++) for (let x = i - 5; x <= i + 5; x++) {
