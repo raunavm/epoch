@@ -28,9 +28,9 @@ Methane absorption at 3.3 µm distinguishes T and Y dwarfs from L dwarfs. An ind
 
 ## Variability at the north ecliptic pole {#e18}
 
-SPHEREx observes the north ecliptic pole on almost every orbit. Within 0.4° of the pole, 2,701 catalogued sources were measured in 17,832 pictures. Half of planted 2.0% brightness variations are recovered for sources of AB magnitude 12–17, at a false-alarm rate of 0.30%. Most catalogued variables in the field vary by less than this; 4 of 86 pass the threshold.
+SPHEREx observes the north ecliptic pole on almost every orbit. Within 0.4° of the pole, 2,701 catalogued sources were measured in 17,832 pictures. The measurements of all stars share small errors: calibration offsets that differ from picture to picture, a dependence on position on the detector, and slow drifts over the year. We fit a correction for these to half of the non-variable stars and test it on the other half. With the correction, half of planted sinusoidal variations are recovered at an amplitude of 1% for sources of AB magnitude 12–16, 2% at 16–17 and 5% at 17–19, at a false-alarm rate of 0.30%. Most catalogued variables in the field vary by less than this; 5 of 86 pass the threshold.
 
-![Recovery of planted brightness variations](figs/v2/e18b_floor.svg "Fraction of planted variations recovered against source brightness, for sinusoidal variations (a) and eclipses (b) of amplitude 2%, 5%, 10% and 20%. Shaded bands are 95% intervals; the dotted line marks half recovered.")
+![Recovery of planted brightness variations](figs/v2/e26_floor.svg "Fraction of planted sinusoidal variations recovered against source brightness, without (a) and with (b) the correction for shared errors, for amplitudes of 1% to 20%. Shaded bands are 95% intervals; the dotted line marks half recovered.")
 
 ## Pulsation of R Draconis {#rdra}
 
