@@ -114,6 +114,7 @@ def main():
         O("e3", ["C6c", "C6e"], "Faint changes in single pictures", [14], None, group="other"),
         O("e15", ["C20"], "Using 102 colours", [], "data/figs/e15_methane.png", group="other"),
         O("e16", ["C28"], "Barnard's Star: the motion", [20], "data/figs/e16_calibration.png", group="other"),
+        O("e18b", ["C30", "C31", "C32"], "The deep field at the north ecliptic pole", [], "data/figs/e18b_floor.png", group="other"),
         O("e18a", ["C29"], "The deep field at the north ecliptic pole", [], "data/figs/e18a_injections.png", group="other"),
         O("e10", ["C27"], "Recovering known variable stars", [], "data/figs/e10_recall.png", group="other"),
         O("e20", ["C26"], "Hydrogen lines in emission-line stars", [], "data/figs/e20_lines.png", group="other"),

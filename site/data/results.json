@@ -351,6 +351,34 @@
    "group": "other"
   },
   {
+   "id": "e18b",
+   "claims": [
+    {
+     "id": "C30",
+     "verdict": "SUPPORTED",
+     "status": "SUPPORTED",
+     "late": false
+    },
+    {
+     "id": "C31",
+     "verdict": "NOT CONFIRMED",
+     "status": "NOT CONFIRMED",
+     "late": false
+    },
+    {
+     "id": "C32",
+     "verdict": "SUPPORTED",
+     "status": "SUPPORTED, post hoc",
+     "late": true
+    }
+   ],
+   "science": "science.html#e18",
+   "failed": [],
+   "figure": "data/figs/e18b_floor.png",
+   "extra": [],
+   "group": "other"
+  },
+  {
    "id": "e18a",
    "claims": [
     {
