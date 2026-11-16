@@ -3,7 +3,7 @@
 Segments: title card 0–2 s; plain blink vs one-detector change maps 2–7 s; WISE 0855 combined along its path
 7–13 s; Barnard's Star, NASA WISE 2010 blinked with SPHEREx 2025–26, 13–19 s; measured numbers, one at a time, 19–26 s; name and
 address 26–29.8 s. English subtitles (SUBS, one list) are burned in and also written as an .srt file. Numbers are
-read from site/data/headline.json, data/findings/e4.json, e11.json and e13.json.
+read from site/data/headline.json, data/findings/e4bs.json, e11.json and e13.json.
 Usage: .venv/bin/python scripts/make_video.py --url "<github-user>.github.io/epoch" --team "<team-name>"
        [--field ecliptic_control]
 Outputs: dist/epoch_demo.mp4, dist/epoch_demo.srt (length verified with ffprobe).
@@ -181,11 +181,11 @@ def main(a):
     field = json.load(open(f"{SITE}/timemachine/{a.field}.json"))
     e4r = json.load(open(f"{SITE}/e4/reveal.json"))
     hl = json.load(open(f"{SITE}/headline.json"))
-    e4 = json.load(open("data/findings/e4.json"))
+    e4b = json.load(open("data/findings/e4bs.json"))   # significance against 200 empty paths (E4b), not E4's 24
     e11 = json.load(open("data/findings/e11.json"))["targets"]["wise0855"]["jwst"]["comparison"]["PRISM"]
     e13 = json.load(open("data/findings/e13.json"))
     nums = [(f"{hl['number']}%", "of a plain blink's changes removed (median)"),
-            (f"{e4['passes'][1]['significance']:.1f}σ", "coldest known brown dwarf, against empty paths"),
+            (f"{e4b['pass2_sig_200']:.1f}σ", "coldest known brown dwarf, against 200 empty paths"),
             (f"{e11['mean_ratio_spherex_over_jwst']:.2f} ± {e11['mean_ratio_err']:.2f}", "its SPHEREx spectrum ÷ JWST's"),
             (f"{e13['n_combined_ge5']} of {e13['n_no_single_5sigma']}", "faint asteroids brought out by combining pictures")]
     os.makedirs("dist/frames", exist_ok=True)
