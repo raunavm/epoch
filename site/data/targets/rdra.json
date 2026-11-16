@@ -1,31 +1,49 @@
 {
  "title": "R Draconis",
- "status": "no significant change detected",
- "plain_result": "R Draconis saturates the detector, so only the halo around it can be measured, in three usable wavelength bands. No change between visits is significant.",
+ "status": "pulsation measured",
+ "plain_result": "R Draconis is a pulsating red giant (a Mira variable) bright enough to saturate the detector, so it is measured from the halo of its image. The date of maximum brightness at 4.4–5.0 µm was predicted from the pictures measured earlier and tested on 512 pictures not used before. Over its 246-day period the star varies by 0.34 ± 0.03 magnitudes either side of its mean, and the fitted maximum, 4 February 2026 ± 2 days, is 2.5 days after the predicted date. The light curve is not a perfect sine wave: with errors set by its own scatter about the fit instead of by comparison stars, the amplitude is 6σ. At 3.8–4.4 µm the new pictures cover too few dates for a fit.",
  "numbers": [
   {
-   "label": "Pictures",
-   "value": 244,
+   "label": "Pictures (not used before)",
+   "value": 512,
    "err": null,
    "kind": "data",
    "unit": "",
-   "label_es": "Imágenes"
+   "label_es": "Imágenes (no utilizadas antes)"
   },
   {
-   "label": "Usable wavelength bands",
-   "value": 3,
+   "label": "Semi-amplitude, 4.4–5.0 µm",
+   "value": "0.34 ± 0.03",
+   "err": null,
+   "kind": "derived",
+   "unit": "mag",
+   "label_es": "Semiamplitud, 4,4–5,0 µm",
+   "value_es": "0,34 ± 0,03"
+  },
+  {
+   "label": "Period (catalogue)",
+   "value": 246,
+   "err": null,
+   "kind": "data",
+   "unit": "d",
+   "label_es": "Periodo (catálogo)"
+  },
+  {
+   "label": "Date of maximum",
+   "value": "4 Feb 2026 ± 2 d (predicted 2 Feb)",
+   "value_es": "4 feb 2026 ± 2 d (predicho: 2 feb)",
    "err": null,
    "kind": "derived",
    "unit": "",
-   "label_es": "Bandas de longitud de onda utilizables"
+   "label_es": "Fecha del máximo"
   }
  ],
  "figures": [
   {
-   "src": "data/figs/v2/e9_rdra.svg",
-   "alt": "Brightness of R Draconis through the year",
-   "caption": "Brightness through the year in six wavelength bands (a–f); grey bands are the scatter of comparison stars and dashed lines the catalogue maxima. Bars are 1σ.",
-   "caption_es": "Brillo a lo largo del año en seis bandas de longitud de onda (a–f); las bandas grises son la dispersión de las estrellas de comparación y las líneas discontinuas los máximos del catálogo. Barras de 1σ."
+   "src": "data/figs/v2/e28_rdra.svg",
+   "alt": "Light curve of R Draconis at 4.4–5.0 µm and 3.8–4.4 µm",
+   "caption": "Brightness relative to the mean at 4.4–5.0 µm (a) and 3.8–4.4 µm (b), in 30-day bins: pictures measured for this test (filled circles) and pictures used for the prediction (open circles), with the predicted curve (dash-dot), the fitted sine (solid; a only) and the scatter of comparison stars (grey band). Bars are 1σ.",
+   "caption_es": "Brillo relativo a la media a 4,4–5,0 µm (a) y 3,8–4,4 µm (b), en intervalos de 30 días: imágenes medidas en esta prueba (círculos llenos) e imágenes usadas para la predicción (círculos vacíos), con la curva predicha (trazo y punto), la sinusoide ajustada (continua; solo a) y la dispersión de las estrellas de comparación (banda gris). Barras de 1σ."
   }
  ],
  "evidence_links": [
@@ -33,9 +51,14 @@
    "text": "Open the prepared field",
    "text_es": "Abrir el campo preparado",
    "href": "index.html?field=rdra"
+  },
+  {
+   "text": "Method",
+   "text_es": "Método",
+   "href": "results.html#rdra"
   }
  ],
  "title_es": "R Draconis",
- "plain_result_es": "R Draconis satura el detector, así que solo puede medirse el halo que la rodea, en tres bandas de longitud de onda utilizables. Ningún cambio entre visitas es significativo.",
- "status_es": "no se detecta un cambio significativo"
+ "plain_result_es": "R Draconis es una gigante roja pulsante (una variable Mira) tan brillante que satura el detector, así que se mide en el halo de su imagen. La fecha de brillo máximo a 4,4–5,0 µm se predijo a partir de las imágenes medidas antes y se puso a prueba con 512 imágenes no utilizadas hasta entonces. A lo largo de su periodo de 246 días, la estrella varía 0,34 ± 0,03 magnitudes a cada lado de su media, y el máximo ajustado, el 4 de febrero de 2026 ± 2 días, cae 2,5 días después de la fecha predicha. La curva de luz no es una sinusoide perfecta: con errores fijados por su propia dispersión respecto al ajuste en lugar de por estrellas de comparación, la amplitud es de 6σ. A 3,8–4,4 µm las nuevas imágenes cubren muy pocas fechas para un ajuste.",
+ "status_es": "pulsación medida"
 }

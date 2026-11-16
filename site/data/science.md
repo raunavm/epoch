@@ -32,6 +32,12 @@ SPHEREx observes the north ecliptic pole on almost every orbit. Within 0.4° of 
 
 ![Recovery of planted brightness variations](figs/v2/e18b_floor.svg "Fraction of planted variations recovered against source brightness, for sinusoidal variations (a) and eclipses (b) of amplitude 2%, 5%, 10% and 20%. Shaded bands are 95% intervals; the dotted line marks half recovered.")
 
+## Pulsation of R Draconis {#rdra}
+
+R Draconis is a Mira variable with a catalogued period of 246 days. It saturates the detector, so it is measured in an annulus around the saturated core, with errors set by comparison stars. A sine fit to the pictures measured first predicted a maximum at 4.4–5.0 µm on 2026-02-02. In 512 pictures not used for that fit, the star varies by 0.34 ± 0.03 mag either side of its mean, with a fitted maximum on 2026-02-04 ± 2 days, 2.5 days after the prediction. The light curve departs from a sine: with errors scaled to the scatter about the fit, the amplitude is 6σ. At 3.8–4.4 µm the new pictures cover too few dates for a fit.
+
+![Light curve of R Draconis](figs/v2/e28_rdra.svg "Brightness relative to the mean at 4.4–5.0 µm (a) and 3.8–4.4 µm (b), in 30-day bins: pictures not used for the prediction (filled circles) and pictures used for it (open circles), with the predicted curve (dash-dot), the fitted sine (solid; a only) and the scatter of comparison stars (grey band). Bars are 1σ.")
+
 ## Hydrogen emission lines {#e20}
 
 SPHEREx covers the Paschen-α (1.875 µm) and Brackett-α (4.05 µm) hydrogen lines. Of 54 stars that Gaia classifies as Herbig Ae/Be or Be stars, 37 show an excess in these lines, against 2 of 155 ordinary stars of similar brightness in the same pictures. At SPHEREx's spectral resolution, emission from the star cannot be separated from emission by surrounding gas.
