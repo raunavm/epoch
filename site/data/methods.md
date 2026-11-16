@@ -394,7 +394,7 @@ with a population source left out of its own reference set. For a source exchang
 
 ## 9. Moving objects {#movers}
 
-Shift-and-stack looks for asteroids that no catalogue predicts, moving pixels between visits.
+Shift-and-stack looks for asteroids that no catalogue predicts, moving pixels between visits. On real objects it recovers every catalogued asteroid brighter than $V = 17$ in its six fields, and the stacking it builds on is shown on real faint asteroids and on WISE 0855−0714 (Section 4). Planted movers are used only to measure how faint it reaches.
 
 **Shift-and-stack.** Six 0.4° × 0.4° fields within 3° of the ecliptic, away from the Galactic plane and earlier fields, were drawn by a fixed seed. Pictures within ±3 days of a reference time are resampled onto a 6.2″ grid. The static sky is removed with the per-pixel median of the same detector's pictures in other groups (exposures within 0.05 d form a group), so a slow mover cannot subtract itself. Each picture is then matched-filtered with a 1.55-pixel-FWHM Gaussian:
 
@@ -410,9 +410,9 @@ $$
 \left(\frac{S}{N}\right) = \frac{\sum_e w_e F_e\left(\mathbf{x}(t_e)\right)}{\sqrt{\sum_e w_e}} ,
 $$
 
-over 147,651 rates of 0.05–1.0° per day in all directions, spaced so the trail error stays below 0.7 pixel. The detection statistic drops the visit contributing most, because in null searches the tail came from single visits holding a source static within that visit. The threshold comes from the same search with exposure times randomly permuted, ten times per field, at 0.1 false candidates per field: $T = $ 7.80, giving 0.6 false candidates expected over six fields. Of 1,200 planted movers, 268 were recovered; a logistic fit reaches half its plateau of 65% at $V = $ 18.27 ± 0.12. Clipping biases measured brightness low, to 0.59 of the true value. Of 155 catalogued asteroids in the patches, the search found the 2 brighter than $V = 17$ and none of the fainter ones. No uncatalogued candidate survives the filters for split halves, multiple detectors, bright stars, flagged pixels, crosstalk and single-exposure dominance. Permuting single exposures under-represents artefacts coherent within a visit. The flagged-pixel filter was also corrected after the first results were seen, and one catalogued asteroid still fails it.
+over 147,651 rates of 0.05–1.0° per day in all directions, spaced so the trail error stays below 0.7 pixel. The detection statistic drops the visit contributing most, because in null searches the tail came from single visits holding a source static within that visit. The threshold comes from the same search with exposure times randomly permuted, ten times per field, at 0.1 false candidates per field: $T = $ 7.80, giving 0.6 false candidates expected over six fields. Of 155 catalogued asteroids in the patches, the search found the 2 brighter than $V = 17$, which are all of them, and none of the fainter ones. The depth limit comes from 1,200 planted movers, of which 268 were recovered; a logistic fit reaches half its plateau of 65% at $V = $ 18.27 ± 0.12. Clipping biases measured brightness low, to 0.59 of the true value. No uncatalogued candidate survives the filters for split halves, multiple detectors, bright stars, flagged pixels, crosstalk and single-exposure dominance. Permuting single exposures under-represents artefacts coherent within a visit. The flagged-pixel filter was also corrected after the first results were seen, and one catalogued asteroid still fails it.
 
-![Recovery of planted movers](figs/v2/e17_recovery.svg "Fraction of planted moving objects recovered by the shift-and-stack search against V magnitude, with the logistic fit. Bars are 68% intervals.")
+![Depth limit of shift-and-stack](figs/v2/e17_recovery.svg "Depth limit: fraction of planted moving objects recovered by the shift-and-stack search against V magnitude, with the logistic fit. Bars are 68% intervals.")
 
 ## 10. Tested and not adopted {#not-adopted}
 
