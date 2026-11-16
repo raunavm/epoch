@@ -357,7 +357,7 @@
      "id": "C30",
      "verdict": "SUPPORTED",
      "status": "SUPPORTED",
-     "late": false
+     "late": true
     },
     {
      "id": "C31",
@@ -373,7 +373,12 @@
     }
    ],
    "science": "science.html#e18",
-   "failed": [],
+   "failed": [
+    {
+     "n": 22,
+     "href": "failed.html#22-few-catalogued-variables-pass-at-the-north-ecliptic-pole"
+    }
+   ],
    "figure": "data/figs/e18b_floor.png",
    "extra": [],
    "group": "other"
@@ -400,12 +405,17 @@
     {
      "id": "C27",
      "verdict": "NOT CONFIRMED",
-     "status": "NOT CONFIRMED",
+     "status": "NOT CONFIRMED: inconclusive under the frozen rule",
      "late": false
     }
    ],
    "science": "science.html#e10",
-   "failed": [],
+   "failed": [
+    {
+     "n": 21,
+     "href": "failed.html#21-recovering-known-variable-stars-was-inconclusive"
+    }
+   ],
    "figure": "data/figs/e10_recall.png",
    "extra": [],
    "group": "other"

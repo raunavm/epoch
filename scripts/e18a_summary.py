@@ -8,6 +8,7 @@ held = [v for k, v in kc.items() if not k.startswith("(")]
 out = dict(source="data/findings/e18a.json", n_artefact=vc.get("artefact veto", 0), n_explained=vc.get("explained / known class", 0),
            n_survivor=vc.get("survivor", 0), n_held_out=sum(v["n"] for v in held), n_held_out_flagged=sum(v["n_flagged"] for v in held),
            tdwarf_medium_100_300=hi("tdwarf/medium")["100-300"] if "tdwarf/medium" in ir else None,
+           n_usable=d["data"]["n_usable"], n_held_out_above_floor=sum(v.get("n_above_reporting_floor", 0) for v in held),
            null_flag_rate=d["calibration_checks"]["null_injection_flag_rate"], null_n=d["calibration_checks"]["null_injection_n"])
 json.dump(out, open("data/findings/e18as.json", "w"), indent=1)
 print(out)

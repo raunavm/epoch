@@ -77,7 +77,7 @@ We list every approach that did not work, because a result is only believable if
 
 ## 17. Barnard's Star, second attempt: the motion matches, the pre-set check does not
 **What happened.** The new method recovers Barnard's Star's motion within 0.2σ of Gaia, but our pre-registered criterion also required 8 faint neighbouring stars to agree with Gaia within their own errors. They share a drift of about −0.17″ per year east–west, so the registered verdict is FAILED.
-**Why (likely, read after the result).** The drift reverses with the detector's orientation between the two visits, which points to a tiny fixed offset in detector pixels (about 0.01 pixel). The same effect makes ordinary stars show a small false negative parallax in the distance test (E12), where it is inside the error bar.
+**Why (likely, read after the result).** The drift reverses with the detector's orientation between the two visits, which points to a tiny fixed offset in detector pixels (about 0.007 pixel; measured in E16, #20). The same effect makes ordinary stars show a small false negative parallax in the distance test (E12), where it is inside the error bar.
 **What we would do next.** Calibrate positions in the detector frame on many stars, then repeat both tests.
 
 ## 18. A blind asteroid test fell short of its own success level
@@ -88,9 +88,17 @@ We list every approach that did not work, because a result is only believable if
 ## 19. Our pre-planned check for the VY CMa "shell" did not see it
 **What happened.** To replay how a withdrawn SPHEREx claim was caught, we wrote down a smooth-ring statistic before reading any picture. It found no ring at the detector spot where the artefact sits, for any of the three stars there.
 **Why (read after the result).** The artefact is a set of thin spikes, which our ring statistic averaged away, and our comparison stars were much brighter than VY CMa at the wavelength used.
-**What we did next.** A pattern-matching test defined afterwards (and labelled so) shows the spikes are shared pixel for pixel by different stars at that spot and absent elsewhere, reproducing the published check (Science page, "A check that would have stopped a withdrawn claim").
+**What we did next.** A pattern-matching test defined afterwards (and labelled so) shows the spikes are shared by different stars at that spot and absent elsewhere, reproducing the published check (Science page, "Replaying a published artefact check"). A first statistic defined afterwards also failed.
 
 ## 20. A position correction that is real but did not pass its test
-**What happened.** Independent stars confirm a tiny fixed offset (about 0.007 pixel) in the detector's own frame, the likely cause of the Barnard's Star drift (#17). Our pre-set test required that removing it improve the agreement of check stars with Gaia by at least 20%; it improved by about 1%.
+**What happened.** Independent stars confirm a tiny fixed offset (about 0.007 pixel) in the detector's own frame, the same size as the Barnard's Star drift (#17; descriptive, not tested). Our pre-set test required that removing it improve the agreement of check stars with Gaia by at least 20%; it improved by about 1%.
 **Why.** Each star's own position scatter is about six times larger than the correction, so this test could not reach 20% even with a perfect correction. The visit-to-visit spread did drop by about 10%.
 **What we did.** By our rule the correction was not applied, and the Barnard's Star and Epsilon Indi B re-tests were not run; their registered verdicts stand. A future test should measure the visit-to-visit change instead.
+
+## 21. Recovering known variable stars was inconclusive
+**What happened.** With a 1% false-alarm threshold set on ordinary stars, SPHEREx recovered 16 of the 24 long-period variables it could test (67%, 95% interval 47–82%). Our rule needed the interval above 50%, so the test is inconclusive (E10). 28 of 52 drawn long-period variables overload the detector and could not be tested.
+**What we learned.** Between-visit changes below about 3% cannot be told from ordinary stars with two visits; bright variables need methods that handle saturation.
+
+## 22. Few catalogued variables pass at the north ecliptic pole
+**What happened.** At the frozen threshold, 4 of 86 catalogued variables in the deep field, and 1 of 15 NEOWISE variables, were flagged (E18-B).
+**Why.** The catalogued variables with known periods mostly change by about 0.1% in the infrared, far below the measured floor (2% for moderately bright sources), and the NEOWISE variables are faint, where the floor is 5–10%.
