@@ -542,3 +542,8 @@ main > h1 { margin-top: var(--s4); }
 
 /* Live spectrum: the methane dip call */
 .methane-dip { padding: 8px 12px; border-left: 4px solid var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); font-weight: 600; }
+
+/* Explanations folded under the tool */
+details.how { margin: 6px 0 12px; }
+details.how > summary { cursor: pointer; color: var(--muted); font-size: 0.9em; }
+details.how[open] > summary { margin-bottom: 6px; }

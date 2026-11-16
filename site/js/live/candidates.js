@@ -62,7 +62,8 @@ export async function mountCandidates({ box, frames, cm, S, f, target, onShow, o
   const tableBox = h('div', { class: 'cand-scroll' });
   const exportBtn = h('button', { type: 'button', class: 'btn small', onclick: exportKept });
   const exportRow = h('p', { class: 'cand-export' }, exportBtn, ' ', h('span', { class: 'muted small' }, t('cand.kept_where')));
-  box.replaceChildren(h('h3', {}, t('cand.h')), about, tableBox, exportRow);
+  box.replaceChildren(h('h3', {}, t('cand.h')), tableBox, exportRow,
+    h('details', { class: 'how' }, h('summary', {}, t('live.how')), about));
 
   function render() {
     about.textContent = learned ? t('cand.about_nn', { n: items.length }) : calibrated ? t('cand.about_z', { n: items.length })

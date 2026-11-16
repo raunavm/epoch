@@ -11,6 +11,10 @@ import { gridSize, rowsNeeded, resample, aperture, apCorr, toMJy, asinhRGBA, div
 import { changeModel, median, despike } from './change.js';
 import { mountCandidates } from './candidates.js';
 import { methaneTest } from './methane.js';
+
+// Explanations stay one click away so the tool itself leads.
+const how = (...kids) => h('details', { class: 'how' }, h('summary', {}, t('live.how')), ...kids);
+const keysBox = (...kids) => h('details', { class: 'how' }, h('summary', {}, t('live.keys_h')), ...kids);
 import { trackShift, motionFromMarks, shiftImage, stackSN, busiestSpan, peakNear } from './track.js';
 import { fetchGaia, starXY, starRadius, starPM, MAX_STARS } from './gaia.js';
 import { wiseStamp, hipsDates, HIPS } from './wise.js';
@@ -401,7 +405,7 @@ export function mountLive(el, target, onState) {
     put(specBox, h('h3', { id: 'h-live-spec' }, t('live.spec_h')),
       h('p', {}, h('strong', {}, t('live.spec_label')), ' ', badge('data'), ' ', t('live.spec_where', { i, j, dx: fmt((c - i) * SCALE_ARCSEC, 3), dy: fmt((c - j) * SCALE_ARCSEC, 3) })),
       rows.length ? plot(series, { xlabel: t('plot.wl'), ylabel: t('plot.flux'), title: t('live.spec_title', { n: rows.length, ra: fmt(sra, 7), dec: fmt(sdec, 7) }) }) : h('p', { class: 'unavailable' }, t('live.spec_none')),
-      h('p', { class: 'muted small' }, t('live.spec_caveat')), mLine, rows.length ? dl : null);
+      mLine, how(h('p', { class: 'muted small' }, t('live.spec_caveat'))), rows.length ? dl : null);
   }
 
   // ---- loading ----
@@ -430,7 +434,7 @@ export function mountLive(el, target, onState) {
       h('div', { class: 'scrub-wrap' }, scrub, h('div', { class: 'scrub-ends muted' }, h('span', {}, t('tm.timeline_note')))),
       h('div', { class: 'controls film-row' }, contrast.el, film),
       controls, candBox, findingBox,
-      h('p', { class: 'muted small' }, t('live.markers'), ' ', t('live.keys')))));
+      keysBox(h('p', { class: 'muted small' }, t('live.markers'), ' ', t('live.keys'))))));
   draw(); loadGaia();
   run().catch(err => { if (!signal.aborted) status.textContent = t('live.error', { msg: err.message }); });
 
@@ -506,9 +510,9 @@ export function mountLive(el, target, onState) {
       h('h3', {}, t('live.changes_h')),
       h('p', {}, h('strong', {}, t('live.changes_view')), ' ', t('live.changes', { all: st.cm.nNaiveAll, det: st.cm.nNaiveDet }), ' ', badge('derived'), ' ', liveEv[0]),
       liveEv[1],
-      h('p', { class: 'small' }, t('live.changes_differ')),
-      h('p', { class: 'small' }, t('live.changes_note')),
-      h('p', { class: 'muted small' }, t('live.changes_method', { f: fTxt }), fProvisional ? [' ', h('strong', {}, t('live.provisional', { f: fTxt }))] : null));
+      how(h('p', { class: 'small' }, t('live.changes_differ')),
+        h('p', { class: 'small' }, t('live.changes_note')),
+        h('p', { class: 'muted small' }, t('live.changes_method', { f: fTxt }), fProvisional ? [' ', h('strong', {}, t('live.provisional', { f: fTxt }))] : null)));
     if (st.sel) spectrum();
     draw();
     cands = await mountCandidates({ box: candBox, frames: st.frames, cm: st.cm, S, f: fFloor, target, onChange: draw,
