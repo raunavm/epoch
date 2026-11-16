@@ -44,6 +44,12 @@ Combining pictures along a known orbit recovers asteroids that no single picture
 
 ![Signal-to-noise of an asteroid as pictures are combined](figs/v2/fig_reveal.svg "a, signal-to-noise ratio of asteroid 98397 against the number of pictures combined along its orbit, with the √N expectation. b, signal-to-noise ratio of the single pictures and of empty paths beside the orbit.")
 
+## A search for distant bodies {#distant-bodies}
+
+A body hundreds of AU from the Sun moves on the sky mainly through parallax as the Earth orbits. We searched 0.044 deg² at the north ecliptic pole, observed in 30 visits over 384 days, for sources whose positions follow a parallax ellipse, and found no candidate. A body injected at 500 AU is recovered at a fitted distance of 499.7 ± 1.0 AU, and at that distance half of injected bodies with a radius of 14 Earth radii (geometric albedo 0.3) are recovered. The field is too small, and single pictures too shallow, to exclude a planet-sized body.
+
+![Recovery of injected distant bodies](figs/v2/e21_completeness.svg "Fraction of injected bodies recovered against heliocentric distance, for seven per-visit signal-to-noise ratios (48 injections per point). Bars are 68% Wilson intervals; the dotted line marks half recovered.")
+
 ## References
 
 - Bock, J. et al. 2026, The SPHEREx Satellite Mission, ApJ. https://doi.org/10.3847/1538-4357/ae2be2
