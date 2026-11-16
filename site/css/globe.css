@@ -1,0 +1,13 @@
+/* SPHEREx sky globe (js/globe/sky-globe.js). Light template; the disc itself is the sky picture. */
+.sky-globe { width: 100%; max-width: 560px; margin: 0 auto; }
+.sky-globe-stage { position: relative; width: 100%; aspect-ratio: 1 / 1; isolation: isolate; overflow: hidden; }
+.sky-globe-gl, .sky-globe-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.sky-globe-gl { z-index: -1; pointer-events: none; }
+.sky-globe-canvas { touch-action: none; cursor: grab; }
+.sky-globe-tip { position: absolute; z-index: 1; pointer-events: none; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 2px var(--s1); font-size: var(--t-sm); white-space: nowrap; }
+.sky-globe-readout { margin: var(--s1) 0 0; font-size: var(--t-sm); color: var(--muted); min-height: 1.5em; text-align: center; }
+.sky-globe-legend { margin: 4px 0 0; font-size: var(--t-sm); color: var(--text); display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; }
+.sky-globe-key { display: inline-block; width: 10px; height: 10px; margin-left: var(--s1); }
+.sky-globe-key:first-child { margin-left: 0; }
+.key-target { background: var(--accent); border-radius: 50%; }
+.key-bd { background: var(--hds-red); transform: rotate(45deg) scale(0.85); }

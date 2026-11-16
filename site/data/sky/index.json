@@ -1,0 +1,66 @@
+{
+ "schema": 1,
+ "band": "D1",
+ "file": "allsky-d1.png",
+ "baked_utc": "2026-09-28T01:17:11Z",
+ "source_url": "https://alasky.cds.unistra.fr/SPHEREx/D1/Norder3/Allsky.png",
+ "hips_base": "https://alasky.cds.unistra.fr/SPHEREx/D1",
+ "geometry": {
+  "order": 3,
+  "n_tiles": 768,
+  "tile_px": 64,
+  "grid_width": 27,
+  "image_width": 1728,
+  "image_height": 1856,
+  "scheme": "healpix-nested",
+  "frame": "equatorial"
+ },
+ "rectified": {
+  "method": "healpix background high-pass, low end restored",
+  "fine_order": 5,
+  "fine_cells": 12285,
+  "cell_deg": 1.83,
+  "smooth_deg": 45.0,
+  "percentile": 0.05,
+  "seam_p90_before": 17.8,
+  "seam_p90_after": 6.9,
+  "seam_max_before": 45.0,
+  "seam_max_after": 11.0
+ },
+ "display_only": true,
+ "display_note": "8-bit and already stretched by the HiPS pixel cut. A picture of the sky for orientation, not a photometric product \u2014 measurement goes through the Level-2 pixels the console range-requests itself.",
+ "properties": {
+  "creator_did": "ivo://CDS/P/SPHEREx/QR2/D1",
+  "obs_title": "SPHEREx D1",
+  "obs_collection": "SPHEREx",
+  "obs_copyright": "Courtesy NASA/JPL-Caltech",
+  "obs_copyright_url": "https://spherex.caltech.edu/page/image-use-policy",
+  "obs_ack": "This publication makes use of data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration.",
+  "hips_creator": "Buga M., Boch T. (CDS)",
+  "hips_copyright": "CNRS/Unistra",
+  "hips_frame": "equatorial",
+  "hips_order": "7",
+  "hips_tile_width": "512",
+  "hips_pixel_cut": "0 10",
+  "hips_release_date": "2026-05-07T07:50Z",
+  "moc_sky_fraction": "0.9992",
+  "em_min": "7.5E-7",
+  "em_max": "0.0000011",
+  "prov_progenitor": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2",
+  "bib_reference_url": "https://doi.org/10.26131/IRSA652"
+ },
+ "preview": {
+  "file": "allsky-d1-preview.png",
+  "binned": 2,
+  "geometry": {
+   "order": 3,
+   "n_tiles": 768,
+   "tile_px": 32,
+   "grid_width": 27,
+   "image_width": 864,
+   "image_height": 928,
+   "scheme": "healpix-nested",
+   "frame": "equatorial"
+  }
+ }
+}

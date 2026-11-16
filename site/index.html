@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;600;700&family=Public+Sans:wght@400;600&display=swap">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/globe.css">
 <script type="module" src="js/timemachine.js"></script>
 </head>
 <body data-title="title.timemachine">
@@ -20,10 +21,8 @@
 <section class="intro">
 <div class="intro-text">
 <h1 data-i18n="tm.h1">SPHEREx time machine</h1>
-<p class="lede" data-i18n="tm.lede"></p>
 <p class="intro-found"><a href="results.html#methane-candidates" data-i18n="intro.found">Found: 16 cold brown dwarfs whose methane SPHEREx measures directly, none with a published spectrum. See them →</a></p>
 <p class="tour-start"><button id="tour-btn" type="button" class="btn" data-i18n="tour.btn">New here? Take the tour (1 minute)</button></p>
-<h2 class="form-h" data-i18n="tm.form_h">Look at any position</h2>
 <form id="coord-form" class="coord-form" aria-label="Position">
   <div class="form-row coords">
     <label><span data-i18n="live.ra">Right ascension</span> <input id="ra" inputmode="text" autocomplete="off" spellcheck="false" aria-describedby="coord-eg"></label>
@@ -38,10 +37,10 @@
   <p id="target-note" class="muted small"></p>
 </form>
 </div>
-<figure id="intro-fig" class="intro-fig"></figure>
 </section>
+<div id="sky-globe" hidden></div>
 <div id="live" hidden></div>
-<section id="showcase" aria-labelledby="h-showcase">
+<section id="showcase" aria-labelledby="h-showcase" hidden>
 <h2 id="h-showcase" data-i18n="live.showcase_h">Prepared field</h2>
 <p class="hint" data-i18n="tm.hint"></p>
 <div class="field-pick"><label for="field" class="small" data-i18n="tm.field">Field</label> <select id="field"></select></div>

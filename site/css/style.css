@@ -547,3 +547,13 @@ main > h1 { margin-top: var(--s4); }
 details.how { margin: 6px 0 12px; }
 details.how > summary { cursor: pointer; color: var(--muted); font-size: 0.9em; }
 details.how[open] > summary { margin-bottom: 6px; }
+/* Live view: the picture at full width, its time control directly under it, everything else below. */
+#live .viewer { grid-template-columns: minmax(0, 1fr); gap: var(--s1); }
+#live .viewer-img .imgwrap { max-width: none; }
+#live .viewer-time .controls { margin-top: 0; }
+#live .viewer-time .scrub-wrap { max-width: none; }
+#live .viewer .segmented:not(.small-seg) { flex-direction: row; flex-wrap: wrap; width: auto; }
+#live .viewer .segmented:not(.small-seg) .seg { border-bottom: 0; border-right: 1px solid var(--c20); }
+.obj-card { border: 1px solid var(--line); padding: var(--s1) var(--s2); margin: var(--s1) 0; }
+.obj-card h3 { margin-top: 0; }
+.obj-card .hint:only-child { margin: 0; }

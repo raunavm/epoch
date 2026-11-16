@@ -1,5 +1,5 @@
 // Live mode: any RA/Dec -> SPHEREx DR1 frames read straight from the public S3 bucket in the browser.
-import { h, put, t, fmt, badge, link, wlColor, REDUCED_MOTION, getJSON } from '../core.js';
+import { h, put, t, fmt, badge, link, wlColor, REDUCED_MOTION, getJSON, getText, loc } from '../core.js';
 import { evidenceNum } from '../components/evidence.js';
 import { contrastControl, filmButton, fromRGBA } from '../components/film.js';
 import { viewControls, detectorInfo, busiestDetector, VIEWS } from '../components/blink.js';
@@ -7,7 +7,8 @@ import { plot, s as svg } from '../plot.js';
 import { findFrames, spreadInTime } from './index.js';
 import { readHeader, readRows } from './fits.js';
 import { makeWCS, waveAt } from './wcs.js';
-import { gridSize, rowsNeeded, resample, aperture, apCorr, toMJy, asinhRGBA, divergingRGBA, SCALE_ARCSEC } from './grid.js';
+import { gridSize, rowsNeeded, resample, aperture, apCorr, toMJy, asinhRGBA, divergingRGBA, SCALE_ARCSEC, gridToWorld } from './grid.js';
+import { TARGETS, propagate } from './targets.js';
 import { changeModel, median, despike } from './change.js';
 import { mountCandidates } from './candidates.js';
 import { methaneTest } from './methane.js';
@@ -30,6 +31,24 @@ const TRACK_SPAN_H = 24, TRACK_CLIP = 5, TRACK_PEAK_R = 3; // follow view: defau
 const WISE_DET = 6; // the SPHEREx detector (4.4-5.0 µm) whose band contains WISE's 4.6 µm; enough for the WISE comparison
 const META_KEYS = [['PSF_FWHM', 'live.meta_psf'], ['L2DQAFLG', 'live.meta_dqa'], ['L2 N_OUTLIER', 'live.meta_outlier'],
   ['L2 N_PERSIST', 'live.meta_persist'], ['L2 SATSTRKS', 'live.meta_streaks'], ['L2 N_GHOST', 'live.meta_ghost']];
+
+const NEAR_ARCSEC = 6, MARK_NEAR_PX = 3; // object card: how close a click must be to a known object, or to a change mark
+
+// One CSV line into its cells (quoted cells may hold commas).
+const csvCells = line => [...line.matchAll(/("([^"]|"")*"|[^,]*)(,|$)/g)].slice(0, -1).map(m => m[1].replace(/^"|"$/g, '').replace(/""/g, '"'));
+// Known objects for the object card: the five challenge targets (with their measured result) and the vetted brown dwarfs.
+let knownCache = null;
+const loadKnown = () => (knownCache ??= (async () => {
+  const [results, csv] = await Promise.all([Promise.all(TARGETS.map(tg => getJSON(`targets/${tg.id}.json`))), getText('products/epoch_methane_candidates.csv')]);
+  const lines = (csv || '').trim().split('\n'), head = csvCells(lines[0] || '');
+  const dwarfs = lines.slice(1).map(l => Object.fromEntries(csvCells(l).map((v, k) => [head[k], v])))
+    .filter(r => r.vet_verdict === 'KEEP' && Number.isFinite(+r.ra_deg) && Number.isFinite(+r.dec_deg));
+  return { targets: TARGETS.map((tg, k) => ({ tg, res: results[k] })), dwarfs };
+})());
+const sepArcsec = (ra1, dec1, ra2, dec2) => {
+  const dra = ((ra1 - ra2 + 540) % 360 - 180) * Math.cos(dec2 * Math.PI / 180);
+  return Math.hypot(dra, dec1 - dec2) * 3600;
+};
 
 export const bytesPerFrame = S => (Math.ceil(S * Math.SQRT2) + 6) * 2040 * 4 + 28800;
 
@@ -80,11 +99,12 @@ export function mountLive(el, target, onState) {
   const gaiaNote = h('span', { class: 'muted small', role: 'status' });
   const gaiaTip = h('p', { class: 'marker-tip small', 'aria-live': 'polite' });
   const blinkBox = h('div', { class: 'live-blink' });
-  const specBox = h('section', { class: 'live-spec', 'aria-labelledby': 'h-live-spec' },
-    h('h3', { id: 'h-live-spec' }, t('live.spec_h')), h('p', { class: 'hint' }, t('live.spec_hint')));
+  const specBox = h('section', { class: 'live-spec obj-card', 'aria-live': 'polite' }, h('p', { class: 'hint' }, t('live.spec_hint')));
   const findingBox = h('div', { class: 'finding-box' });
   const candBox = h('section', { class: 'cand-box', 'aria-live': 'polite' });
   let cands = null; // the change detector's candidates, once the pictures are in
+  let knownNow = null; // the targets and vetted brown dwarfs, named on the picture once read
+  loadKnown().then(k => { knownNow = k; }, () => {});
   const subsetNote = h('p', { class: 'hint' });
 
   function setMode(m, d) {
@@ -103,10 +123,11 @@ export function mountLive(el, target, onState) {
     const r = canvas.getBoundingClientRect();
     st.sel = [Math.floor((e.clientX - r.left) / r.width * S), Math.floor((e.clientY - r.top) / r.height * S)];
     starTip(e, canvas, list()[st.i]?.mjd);
-    spectrum(); draw();
+    const f = list()[st.i], mark = f && cands ? cands.marks(f.idx).find(m => Math.hypot(m.x - st.sel[0], m.y - st.sel[1]) <= MARK_NEAR_PX) : null;
+    spectrum(mark ? { date: f.date } : null); draw();
   });
   canvas.addEventListener('keydown', e => { // keyboard pixel picking: Enter selects the centre
-    if (e.key === 'Enter') { st.sel = [Math.round(c), Math.round(c)]; spectrum(); draw(); }
+    if (e.key === 'Enter') { st.sel = [Math.round(c), Math.round(c)]; spectrum(); draw(); specBox.scrollIntoView({ block: 'nearest' }); }
   });
   scrub.addEventListener('input', () => { st.i = +scrub.value; st.playing = false; schedule(); draw(); });
   const onKey = e => {
@@ -173,6 +194,18 @@ export function mountLive(el, target, onState) {
     if (target.pm && mjd) { // predicted position of a fast-moving catalogue star at this frame's time
       const yr = (mjd - target.pm.epochMjd) / 365.25, dx = target.pm.pmra * yr / 1000 / SCALE_ARCSEC, dy = target.pm.pmdec * yr / 1000 / SCALE_ARCSEC;
       o.append(svg('circle', { cx: c + 0.5 - dx, cy: c + 0.5 - dy, r: 2, fill: 'none', stroke: '#CC79A7', 'stroke-width': Math.max(0.15, S / 120) }));
+    }
+    if (knownNow && mjd) { // known objects in view: the five targets moved to this picture's date, the brown dwarfs at their listed position
+      const sw = Math.max(0.08, S / 250), fs = S / 40;
+      const objs = [...knownNow.targets.map(x => [x.tg.name, ...propagate(x.tg, mjd)]), ...knownNow.dwarfs.map(r => [r.name, +r.ra_deg, +r.dec_deg])];
+      for (const [name, ra, dec] of objs) {
+        const p = starXY({ ra, dec }, mjd, S, target.ra, target.dec);
+        if (!p || p[0] < -0.5 || p[1] < -0.5 || p[0] > S - 0.5 || p[1] > S - 0.5) continue;
+        const x = p[0] + 0.5, y = p[1] + 0.5;
+        const right = x > S / 2;
+        o.append(svg('circle', { cx: x, cy: y, r: 1.5, fill: 'none', stroke: '#fff', 'stroke-width': sw }),
+          svg('text', { x: right ? x - 1.8 : x + 1.8, y: y - 1.8, 'text-anchor': right ? 'end' : 'start', fill: '#fff', 'font-size': fs, 'font-family': 'Inter, sans-serif' }, name));
+      }
     }
     if (st.sel) o.append(svg('rect', { x: st.sel[0] - 1, y: st.sel[1] - 1, width: 3, height: 3, fill: 'none', stroke: '#56B4E9', 'stroke-width': Math.max(0.12, S / 150) }));
     if (st.gaia && st.stars && mjd) for (const s of st.stars) { // Gaia DR3 stars, moved to this picture's date
@@ -388,8 +421,9 @@ export function mountLive(el, target, onState) {
     return update;
   }
 
-  function spectrum() {
+  async function spectrum(mark = null) {
     if (!st.sel || !st.frames.length) return;
+    const sel = st.sel;
     const [i, j] = st.sel, { split } = passes();
     const rows = st.frames.map((f, k) => {
       const a = aperture(f.v, S, i, j), k3 = apCorr(S, i, j, f.det);
@@ -401,11 +435,27 @@ export function mountLive(el, target, onState) {
     const [sra, sdec] = [target.ra, target.dec];
     const mt = methaneTest(rows); // one-sided: a dip is reported, its absence is not taken as evidence
     const mLine = mt.dip === true ? h('p', { class: 'methane-dip' }, t('live.methane_dip', { i: mt.index.toFixed(2), e: mt.err.toFixed(2) }))
-      : mt.dip === false ? h('p', { class: 'muted small' }, t('live.methane_none')) : null;
-    put(specBox, h('h3', { id: 'h-live-spec' }, t('live.spec_h')),
-      h('p', {}, h('strong', {}, t('live.spec_label')), ' ', badge('data'), ' ', t('live.spec_where', { i, j, dx: fmt((c - i) * SCALE_ARCSEC, 3), dy: fmt((c - j) * SCALE_ARCSEC, 3) })),
-      rows.length ? plot(series, { xlabel: t('plot.wl'), ylabel: t('plot.flux'), title: t('live.spec_title', { n: rows.length, ra: fmt(sra, 7), dec: fmt(sdec, 7) }) }) : h('p', { class: 'unavailable' }, t('live.spec_none')),
-      mLine, how(h('p', { class: 'muted small' }, t('live.spec_caveat'))), rows.length ? dl : null);
+      : mt.dip === false ? h('p', {}, t('live.methane_none')) : null;
+    // What is known here: a change mark, one of the five targets, or one of the vetted brown dwarfs (values read from their files).
+    const known = await loadKnown();
+    if (signal.aborted || st.sel !== sel) return;
+    const [pra, pdec] = gridToWorld(i, j, S, sra, sdec);
+    const mjd = st.frames.reduce((a, f) => a + f.mjd, 0) / st.frames.length;
+    const tgt = known.targets.find(x => x.res && sepArcsec(...propagate(x.tg, mjd), pra, pdec) <= NEAR_ARCSEC);
+    const bd = known.dwarfs.find(r => sepArcsec(+r.ra_deg, +r.dec_deg, pra, pdec) <= NEAR_ARCSEC);
+    const lead = [
+      mark ? h('p', {}, t(cands?.paired ? 'card.mark_paired' : 'card.mark', { date: mark.date })) : null,
+      tgt && loc(tgt.res, 'plain_result') ? h('p', {}, h('strong', {}, tgt.tg.name, '. '), loc(tgt.res, 'plain_result')) : null,
+      bd ? h('p', {}, t('card.bd', { name: bd.name, i: bd.methane_index, e: bd.methane_index_err })) : null,
+      mLine,
+    ].filter(Boolean);
+    put(specBox, h('h3', {}, t('card.h')),
+      lead.length ? lead : h('p', {}, t(rows.length ? 'card.none' : 'live.spec_none')),
+      h('details', { class: 'how' }, h('summary', {}, t('card.details')),
+        h('p', {}, h('strong', {}, t('live.spec_label')), ' ', t('live.spec_where', { i, j, dx: fmt((c - i) * SCALE_ARCSEC, 3), dy: fmt((c - j) * SCALE_ARCSEC, 3) })),
+        rows.length ? plot(series, { xlabel: t('plot.wl'), ylabel: t('plot.flux'), title: t('live.spec_title', { n: rows.length, ra: fmt(sra, 7), dec: fmt(sdec, 7) }) }) : null,
+        rows.length ? h('p', {}, dl) : null,
+        h('p', { class: 'muted small' }, t('live.spec_caveat'))));
   }
 
   // ---- loading ----
@@ -416,22 +466,23 @@ export function mountLive(el, target, onState) {
     h('p', { class: 'small' }, h('a', { href: `https://aladin.cds.unistra.fr/AladinLite/?target=${target.ra.toFixed(5)}%20${target.dec.toFixed(5)}&fov=${(target.fov / 60).toFixed(4)}`, rel: 'noopener', target: '_blank' }, t('live.aladin')), ' ', h('span', { class: 'muted' }, t('live.aladin_note'))),
     addBox, subBox, wiseBox, trackBox,
     h('details', { class: 'live-meta-wrap' }, h('summary', {}, t('live.meta_h')), metaBox));
-  // Picture on the left, everything that controls or describes it on the right (stacked on narrow screens),
-  // so the picture and its time control are on screen together.
+  // The picture at full width, its time control directly under it, then the object card and everything else.
   put(el,
     h('div', { class: 'live-head' }, status, prog, subsetNote),
-    blinkBox, more, specBox);
+    blinkBox, more);
   const pic = h('figure', { class: 'tm-view viewer-img' }, h('div', { class: 'imgwrap' }, canvas, ov), caption);
   const contrast = contrastControl(pic);
   const film = filmButton(() => ({ fps: st.fps, k: contrast.getK(), name: `epoch_${target.ra.toFixed(4)}_${target.dec.toFixed(4)}`,
     sources: list().map(f => fromRGBA(st.mode === 'corr' && st.cm ? divergingRGBA(st.cm.corr[f.idx]) : f.rgba, S)) }));
   blinkBox.append(h('div', { class: 'viewer' },
     pic,
-    h('div', { class: 'viewer-side' },
+    h('div', { class: 'viewer-time' },
       h('div', { class: 'controls' },
         h('button', { type: 'button', class: 'btn', 'aria-label': t('tm.prev'), onclick: () => step(-1) }, '←'), playBtn,
         h('button', { type: 'button', class: 'btn', 'aria-label': t('tm.next'), onclick: () => step(1) }, '→')),
-      h('div', { class: 'scrub-wrap' }, scrub, h('div', { class: 'scrub-ends muted' }, h('span', {}, t('tm.timeline_note')))),
+      h('div', { class: 'scrub-wrap' }, scrub, h('div', { class: 'scrub-ends muted' }, h('span', {}, t('tm.timeline_note'))))),
+    h('div', { class: 'viewer-side' },
+      specBox,
       h('div', { class: 'controls film-row' }, contrast.el, film),
       controls, candBox, findingBox,
       keysBox(h('p', { class: 'muted small' }, t('live.markers'), ' ', t('live.keys'))))));

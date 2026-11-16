@@ -338,5 +338,19 @@
  "live.methane_dip": "Caída de metano a 3,3 µm (índice {i} ± {e}): esta fuente es probablemente una enana marrón de tipo T o más fría. Enanas marrones de tipo conocido probadas así: las 6 llamadas de este tipo fueron correctas, y ninguna de 63 enanas L más calientes recibió esta llamada.",
  "live.methane_none": "No hay una caída de metano clara a 3,3 µm. (Las enanas marrones frías y débiles pueden pasarse por alto, así que esto no descarta una.)",
  "live.how": "Cómo leer esto",
- "live.keys_h": "Símbolos y teclas"
+ "live.keys_h": "Símbolos y teclas",
+ "globe.aria": "Mapa de todo el cielo de SPHEREx. Use las flechas del teclado para girarlo.",
+ "globe.hint": "Arrastre para girar el cielo. Haga clic en un punto para abrirlo, o en cualquier lugar del cielo para mirar ahí.",
+ "globe.loading": "Cargando el mapa del cielo…",
+ "globe.readout": "Puntero en AR {ra}°, Dec {dec}°",
+ "globe.legend_targets": "Objetivos del desafío",
+ "globe.legend_bd": "Enanas marrones",
+ "globe.list": "Objetos en el mapa del cielo",
+ "card.h": "Qué hay aquí",
+ "card.details": "Detalles",
+ "card.none": "No hay resultado medido para este punto aparte de su espectro, en Detalles.",
+ "card.bd": "Candidata a enana marrón {name}. Índice de metano {i} ± {e} de la lista revisada.",
+ "card.mark_paired": "Posible cambio real el {date}, marcado en las dos imágenes simultáneas.",
+ "card.mark": "Posible cambio real el {date}, marcado por el detector de cambios.",
+ "cand.none_here": "No se marcó ningún cambio aquí. Los cambios demasiado débiles para el detector pueden pasar inadvertidos."
 }

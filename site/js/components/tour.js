@@ -7,7 +7,7 @@ import { h, t, REDUCED_MOTION } from '../core.js';
 const STEPS = [
   ['.intro-fig', 'tour.s_idea'],
   ['@ .viewer-img', 'tour.s_picture'],
-  ['@ .viewer-side .controls', 'tour.s_play'],
+  ['@ .viewer-time .controls', 'tour.s_play'],
   ['@ .scrub', 'tour.s_timeline'],
   ['@ .segmented.views', 'tour.s_views'],
   ['@ .flag-counter', 'tour.s_counts'],

@@ -4,12 +4,10 @@ import { mountLive, loadIndex, bytesPerFrame, mjdDate } from './live/live.js';
 import { parseRA, parseDec, gridSize } from './live/grid.js';
 import { TARGETS, propagate, movedTarget, J2000_MJD } from './live/targets.js';
 import { renderTargetCard } from './components/targets.js';
-import { mountIntro } from './components/intro.js';
 import { startTour } from './components/tour.js';
 
 await init();
 const $ = id => document.getElementById(id);
-mountIntro($('intro-fig'));
 $('tour-btn').addEventListener('click', startTour);
 const FOVS = [1, 2, 4, 8];
 const params = new URLSearchParams(location.search);
@@ -83,6 +81,7 @@ function start(mode = params.get('mode') || 'det', all = params.get('all') === '
     } }, t('live.note_exact')), ' ');
   }
   live?.stop(); showcase?.stop();
+  hideGlobe();
   liveBox.hidden = false;
   $('showcase').hidden = true;
   $('target-result').hidden = !preset;
@@ -131,8 +130,20 @@ else {
   else if (fieldIndex.some(f => f.field === DEFAULT_FIELD)) sel.value = DEFAULT_FIELD;
   sel.addEventListener('change', loadField);
   if (openCard) openTarget(tp);
-  else if (!live) loadField();
 }
+
+// Front page: the sky globe with our targets and brown dwarfs, shown only while no position is open.
+if (!live && !openCard) mountGlobe();
+async function mountGlobe() {
+  const el = $('sky-globe');
+  try {
+    const g = await import('./globe/sky-globe.js');
+    if (live || !$('showcase').hidden) return;
+    el.hidden = false;
+    await g.mountSkyGlobe(el, { markers: await g.loadEpochMarkers() });
+  } catch { el.hidden = true; }
+}
+function hideGlobe() { $('sky-globe').hidden = true; }
 
 // A challenge target opens on its own measured result: result card + its prepared field (live stays one click away).
 function openTarget(tg) {
@@ -149,7 +160,7 @@ function openTarget(tg) {
 }
 
 function showField(id) {
-  live?.stop(); live = null; liveBox.hidden = true;
+  live?.stop(); live = null; liveBox.hidden = true; hideGlobe();
   $('showcase').hidden = false;
   sel.value = id; loadField();
 }

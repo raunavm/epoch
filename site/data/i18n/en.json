@@ -338,5 +338,19 @@
  "live.methane_dip": "Methane dip at 3.3 µm (index {i} ± {e}): this source is likely a T-type or colder brown dwarf. Brown dwarfs of known type tested this way: 6 of 6 such calls were right, and none of 63 warmer L dwarfs was called.",
  "live.methane_none": "No clear methane dip at 3.3 µm. (Faint cold brown dwarfs can be missed, so this does not rule one out.)",
  "live.how": "How to read this",
- "live.keys_h": "Symbols and keyboard keys"
+ "live.keys_h": "Symbols and keyboard keys",
+ "globe.aria": "SPHEREx all-sky map. Use the arrow keys to turn it.",
+ "globe.hint": "Drag to turn the sky. Click a dot to open it, or click anywhere on the sky to look there.",
+ "globe.loading": "Loading the sky map…",
+ "globe.readout": "Pointer at RA {ra}°, Dec {dec}°",
+ "globe.legend_targets": "Challenge targets",
+ "globe.legend_bd": "Brown dwarfs",
+ "globe.list": "Objects on the sky map",
+ "card.h": "What is here",
+ "card.details": "Details",
+ "card.none": "No measured result for this spot beyond its spectrum, in Details.",
+ "card.bd": "Brown dwarf candidate {name}. Methane index {i} ± {e} from the vetted list.",
+ "card.mark_paired": "Possible real change on {date}, marked in both simultaneous pictures.",
+ "card.mark": "Possible real change on {date}, marked by the change detector.",
+ "cand.none_here": "No change marked here. Changes too faint for the detector can be missed."
 }

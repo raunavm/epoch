@@ -70,7 +70,7 @@ export async function mountCandidates({ box, frames, cm, S, f, target, onShow, o
       : t('cand.about_uncal', { n: items.length });
     const nKept = Object.values(store).filter(r => r.state === 'keep').length;
     exportBtn.textContent = t('cand.export', { n: nKept }); exportBtn.disabled = nKept === 0;
-    if (!items.length) { tableBox.replaceChildren(h('p', { class: 'muted small' }, t(calibrated ? 'cand.none' : 'cand.none_uncal'))); return; }
+    if (!items.length) { tableBox.replaceChildren(h('p', {}, t(calibrated ? 'cand.none_here' : 'cand.none_uncal'))); return; }
     const btn = (it, s) => h('button', { type: 'button', class: 'btn small', 'aria-pressed': String(store[it.id]?.state === s), onclick: () => setState(it, s) }, t(`cand.${s}`));
     tableBox.replaceChildren(h('table', { class: 'data-table cand-table' },
       h('thead', {}, h('tr', {}, ['#', t('cand.col_date'), t('cand.col_wl'), t('cand.col_det'), calibrated ? t(learned ? 'cand.col_score' : 'cand.col_z') : null,
@@ -85,6 +85,7 @@ export async function mountCandidates({ box, frames, cm, S, f, target, onShow, o
   if (fromUrl) show(fromUrl);
 
   return {
+    paired: !!model?.coincidence && /_pair$/.test(model.use ?? ''), // marks need both simultaneous pictures (as in detect.js)
     marks: idx => items.filter(it => it.idx === idx && store[it.id]?.state !== 'dismiss')
       .map(it => ({ x: it.x, y: it.y, label: String(items.indexOf(it) + 1), state: store[it.id]?.state, selected: it.key === selected })),
   };
