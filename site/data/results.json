@@ -330,6 +330,27 @@
    "group": "other"
   },
   {
+   "id": "e16",
+   "claims": [
+    {
+     "id": "C28",
+     "verdict": "FAILED",
+     "status": "FAILED",
+     "late": true
+    }
+   ],
+   "science": "science.html#e8",
+   "failed": [
+    {
+     "n": 20,
+     "href": "failed.html#20-a-position-correction-that-is-real-but-did-not-pass-its-test"
+    }
+   ],
+   "figure": "data/figs/e16_calibration.png",
+   "extra": [],
+   "group": "other"
+  },
+  {
    "id": "e10",
    "claims": [
     {

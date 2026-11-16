@@ -89,3 +89,8 @@ We list every approach that did not work, because a result is only believable if
 **What happened.** To replay how a withdrawn SPHEREx claim was caught, we wrote down a smooth-ring statistic before reading any picture. It found no ring at the detector spot where the artefact sits, for any of the three stars there.
 **Why (read after the result).** The artefact is a set of thin spikes, which our ring statistic averaged away, and our comparison stars were much brighter than VY CMa at the wavelength used.
 **What we did next.** A pattern-matching test defined afterwards (and labelled so) shows the spikes are shared pixel for pixel by different stars at that spot and absent elsewhere, reproducing the published check (Science page, "A check that would have stopped a withdrawn claim").
+
+## 20. A position correction that is real but did not pass its test
+**What happened.** Independent stars confirm a tiny fixed offset (about 0.007 pixel) in the detector's own frame, the likely cause of the Barnard's Star drift (#17). Our pre-set test required that removing it improve the agreement of check stars with Gaia by at least 20%; it improved by about 1%.
+**Why.** Each star's own position scatter is about six times larger than the correction, so this test could not reach 20% even with a perfect correction. The visit-to-visit spread did drop by about 10%.
+**What we did.** By our rule the correction was not applied, and the Barnard's Star and Epsilon Indi B re-tests were not run; their registered verdicts stand. A future test should measure the visit-to-visit change instead.

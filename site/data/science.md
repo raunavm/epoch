@@ -205,6 +205,10 @@ Barnard's Star overloads SPHEREx's detector in essentially every picture, and th
 
 **Why it still counts as failed.** We also required 8 faint stars nearby, measured with the standard fit, to agree with Gaia within their own errors. They share a drift of -0.17″ per year east–west — small (under half of Barnard's error bar) but beyond their own. By our rule the result is FAILED. A reading made afterwards: the drift flips with the detector's orientation between the two visits, which points to a tiny fixed offset in detector pixels — the same effect that biases the control stars in the distance test.
 
+**Checking the explanation on other stars (E16).** If a tiny fixed offset in the detector's own frame causes the neighbours' drift, independent stars should show it too. We measured 471 ordinary Gaia stars in 45 other fields, chose a correction on half of them and tested it on the other half, with rules written down first. The offset is there: about 0.007 pixel along the detector's x axis, the same in both of the telescope's orientations, and it produces the expected back-and-forth pattern on the sky (figure). But our pre-set test asked that removing it make the check stars' average positions agree with Gaia at least 20% better, and they improved by only 1.1% (261 → 258 thousandths of an arcsecond), because each star's own scatter is about six times larger than the correction. So the correction counts as failed, was not applied, and the Barnard's Star and Epsilon Indi B re-tests were not run; their registered verdicts stand ([What failed #20](../failed.html)).
+
+![Calibrating the detector offset](figs/e16_calibration.png "The offset in independent stars, by detector and by the telescope's orientation, and the pre-set test that failed.")
+
 ## Stacking along an orbit {#stacking-along-an-orbit}
 
 For an asteroid with a known orbit, we predict where it is in every picture (JPL Horizons, SPHEREx as observer). We subtract the fitted stars and background, centre each leftover picture on the predicted position, and add them with weights proportional to the expected brightness divided by the noise squared (a matched filter).
