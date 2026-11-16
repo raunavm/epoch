@@ -30,6 +30,8 @@ Methane absorption at 3.3 µm distinguishes T and Y dwarfs from L dwarfs. An ind
 
 SPHEREx observes the north ecliptic pole on almost every orbit. Within 0.4° of the pole, 2,701 catalogued sources were measured in 17,832 pictures. The measurements of all stars share small errors: calibration offsets that differ from picture to picture, a dependence on position on the detector, and slow drifts over the year. We fit a correction for these to half of the non-variable stars and test it on the other half. With the correction, half of planted sinusoidal variations are recovered at an amplitude of 1% for sources of AB magnitude 12–16, 2% at 16–17 and 5% at 17–19, at a false-alarm rate of 0.30%. Most catalogued variables in the field vary by less than this; 5 of 86 pass the threshold.
 
+[Download the table (CSV)](products/epoch_nep_variability.csv) · [Column descriptions](products/README.md)
+
 ![Recovery of planted brightness variations](figs/v2/e26_floor.svg "Fraction of planted sinusoidal variations recovered against source brightness, without (a) and with (b) the correction for shared errors, for amplitudes of 1% to 20%. Shaded bands are 95% intervals; the dotted line marks half recovered.")
 
 ## Pulsation of R Draconis {#rdra}
@@ -41,6 +43,8 @@ R Draconis is a Mira variable with a catalogued period of 246 days. It saturates
 ## Hydrogen emission lines {#e20}
 
 SPHEREx covers the Paschen-α (1.875 µm) and Brackett-α (4.05 µm) hydrogen lines. Of 54 stars that Gaia classifies as Herbig Ae/Be or Be stars, 37 show an excess in these lines, against 2 of 155 ordinary stars of similar brightness in the same pictures. At SPHEREx's spectral resolution, emission from the star cannot be separated from emission by surrounding gas.
+
+[Download the table (CSV)](products/epoch_emission_lines.csv) · [Column descriptions](products/README.md)
 
 ![Hydrogen-line excess](figs/v2/e20_lines.svg "a, b, flux relative to the local continuum around Paschen-α (a) and Brackett-α (b) for one candidate (stars) and a control star in the same pictures (crosses); bars are 1σ. c, distribution of the line excess for candidates and controls; the dashed line is the detection threshold.")
 

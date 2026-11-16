@@ -446,3 +446,43 @@ main > h1 { margin-top: var(--s4); }
 .film-row { gap: var(--s2); }
 .contrast-label { display: inline-flex; align-items: center; gap: var(--s1); font-size: var(--t-sm); }
 .contrast { width: 120px; min-height: 24px; }
+
+/* Methods: equations (MathML made when the site is built). Display equations are numbered like a paper;
+   a long one scrolls inside its own box, never the page. */
+.prose { counter-reset: eq; }
+.prose math { font-family: "STIX Two Math", "Latin Modern Math", "Cambria Math", math; }
+.eq { counter-increment: eq; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center;
+  gap: var(--s2); margin: var(--s2) 0; }
+.eq::after { content: "(" counter(eq) ")"; font-family: var(--font); color: var(--muted); }
+.eq-body { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+.eq-body math { font-size: 1.1em; }
+.eq-body pre { margin: 0; }
+/* Four tabs fit a 360-390 px phone without sideways scrolling. */
+@media (max-width: 440px) {
+  .site-header { gap: 14px; }
+  nav ul { gap: 0 14px; }
+  nav a { letter-spacing: 0; }
+}
+@media (max-width: 380px) {
+  .site-header, nav ul { gap: 0 10px; }
+  .brand { font-size: 16px; }
+  nav a { font-size: 13px; }
+}
+
+/* Home: opening picture beside the title (stacked on narrow screens). */
+.intro { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--s2) var(--s6); align-items: start; margin-bottom: var(--s3); }
+.intro .lede { margin-bottom: 0; }
+.intro-fig { margin: var(--s4) 0 0; }
+.intro-stack { position: relative; aspect-ratio: 1; background: var(--img-bg); }
+.intro-stack img { display: block; width: 100%; height: 100%; }
+.intro-stack img[hidden] { display: none; }
+.intro-tag { position: absolute; left: 8px; top: 8px; padding: 2px 6px; background: rgba(0, 0, 0, 0.7); color: #fff;
+  font-family: var(--font-ui); font-size: var(--t-xs); }
+.intro-controls { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s1); margin-top: var(--s1); }
+.intro-controls .segmented { margin: 0; }
+.intro-fig figcaption { margin-top: var(--s1); }
+.form-h { margin-top: var(--s3); }
+@media (max-width: 760px) {
+  .intro { grid-template-columns: minmax(0, 1fr); }
+  .intro-fig { margin-top: 0; max-width: 320px; }
+}

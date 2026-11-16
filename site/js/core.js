@@ -119,7 +119,7 @@ export const CATS = {
 };
 
 const NAV = [
-  ['index.html', 'nav.timemachine'], ['results.html', 'nav.results'], ['about.html', 'nav.about'],
+  ['index.html', 'nav.timemachine'], ['results.html', 'nav.results'], ['methods.html', 'nav.methods'], ['about.html', 'nav.about'],
 ];
 
 async function loadLang(code) {
