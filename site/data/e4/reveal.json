@@ -9,7 +9,7 @@
   "pass_id": 2,
   "start": "2025-11-07",
   "end": "2025-12-13",
-  "label": "Nov\u2013Dec 2025 visits"
+  "label": "Nov–Dec 2025 visits"
  },
  "frames": [
   {
@@ -378,10 +378,9 @@
   -0.275
  ],
  "n_frames": 22,
- "hedge": "Nov\u2013Dec 2025 visits only; each step against the same pictures combined along 24 empty paths",
+ "hedge": "Nov–Dec 2025 visits only; each step against the same pictures combined along 24 empty paths",
  "order": "pictures are combined in order of their expected signal-to-noise (flat template / noise; measured fluxes are not used to choose the order)",
  "units": "singles and stacks: Gaia stars removed, smoothed at the PSF scale, in units of each image's own background noise; frames 4.4-5.0 um, Nov-Dec 2025 visits only, each centred on its predicted position (proper motion + parallax)",
  "rerun": "OMP_NUM_THREADS=1 .venv/bin/python scripts/run_e4.py forced && .venv/bin/python scripts/run_e4.py analyze  (slider only: run_e4.py slider)",
- "generated_with": "scripts in this repository",
- "hedge_es": "Solo las visitas de nov\u2013dic 2025; cada paso, frente a las mismas im\u00e1genes combinadas a lo largo de 24 caminos vac\u00edos"
+ "hedge_es": "Solo las visitas de nov–dic 2025; cada paso, frente a las mismas imágenes combinadas a lo largo de 24 caminos vacíos"
 }

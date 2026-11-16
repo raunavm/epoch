@@ -1,6 +1,6 @@
 {
- "title": "WISE 0855\u22120714 \u2014 the coldest known brown dwarf",
- "plain_result": "At 4.4\u20135 \u00b5m, combining SPHEREx pictures along its known path gives a clear signal where it should be: 0.50 \u00b1 0.03 mJy in the Nov\u2013Dec 2025 visits, consistent with Spitzer (0.48\u20130.54 mJy) and WISE (0.41\u20130.50 mJy) in broader bands. Between visits it shifts the way its known motion predicts, and a source standing still fits the positions far worse. A statement about a known object, not a new object.",
+ "title": "WISE 0855\u22120714",
+ "plain_result": "At 4.4\u20135 \u00b5m, combining SPHEREx pictures along its known path gives a clear signal where it should be: 0.50 \u00b1 0.03 mJy in the Nov\u2013Dec 2025 visits, consistent with Spitzer (0.48\u20130.54 mJy) and WISE (0.41\u20130.50 mJy) in broader bands. Between visits it shifts the way its known motion predicts, and a source standing still fits the positions far worse. This is a measurement of a known object.",
  "numbers": [
   {
    "label": "Signal, Nov\u2013Dec 2025 visits, against 24 empty paths",
@@ -128,9 +128,8 @@
    "caption_es": "Espectro de SPHEREx (91 im\u00e1genes a 3.8\u20135 \u00b5m; azul) junto al de JWST (Luhman et al. 2024; naranja). Los dos puntos m\u00e1s rojos est\u00e1n por debajo de JWST; no sabemos por qu\u00e9."
   }
  ],
- "generated_with": "scripts in this repository",
- "title_es": "WISE 0855\u22120714 \u2014 la enana marr\u00f3n m\u00e1s fr\u00eda conocida",
- "plain_result_es": "A 4.4\u20135 \u00b5m, combinar im\u00e1genes de SPHEREx a lo largo de su camino conocido da una se\u00f1al clara donde deber\u00eda estar: 0.50 \u00b1 0.03 mJy en las visitas de nov\u2013dic 2025, compatible con Spitzer (0.48\u20130.54 mJy) y WISE (0.41\u20130.50 mJy) en bandas m\u00e1s anchas. Entre visitas se desplaza como predice su movimiento conocido, y una fuente quieta encaja mucho peor con las posiciones. Es una afirmaci\u00f3n sobre un objeto conocido, no un objeto nuevo.",
+ "title_es": "WISE 0855\u22120714",
  "method_note_es": "Posici\u00f3n a partir del movimiento propio y el paralaje (Luhman & Esplin 2016); cada imagen ajustada con estrellas de Gaia; im\u00e1genes a 4.4\u20135 \u00b5m combinadas por ventana de visitas; significancia frente al mismo camino desplazado a 24 posiciones vac\u00edas. Salvedades: una estrella de G = 16.3 est\u00e1 a 0.7\u20131.4 p\u00edxeles (nuestro c\u00f3digo primero la descart\u00f3; restaurada \u2014 ver Qu\u00e9 fall\u00f3); en longitudes de onda cortas, donde la enana marr\u00f3n es invisible, el control de nov\u2013dic 2025 es -0.018 \u00b1 0.003 mJy, no cero, probablemente por el modelo de la vecina; la ventana de mayo de 2025 solo tiene 3 im\u00e1genes utilizables y no es informativa.",
- "slider_caption_es": "Solo las visitas de nov\u2013dic 2025: desliza desde una imagen hasta las 22 combinadas a lo largo de su camino. Cada paso se mide frente a las mismas im\u00e1genes combinadas a lo largo de 24 caminos vac\u00edos."
+ "slider_caption_es": "Solo las visitas de nov\u2013dic 2025: desliza desde una imagen hasta las 22 combinadas a lo largo de su camino. Cada paso se mide frente a las mismas im\u00e1genes combinadas a lo largo de 24 caminos vac\u00edos.",
+ "plain_result_es": "A 4,4\u20135 \u00b5m, combinar las im\u00e1genes de SPHEREx a lo largo de su trayectoria conocida da una se\u00f1al clara donde debe estar: 0,50 \u00b1 0,03 mJy en las visitas de nov.\u2013dic. de 2025, coherente con Spitzer (0,48\u20130,54 mJy) y WISE (0,41\u20130,50 mJy) en bandas m\u00e1s anchas. Entre visitas se desplaza como predice su movimiento conocido, y una fuente inm\u00f3vil ajusta las posiciones mucho peor. Es una medida de un objeto conocido."
 }

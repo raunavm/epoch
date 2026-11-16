@@ -1,5 +1,5 @@
 {
- "title": "Barnard's Star \u2014 the fastest-moving star in our sky",
+ "title": "Barnard's Star",
  "status": "motion matches Gaia; pre-set check failed",
  "plain_result": "Measured from the centre of its outer glow (its core overloads SPHEREx's detector), Barnard's Star moves +10.3 \u00b1 0.4\u2033 per year north and -0.8 \u00b1 0.4\u2033 east, against Gaia's +10.4\u2033 and -0.8\u2033. By the rule we wrote down beforehand the result still counts as failed: a check on 8 faint stars nearby, measured the same way, showed a small shared drift (-0.17\u2033 per year east\u2013west), larger than their own error bars allow. Our first attempt, from the overloaded core, failed outright (What failed #13).",
  "numbers": [
@@ -86,8 +86,7 @@
  "method_note": "Method chosen on 26 bright comparison stars before Barnard's Star was measured (docs/protocols/E8.md): the centre of symmetry of the unflagged outer light, with a per-detector correction; error per visit from the comparison stars (0.15\u2033). Only two visit windows, so the fit has no spare freedom. Gaia's parallax held fixed. The faint-neighbour drift flips sign with the detector's orientation between visits, which points to a small offset in the detector frame (a reading made after the result). A spectrum also failed: 238 of 239 pictures have a saturated pixel next to the star (Science page, spectra).",
  "method_anchor": "science.html#e8",
  "_e11": true,
- "generated_with": "scripts in this repository",
- "title_es": "Estrella de Barnard \u2014 la estrella que m\u00e1s r\u00e1pido se mueve en nuestro cielo",
+ "title_es": "Estrella de Barnard",
  "plain_result_es": "Medida desde el centro de su resplandor exterior (su n\u00facleo sobrecarga el detector de SPHEREx), la estrella de Barnard se mueve +10.3 \u00b1 0.4\u2033 por a\u00f1o hacia el norte y -0.8 \u00b1 0.4\u2033 hacia el este, frente a +10.4\u2033 y -0.8\u2033 seg\u00fan Gaia. Seg\u00fan la regla que dejamos por escrito de antemano, el resultado sigue contando como fallido: una comprobaci\u00f3n con 8 estrellas d\u00e9biles cercanas, medidas de la misma manera, mostr\u00f3 una peque\u00f1a deriva compartida (-0.17\u2033 por a\u00f1o en direcci\u00f3n este\u2013oeste), mayor de lo que permiten sus propias barras de error. Nuestro primer intento, desde el n\u00facleo sobrecargado, fall\u00f3 por completo (Qu\u00e9 fall\u00f3 n.\u00ba 13).",
  "status_es": "el movimiento coincide con Gaia; la comprobaci\u00f3n fijada de antemano fall\u00f3",
  "method_note_es": "M\u00e9todo elegido con 26 estrellas de comparaci\u00f3n brillantes antes de medir la estrella de Barnard (docs/protocols/E8.md): el centro de simetr\u00eda de la luz exterior sin marcas, con una correcci\u00f3n por detector; error por visita a partir de las estrellas de comparaci\u00f3n (0.15\u2033). Solo hay dos ventanas de visitas, as\u00ed que el ajuste no tiene libertad de sobra. El paralaje de Gaia se mantiene fijo. La deriva de las vecinas d\u00e9biles cambia de signo con la orientaci\u00f3n del detector entre visitas, lo que apunta a un peque\u00f1o desplazamiento en el marco del detector (una interpretaci\u00f3n hecha despu\u00e9s del resultado). Un espectro tambi\u00e9n fall\u00f3: 238 de 239 im\u00e1genes tienen un p\u00edxel saturado junto a la estrella (p\u00e1gina de Ciencia, espectros)."

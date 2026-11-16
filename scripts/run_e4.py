@@ -469,8 +469,7 @@ def stage_slider(prim, res):
                order="pictures are combined in order of their expected signal-to-noise (flat template / noise; measured fluxes are not used to choose the order)",
                units="singles and stacks: Gaia stars removed, smoothed at the PSF scale, in units of each image's own background noise; frames 4.4-5.0 um, "
                      "Nov-Dec 2025 visits only, each centred on its predicted position (proper motion + parallax)",
-               rerun="OMP_NUM_THREADS=1 .venv/bin/python scripts/run_e4.py forced && .venv/bin/python scripts/run_e4.py analyze  (slider only: run_e4.py slider)",
-               generated_with="scripts in this repository")
+               rerun="OMP_NUM_THREADS=1 .venv/bin/python scripts/run_e4.py forced && .venv/bin/python scripts/run_e4.py analyze  (slider only: run_e4.py slider)")
     json.dump(rev, open("site/data/e4/reveal.json", "w"), indent=1, default=float)
     print("slider stack", res["slider_stack"], flush=True)
     print("steps", [(s_["n"], s_["snr"]) for s_ in stacks], flush=True)

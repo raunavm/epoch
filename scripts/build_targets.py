@@ -75,7 +75,6 @@ def add_e11(tid, card):
 
 def write(tid, card):
     add_e11(tid, card)
-    card["generated_with"] = "scripts in this repository"
     json.dump(card, open(f"{OUT}/{tid}.json", "w"), indent=1)
     print(tid, "->", card["plain_result"][:120])
 
@@ -90,11 +89,11 @@ if e4:
     ctrl = e4["control_short_wavelength"][1]["neighbour_restored"]
     exp = e4["expected_flux_mJy"]
     write("wise0855", dict(
-        title="WISE 0855−0714 — the coldest known brown dwarf",
+        title="WISE 0855−0714",
         plain_result=(f"At 4.4–5 µm, combining SPHEREx pictures along its known path gives a clear signal where it should be: "
                       f"{p2['a_hat_mJy']:.2f} ± {(p2['sigma_a_mJy']**2 + ctrl['a_hat_mJy']**2)**0.5:.2f} mJy in the Nov–Dec 2025 visits, consistent with Spitzer (0.48–0.54 mJy) and WISE (0.41–0.50 mJy) in broader bands."
                       " Between visits it shifts the way "
-                      "its known motion predicts, and a source standing still fits the positions far worse. A statement about a known object, not a new object."),
+                      "its known motion predicts, and a source standing still fits the positions far worse. This is a measurement of a known object."),
         numbers=[num("Signal, Nov–Dec 2025 visits, against 24 empty paths", round(p2["significance"], 1), unit="σ",
                      nulls=p2.get("null_snrs"), nulls_note="same pictures, path shifted 6–9 px", method="science.html#e4"),
                  num("Signal, Apr–May 2026 visits (a neighbouring star restored to the model)", round(p3.get("significance", float("nan")), 1), unit="σ",
@@ -117,7 +116,7 @@ if e4:
                         "Each step is measured against the same pictures combined along 24 empty paths.")))
 
 # Motion measurements (Epsilon Indi B, Barnard's Star)
-for tid, name in (("epsindib", "Epsilon Indi B — a pair of nearby brown dwarfs"), ("barnard", "Barnard's Star — the fastest-moving star in our sky")):
+for tid, name in (("epsindib", "Epsilon Indi B"), ("barnard", "Barnard's Star")):
     m = load(f"data/findings/motion_{tid}.json")
     if not m:
         continue
@@ -166,7 +165,7 @@ for tid, name in (("epsindib", "Epsilon Indi B — a pair of nearby brown dwarfs
         method_anchor="science.html#motion"))
 
 # Variables: neutral counts only (referee items on R Dra / RW Aur cards)
-for tid, name in (("rwaur", "RW Aurigae — a young variable star"), ("rdra", "R Draconis — a pulsating giant star")):
+for tid, name in (("rwaur", "RW Aurigae"), ("rdra", "R Draconis")):
     f = load(f"data/findings/f1_{tid}.json")
     if not f:
         continue
@@ -221,7 +220,7 @@ if e8:
     g = e8["gaia"]
     c = e8["controls"]["summary"]
     write("barnard", dict(
-        title="Barnard's Star — the fastest-moving star in our sky",
+        title="Barnard's Star",
         status="motion matches Gaia; pre-set check failed",
         plain_result=(f"Measured from the centre of its outer glow (its core overloads SPHEREx's detector), Barnard's Star moves "
                       f"{e8['pmdec_arcsec_yr']:+.1f} ± {e8['pmdec_err']:.1f}″ per year north and {e8['pmra_arcsec_yr']:+.1f} ± {e8['pmra_err']:.1f}″ east, "
@@ -259,7 +258,7 @@ if e9:
     lam = {c["detector"]: c["lam_um"] for c in w["colour"]["contrast"]}
     zbest = max((d for d in w["a_dw"] if d.get("z") is not None), key=lambda d: abs(d["z"]))
     write("rwaur", dict(
-        title="RW Aurigae — a young variable star",
+        title="RW Aurigae",
         status="measured; no change confirmed by our pre-set rule",
         plain_result=(f"Its centre overloads SPHEREx's detector, so we measured it from the halo of light around it, a method tested first on "
                       f"{w['comparison']['n_stars']} ordinary stars of similar brightness. Between the two visits (Sep 2025 and Mar 2026) it looks "
@@ -286,7 +285,7 @@ if e9:
     r = e9["targets"]["rdra"]
     dm = r["post_hoc_guard_off"]["date_of_maximum"][0]
     write("rdra", dict(
-        title="R Draconis — a pulsating giant star",
+        title="R Draconis",
         status="measured; no change confirmed by our pre-set rule",
         plain_result=(f"R Draconis is so bright that only the halo around its overloaded centre can be measured, and the pre-set test could use only "
                       f"three noisy colour bands: there no change passes 5 times the error ({r['comparison']['n_stars']} ordinary bright stars measured "

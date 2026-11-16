@@ -213,8 +213,7 @@ def main(ids, pick):
                hedge="modest signal; the error-scale check did not pass cleanly, so the larger, more cautious scale is used",
                order="pictures are combined in order of their expected signal-to-noise (brightness model and noise only; measured fluxes are not used to choose the order)",
                units="singles and stacks: stars removed, smoothed at the PSF scale, in units of each image's own background noise (same treatment for both)",
-               rerun="python scripts/run_forced.py --ids %s --stamps && python scripts/build_reveal.py --pick %s" % (pick, pick),
-               generated_with="scripts in this repository")
+               rerun="python scripts/run_forced.py --ids %s --stamps && python scripts/build_reveal.py --pick %s" % (pick, pick))
     json.dump(rev, open("site/data/reveal.json", "w"), indent=1)
     f2 = dict(object=meta["name"], designation=pick, n_frames=N, n_frames_dropped_quality=n_all - N, single_frame_snr_max=rev["single_frame_snr_max"],
               single_frame_snr_median=rev["single_frame_snr_median"], stack_snr=stack_snr,
