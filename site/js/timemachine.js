@@ -65,8 +65,8 @@ for (const el of [raIn, decIn]) el.addEventListener('input', () => { preset = nu
 function start(mode = params.get('mode') || 'det', all = params.get('all') === '1') {
   let ra = parseRA(raIn.value), dec = parseDec(decIn.value);
   const fov = +fovSel.value;
-  if (!Number.isFinite(ra) || !Number.isFinite(dec) || dec < -90 || dec > 90) { err.textContent = t('live.bad_coords'); return; }
-  err.textContent = '';
+  if (!coordsValid(raIn.value, decIn.value, ra, dec)) { err.textContent = t('live.bad_coords'); raIn.setAttribute('aria-invalid', 'true'); decIn.setAttribute('aria-invalid', 'true'); return; }
+  err.textContent = ''; raIn.removeAttribute('aria-invalid'); decIn.removeAttribute('aria-invalid');
   // A typed catalogue position of a fast-moving target (epoch 2000, 2010, 2016…) is a patch the star has left:
   // centre on where it is now, say so, and offer the typed position back.
   const moved = !preset && !exact && refMjd != null ? movedTarget(ra, dec, refMjd) : null;
@@ -122,7 +122,9 @@ if (!fieldIndex?.length) { $('showcase').hidden = true; if (openCard) openTarget
 else {
   for (const f of fieldIndex) sel.append(h('option', { value: f.field }, loc(f, 'name')));
   const want = params.get('field');
+  const DEFAULT_FIELD = 'barnard'; // a well-known star, marked at the centre, that moves
   if (fieldIndex.some(f => f.field === want)) sel.value = want;
+  else if (fieldIndex.some(f => f.field === DEFAULT_FIELD)) sel.value = DEFAULT_FIELD;
   sel.addEventListener('change', loadField);
   if (openCard) openTarget(tp);
   else if (!live) loadField();
@@ -148,11 +150,22 @@ function showField(id) {
   sel.value = id; loadField();
 }
 
+// Both boxes filled; RA in [0, 360) degrees or [0, 24) hours (not wrapped); Dec in [−90, +90].
+function coordsValid(rawRA, rawDec, ra, dec) {
+  const r = rawRA.trim(), d = rawDec.trim();
+  if (!r || !d || !Number.isFinite(ra) || !Number.isFinite(dec) || dec < -90 || dec > 90) return false;
+  const lead = parseFloat(r);
+  return /[hH:\s]/.test(r) ? lead >= 0 && lead < 24 : lead >= 0 && lead < 360;
+}
+
+// Detector a field opens on, where the default (the one with most pictures) would hide the target.
+const FIELD_DET = { wise0855: 6 };
+
 async function loadField() {
   showcase?.stop();
   const id = sel.value.replace(/[^\w.-]/g, '');
   const field = await getJSON(`timemachine/${id}.json`);
   if (!field?.frames?.length) { box.replaceChildren(unavailable(t('what.field'))); showcase = null; return; }
-  showcase = mountBlink(box, field);
+  showcase = mountBlink(box, field, { det: FIELD_DET[id] });
 }
 

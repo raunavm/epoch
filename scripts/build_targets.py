@@ -195,7 +195,7 @@ e12 = load("data/findings/e12.json")
 if e12 and os.path.exists(f"{OUT}/epsindib.json"):
     card = json.load(open(f"{OUT}/epsindib.json"))
     lo, hi = e12["distance_interval_ly_68"]
-    card["plain_result"] += (f" Fitting its yearly wobble as well, with nothing taken from Gaia for this object, SPHEREx gives a parallax of "
+    card["plain_result"] += (f" Fitting its yearly wobble as well, with no Gaia measurement of this object (the archive astrometry is tied to Gaia DR3 reference stars), SPHEREx gives a parallax of "
                              f"{e12['parallax_mas']:.0f} ± {e12['parallax_err_mas']['adopted']:.0f} thousandths of an arcsecond: a distance of about "
                              f"{e12['distance_ly']:.0f} light-years ({lo:.0f}–{hi:.0f}); Gaia gives {3.26156 * e12['gaia_distance_pc']:.1f}.")
     card["numbers"] = [n for n in card["numbers"] if not n["label"].startswith("Pictures used")] + [

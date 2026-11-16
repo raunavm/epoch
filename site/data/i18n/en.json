@@ -191,7 +191,7 @@
  "live.fov_opt": "{f}′ ({px} × {px} pixels)",
  "live.fov_cost": "About {mb} MB per picture.",
  "live.go": "Show",
- "live.bad_coords": "Enter both coordinates, in degrees (133.795) or as 08h55m10.8s and −07d14m42s. Declination must be between −90 and 90.",
+ "live.bad_coords": "Enter both coordinates. Right ascension: 0–360° or 0–24 h (08h55m10.8s). Declination: −90° to +90° (−07d14m42s).",
  "live.showcase_h": "Prepared field",
  "live.note_epoch": "Centred on the position predicted for {date}; the epoch-2000 catalogue position ({ra}°, {dec}°) is {moved}″ away.",
  "live.note_barnard": "Proper motion 10.4″ yr⁻¹, the largest of any star.",
@@ -359,7 +359,7 @@
  "live.track_try": "Moving objects: the “Follow a mover” view adds pictures along a motion you choose.",
  "nav.results": "Results",
  "title.results": "Results",
- "tm.lede": "Every picture NASA's SPHEREx telescope has taken of a position on the sky, in time order, read from NASA's public archive.",
+ "tm.lede": "Every picture NASA's SPHEREx telescope has taken of a position on the sky, in time order, read from NASA's public archive. Use it to follow a moving or variable object, or to inspect a position before downloading the data.",
  "live.coord_eg": "Degrees (133.795, −7.245) or sexagesimal (08h55m10.8s, −07d14m42.5s).",
  "live.presets": "Targets:",
  "live.place_nep": "North ecliptic pole",
@@ -367,5 +367,6 @@
  "live.changes_differ": "These counts are measured live in your browser, on the field of view you chose, without the archive's quality flags. They are a different measurement from the prepared examples on the home page, and they can change slightly between loads if some pictures fail to download.",
  "tr.h": "Measured result for {name}",
  "obj.none": "No asteroid is selected. Choose one from the list of asteroids.",
- "obj.none_link": "Open the list of asteroids"
+ "obj.none_link": "Open the list of asteroids",
+ "view.flagged_none": "No changes flagged in these {N} pictures."
 }

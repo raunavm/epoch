@@ -437,3 +437,8 @@ select, input[type="search"], .coord-form input { border-radius: 2px; border: 1p
   .controls select { min-height: 36px; padding: 0 var(--s1); width: auto; }
   .controls label { font-size: 13px; }
 }
+/* Tool page: less vertical space above the pictures. */
+main > h1 { margin-top: var(--s4); }
+#showcase > h2 { margin-top: var(--s4); }
+#showcase > .hint { margin-bottom: var(--s1); }
+.field-pick { margin: 0 0 var(--s2); }

@@ -52,12 +52,12 @@ export function viewControls(info, st, onChange) {
 }
 
 // compact: small version (tour). minimal: views + picture only (landing).
-export function mountBlink(el, field, { compact = false, minimal = false, view = 'det' } = {}) {
+export function mountBlink(el, field, { compact = false, minimal = false, view = 'det', det = null } = {}) {
   const frames = [...(field.frames || [])].sort((a, b) => a.mjd - b.mjd);
   if (!frames.length) return null;
   const size = field.size_px || 64;
   const info = detectorInfo(frames);
-  const st = { view: VIEWS.includes(view) ? view : 'all', det: busiestDetector(info), i: 0, playing: !REDUCED_MOTION, fps: 2, layout: 'blink', a: 0, b: Math.min(1, frames.length - 1), gaia: false };
+  const st = { view: VIEWS.includes(view) ? view : 'all', det: info[det]?.n ? det : busiestDetector(info), i: 0, playing: !REDUCED_MOTION, fps: 2, layout: 'blink', a: 0, b: Math.min(1, frames.length - 1), gaia: false };
   let timer = null;
   const uid = Math.random().toString(36).slice(2, 7);
   const small = compact || minimal;
@@ -181,7 +181,8 @@ export function mountBlink(el, field, { compact = false, minimal = false, view =
     const key = COUNT_KEY[st.view];
     if (L.some(f => f[key] != null)) {
       const upto = L.slice(0, st.i + 1).reduce((a, f) => a + (f[key] || 0), 0), total = L.reduce((a, f) => a + (f[key] || 0), 0);
-      counter.replaceChildren(h('strong', {}, t('view.flagged', { n: upto })), ' ', h('span', { class: 'muted' }, t('view.flagged_total', { total, N: L.length })), ' ', badge('derived'));
+      counter.replaceChildren(...(total === 0 ? [t('view.flagged_none', { N: L.length })]
+        : [h('strong', {}, t('view.flagged', { n: upto })), ' ', h('span', { class: 'muted' }, t('view.flagged_total', { total, N: L.length }))]));
     } else counter.replaceChildren();
     const nxt = L[(st.i + 1) % L.length];
     new Image().src = asset(corr() ? nxt.corr_png : nxt.img_png); // preload one ahead only

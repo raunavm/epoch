@@ -10,13 +10,13 @@ SPHEREx takes each picture at a different wavelength with one of six detectors, 
 
 ## WISE 0855−0714 {#e4}
 
-WISE 0855−0714, the coldest known brown dwarf, is too faint to see in most single pictures. Combining the 22 pictures from the November–December 2025 visits along its predicted path detects it at 16.5σ, measured against the same pictures combined along 24 empty paths. Its flux density at 4.4–5.0 µm is 0.50 ± 0.03 mJy, between the Spitzer and WISE values (0.51 and 0.42 mJy; Luhman & Esplin 2016). Over the 10 wavelength steps where it is detected, the SPHEREx spectrum is 0.97 ± 0.03 times the JWST NIRSpec spectrum (Luhman et al. 2024). The two reddest steps, at 4.8–5.0 µm, fall below it.
+WISE 0855−0714, the coldest known brown dwarf, is too faint to see in most single pictures. Combining the 22 pictures from the November–December 2025 visits along its predicted path detects it at 16.5σ, measured against the same pictures combined along 24 empty paths. Its flux density at 4.4–5.0 µm is 0.50 ± 0.03 mJy, between the Spitzer and WISE values (0.51 and 0.42 mJy; Luhman & Esplin 2016). Over the 10 wavelength steps where it is detected, the SPHEREx spectrum is 0.97 ± 0.03 times the JWST NIRSpec spectrum (Luhman et al. 2024). The two reddest steps, at 4.8–5.0 µm, fall below it. A SPHEREx spectrum of WISE 0855 has been published (Rustamkulov et al. 2026); ours is an independent comparison with JWST.
 
 ![SPHEREx spectrum of WISE 0855−0714 next to JWST](figs/v2/e11_wise0855.svg "SPHEREx spectrum in 0.1 µm steps (circles; open circles are below 3σ; bars are 1σ), the JWST NIRSpec spectrum (thin line) averaged over the same steps (squares), and the Spitzer 4.5 µm measurement (diamond).")
 
 ## Distance to Epsilon Indi B {#e12}
 
-Epsilon Indi B is a pair of brown dwarfs that SPHEREx sees as one source. Fitting its SPHEREx positions over a year for position, proper motion and parallax, with nothing taken from Gaia, gives a parallax of 243 ± 53 mas, a distance of 13.4 light-years (68% interval 11.0–17.2). Gaia measures 270.7 mas. Ordinary stars in the same pictures show a small shared offset that mimics a parallax of -50 mas; it is not subtracted, and the quoted uncertainty is the scatter of those 8 stars.
+Epsilon Indi B is a pair of brown dwarfs that SPHEREx sees as one source. Fitting its SPHEREx positions over a year for position, proper motion and parallax gives a parallax of 243 ± 53 mas, a distance of 13.4 light-years (68% interval 11.0–17.2). The archive's astrometry is tied to Gaia DR3 reference stars, but no Gaia measurement of Epsilon Indi B itself is used; Gaia measures 270.7 mas. Ordinary stars in the same pictures show a small shared offset that mimics a parallax of -50 mas; it is not subtracted, and the quoted uncertainty is the scatter of those 8 stars.
 
 ![Epsilon Indi B's path and parallax](figs/v2/e12_parallax.svg "a, positions over a year: single pictures (small points), visit averages (circles), and fits with proper motion only (dotted) and with parallax (dash-dot). b, visit averages with the proper motion removed, and the fitted parallax ellipse. Bars are the standard error of each visit mean.")
 
@@ -46,7 +46,7 @@ Combining pictures along a known orbit recovers asteroids that no single picture
 
 ## A search for distant bodies {#distant-bodies}
 
-A body hundreds of AU from the Sun moves on the sky mainly through parallax as the Earth orbits. We searched 0.044 deg² at the north ecliptic pole, observed in 30 visits over 384 days, for sources whose positions follow a parallax ellipse, and found no candidate. A body injected at 500 AU is recovered at a fitted distance of 499.7 ± 1.0 AU, and at that distance half of injected bodies with a radius of 14 Earth radii (geometric albedo 0.3) are recovered. The field is too small, and single pictures too shallow, to exclude a planet-sized body.
+A body hundreds of AU from the Sun moves on the sky mainly through parallax as the Earth orbits. We searched 0.044 deg² at the north ecliptic pole, observed in 30 visits over 384 days, for sources whose positions follow a parallax ellipse, and found no candidate. A body injected at 500 AU is recovered at a fitted distance of 499.7 ± 1.0 AU, and at that distance half of injected bodies with a radius of 14 Earth radii, about the size of Jupiter (geometric albedo 0.3, reflected light), are recovered. The field is too small, and single pictures too shallow, to exclude a planet-sized body.
 
 ![Recovery of injected distant bodies](figs/v2/e21_completeness.svg "Fraction of injected bodies recovered against heliocentric distance, for seven per-visit signal-to-noise ratios (48 injections per point). Bars are 68% Wilson intervals; the dotted line marks half recovered.")
 
@@ -57,4 +57,5 @@ A body hundreds of AU from the Sun moves on the sky mainly through parallax as t
 - SPHEREx DR1 Spectral Images, doi:10.26131/IRSA678. https://doi.org/10.26131/IRSA678
 - Luhman, K. L. & Esplin, T. L. 2016, AJ 152, 78. https://arxiv.org/abs/1605.06655
 - Luhman, K. L. et al. 2024, AJ 167, 5. https://doi.org/10.3847/1538-3881/ad0b72
+- Rustamkulov, Z. et al. 2026, ApJ. https://doi.org/10.3847/1538-4357/ae9d66
 - Gaia Collaboration, Vallenari, A. et al. 2023, A&A 674, A1. https://doi.org/10.1051/0004-6361/202243940

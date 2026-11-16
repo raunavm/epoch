@@ -1,6 +1,6 @@
 {
  "title": "Epsilon Indi B",
- "plain_result": "SPHEREx sees the pair of brown dwarfs as one source. Its proper motion from SPHEREx positions, +3.96 ± 0.07″ yr⁻¹ east and −2.43 ± 0.07″ yr⁻¹ north, agrees with Gaia (+3.98″ and −2.47″ yr⁻¹). Fitting the positions for parallax as well, with nothing taken from Gaia, gives 243 ± 53 mas, a distance of about 13 light-years.",
+ "plain_result": "SPHEREx sees the pair of brown dwarfs as one source. Its proper motion from SPHEREx positions, +3.96 ± 0.07″ yr⁻¹ east and −2.43 ± 0.07″ yr⁻¹ north, agrees with Gaia (+3.98″ and −2.47″ yr⁻¹). Fitting the positions for parallax as well, with no Gaia measurement of Epsilon Indi B itself, gives 243 ± 53 mas, a distance of about 13 light-years.",
  "numbers": [
   {
    "label": "Proper motion, east (SPHEREx)",
@@ -19,12 +19,12 @@
    "label_es": "Movimiento propio, norte (SPHEREx)"
   },
   {
-   "label": "Parallax (SPHEREx positions only)",
+   "label": "Parallax (SPHEREx positions)",
    "value": 243,
    "err": 53,
    "kind": "derived",
    "unit": "mas",
-   "label_es": "Paralaje (solo posiciones de SPHEREx)"
+   "label_es": "Paralaje (posiciones de SPHEREx)"
   },
   {
    "label": "Parallax, Gaia DR3 (Ba)",
@@ -67,5 +67,5 @@
   }
  ],
  "title_es": "Epsilon Indi B",
- "plain_result_es": "SPHEREx ve la pareja de enanas marrones como una sola fuente. Su movimiento propio a partir de las posiciones de SPHEREx, +3,96 ± 0,07″ año⁻¹ hacia el este y −2,43 ± 0,07″ año⁻¹ hacia el norte, coincide con Gaia (+3,98″ y −2,47″ año⁻¹). Ajustando también el paralaje, sin tomar nada de Gaia, se obtiene 243 ± 53 mas, una distancia de unos 13 años luz."
+ "plain_result_es": "SPHEREx ve la pareja de enanas marrones como una sola fuente. Su movimiento propio a partir de las posiciones de SPHEREx, +3,96 ± 0,07″ año⁻¹ hacia el este y −2,43 ± 0,07″ año⁻¹ hacia el norte, coincide con Gaia (+3,98″ y −2,47″ año⁻¹). Ajustando también el paralaje, sin usar ninguna medida de Gaia de la propia Epsilon Indi B, se obtiene 243 ± 53 mas, una distancia de unos 13 años luz."
 }

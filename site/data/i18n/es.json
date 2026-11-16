@@ -191,7 +191,7 @@
  "live.fov_opt": "{f}′ ({px} × {px} píxeles)",
  "live.fov_cost": "Unos {mb} MB por imagen.",
  "live.go": "Mostrar",
- "live.bad_coords": "Escribe las dos coordenadas, en grados (133.795) o como 08h55m10.8s y −07d14m42s. La declinación debe estar entre −90 y 90.",
+ "live.bad_coords": "Escribe las dos coordenadas. Ascensión recta: 0–360° o 0–24 h (08h55m10.8s). Declinación: −90° a +90° (−07d14m42s).",
  "live.showcase_h": "Campo preparado",
  "live.note_epoch": "Centrado en la posición prevista para {date}; la posición de catálogo de la época 2000 ({ra}°, {dec}°) está a {moved}″.",
  "live.note_barnard": "Movimiento propio de 10,4″ año⁻¹, el mayor de cualquier estrella.",
@@ -359,7 +359,7 @@
  "live.track_try": "Objetos en movimiento: la vista «Seguir un objeto en movimiento» suma imágenes a lo largo del movimiento que elijas.",
  "nav.results": "Resultados",
  "title.results": "Resultados",
- "tm.lede": "Todas las imágenes que el telescopio SPHEREx de la NASA ha tomado de una posición del cielo, en orden de fecha, leídas del archivo público de la NASA.",
+ "tm.lede": "Todas las imágenes que el telescopio SPHEREx de la NASA ha tomado de una posición del cielo, en orden de fecha, leídas del archivo público de la NASA. Sirve para seguir un objeto que se mueve o varía, o para examinar una posición antes de descargar los datos.",
  "live.coord_eg": "Grados (133.795, −7.245) o sexagesimal (08h55m10.8s, −07d14m42.5s).",
  "live.presets": "Objetos:",
  "live.place_nep": "Polo norte de la eclíptica",
@@ -367,5 +367,6 @@
  "live.changes_differ": "Estos recuentos se miden en directo en tu navegador, sobre el campo de visión que elegiste y sin las marcas de calidad del archivo. Son una medida distinta de los ejemplos preparados de la página de inicio, y pueden variar un poco entre cargas si algunas imágenes no se descargan.",
  "tr.h": "Resultado medido de {name}",
  "obj.none": "No hay ningún asteroide seleccionado. Elige uno de la lista de asteroides.",
- "obj.none_link": "Abrir la lista de asteroides"
+ "obj.none_link": "Abrir la lista de asteroides",
+ "view.flagged_none": "No se marcó ningún cambio en estas {N} imágenes."
 }
