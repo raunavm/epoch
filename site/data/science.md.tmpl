@@ -255,7 +255,7 @@ For an asteroid with a known orbit, we predict where it is in every picture (JPL
 
 **The slider.** On the home page slider, each step is measured against the same pictures combined along the same empty paths (the scale is never taken below 1), so the number can fall as well as rise as pictures are added.
 
-![Single pictures against the stack](figs/fig_reveal.png "Left: single pictures. Right: the stack along the orbit.")
+![The stack along the orbit against single pictures](figs/fig_reveal.png "Left: the pictures combined along the orbit. Right: single pictures.")
 
 **Not new.** Stacking along known orbits is established: NEOWISE (Masiero et al.), the KBMOD shift-and-stack search (Whidden et al. 2019), IRSA's MOST tutorial, and other Space Apps 2026 teams. We use it as a measured demonstration, not as a new method.
 
