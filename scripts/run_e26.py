@@ -300,6 +300,8 @@ def model_index(pop):
     """Which fold's correction each source gets: a calibration star in fold k gets the one learned on fold 1 - k
     (never its own); every other source gets fold 0 or 1 by a seeded draw."""
     cal = pop.idx[pop.half == "cal"].values
+    # populations() depends on vsx.parquet in run_e18b.D; without it the split changes silently (E26 post-run note)
+    assert len(cal) == 992, f"calibration half has {len(cal)} stars, not E26's 992: is vsx.parquet in {B.D}?"
     fo = folds(cal)
     out = {int(i): 1 - fo[int(i)] for i in cal}
     other = np.sort(pop.idx[pop.half != "cal"].values)
