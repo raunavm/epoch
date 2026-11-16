@@ -1,4 +1,4 @@
-# Orrery site
+# Epoch site
 
 Static site: plain HTML, CSS and JavaScript modules. No build step and no framework; it uses system fonts only. Pixels come from NASA's public SPHEREx bucket on AWS. Two optional overlays, only when switched on, also call outside services: the Gaia DR3 overlay (VizieR `I/355/gaiadr3` on the CfA mirror, falling back to GAVO's `gaia.dr3lite` TAP) and the WISE comparison (AllWISE W2 HiPS tiles from NASA/IPAC IRSA's mirror of the CDS HiPS).
 

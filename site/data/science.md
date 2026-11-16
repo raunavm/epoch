@@ -1,8 +1,8 @@
-# How Orrery works, and how we checked it
+# How Epoch works, and how we checked it
 
 ## In plain words
 
-NASA's SPHEREx telescope photographs the whole sky in 102 colours of infrared light. Orrery plays its pictures of any spot like a short film and answers one question: **at this spot in the sky, what really changed?**
+NASA's SPHEREx telescope photographs the whole sky in 102 colours of infrared light. Epoch plays its pictures of any spot like a short film and answers one question: **at this spot in the sky, what really changed?**
 
 The difficulty is that SPHEREx photographs each spot in a different colour every time. A star that is brighter at one wavelength than another seems to flicker from picture to picture even when nothing moved, so a plain "blink" fills with false changes. Comparing each picture only with pictures from the same detector, which all fall in one band of colours, removes most of them: a median of 93% across 20 random patches of sky.
 
@@ -14,9 +14,9 @@ We also built a cleverer, colour-aware view. In our own test, written down befor
 
 ## The question
 
-The challenge asks for a tool where you enter the coordinates of a patch of sky and watch SPHEREx's pictures of it like a little video, so that moving objects are easy to spot. Orrery does that for any coordinates. Everything else on this page serves one question about the film you are watching: which of the changes you see are real, and which are only SPHEREx changing colour?
+The challenge asks for a tool where you enter the coordinates of a patch of sky and watch SPHEREx's pictures of it like a little video, so that moving objects are easy to spot. Epoch does that for any coordinates. Everything else on this page serves one question about the film you are watching: which of the changes you see are real, and which are only SPHEREx changing colour?
 
-Orrery offers three views of change:
+Epoch offers three views of change:
 
 - **Plain blink:** every picture compared with the one before it in time.
 - **One detector at a time:** each picture compared only with the previous picture from the same detector. This is the view our tests support.
@@ -442,6 +442,6 @@ This publication makes use of data products from the Spectro-Photometer for the 
 
 This research has made use of the NASA/IPAC Infrared Science Archive, which is funded by the National Aeronautics and Space Administration and operated by the California Institute of Technology.
 
-SPHEREx DR1 Spectral Images: doi:10.26131/IRSA678. This work has made use of data from the European Space Agency (ESA) mission Gaia (https://www.cosmos.esa.int/gaia), processed by the Gaia Data Processing and Analysis Consortium (DPAC, https://www.cosmos.esa.int/web/gaia/dpac/consortium). Funding for the DPAC has been provided by national institutions, in particular the institutions participating in the Gaia Multilateral Agreement. Gaia DR3 was queried through the AIP mirror. This research has made use of the SIMBAD database, operated at CDS, Strasbourg, France. It also uses JPL Horizons and the JPL Small-Body Database, NEOWISE diameters from the Planetary Data System, and IMCCE SkyBoT. Orrery is not endorsed by NASA.
+SPHEREx DR1 Spectral Images: doi:10.26131/IRSA678. This work has made use of data from the European Space Agency (ESA) mission Gaia (https://www.cosmos.esa.int/gaia), processed by the Gaia Data Processing and Analysis Consortium (DPAC, https://www.cosmos.esa.int/web/gaia/dpac/consortium). Funding for the DPAC has been provided by national institutions, in particular the institutions participating in the Gaia Multilateral Agreement. Gaia DR3 was queried through the AIP mirror. This research has made use of the SIMBAD database, operated at CDS, Strasbourg, France. It also uses JPL Horizons and the JPL Small-Body Database, NEOWISE diameters from the Planetary Data System, and IMCCE SkyBoT. Epoch is not endorsed by NASA.
 
 Software: astropy, numpy, scipy, pandas, pyarrow, pyvo, astroquery, matplotlib, jax, fsspec, aiohttp, requests, Pillow.
