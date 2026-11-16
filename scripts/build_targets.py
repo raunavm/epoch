@@ -85,7 +85,6 @@ if e4:
     p = e4["passes"]
     e4b = load("data/findings/e4bs.json")
     p2 = p[1]
-    p3 = p[2].get("neighbour_restored") or p[2]
     sh = e4["centroid_shift_vs_prediction"][0]
     ctrl = e4["control_short_wavelength"][1]["neighbour_restored"]
     exp = e4["expected_flux_mJy"]
