@@ -49,7 +49,8 @@ test('identical candidates, cutouts and logits within 1e-3', { skip: !ready }, (
 });
 
 test('detectChanges returns the interface, ranked by score', { skip: !ready }, () => {
-  const { fx, model, vs } = load();
+  const { fx, model: shipped, vs } = load();
+  const model = { ...shipped, use: shipped.use.replace(/_pair$/, '') };   // parity of the unpaired scorer; pairing is tested below
   const frames = fx.det.map((d, e) => ({ det: d, mjd: 61000 + e, obs_id: `o${e}`, wl: 1 + d }));
   const out = detectChanges(frames, { vs, sigma: fx.sigma }, fx.S, fx.f, model);
   assert.equal(out.perFrame.length, frames.length);
