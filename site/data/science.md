@@ -163,6 +163,18 @@ We then measured 11 faint objects listed as probable cold brown dwarfs from thei
 
 ###### E12 {#e12-label}
 
+## The deep field at the north ecliptic pole {#e18}
+
+SPHEREx passes over the north ecliptic pole on almost every orbit, so a small patch there has hundreds of pictures instead of the usual few. We measured every catalogued source within 0.4° of the pole (2,701 stars and galaxies from Gaia and AllWISE) in each of 17,802 pictures, giving each source a 102-colour spectrum and a light curve (`docs/protocols/E18.md`, rules frozen before the measurements were analysed).
+
+**Looking for unusual spectra without labels (E18-A).** Three machine-learning models, each blind to what any object is (an unsupervised random forest after Baron & Poznanski 2017, an autoencoder, and an isolation forest), score how unlike the rest each spectrum is. The scores are turned into calibrated false-alarm probabilities (conformal p-values, computed separately for faint and bright sources), and a source is flagged only if the combined probability is below 0.5% and two of the three models agree. Before looking at real flags, we planted fake unusual spectra (a cold brown dwarf, a dusty quasar, a carbon star, hydrogen emission lines, ice absorption) into real sources' measurements. The search finds them only in bright sources: at signal-to-noise 100–300 per channel it catches 86% of medium-strength brown-dwarf spectra but few emission lines or ices, so we report flags only above that brightness, where about 6.3 false flags are expected among 1,253 sources. Unaltered sources put through the same process are flagged 0.83% of the time (240 trials), close to the 0.5% design.
+
+**Result.** 7 bright sources were flagged. 3 are star-forming galaxies whose 3.3 µm dust band, shifted by their known redshift, stands out; 4 are removed by our artefact rules (three stars in the faint halo of the Cat's Eye nebula, NGC 6543, whose gas lines leak into their light, and one red dwarf beside a saturated star). **No flagged source is left that the catalogues we checked do not explain.** The known quasars and variable stars in the field (42, held out) were not flagged: they do not look unusual in a time-averaged infrared spectrum. This is a tested method with a measured sensitivity, not a list of new objects; we found no published anomaly search on real SPHEREx spectra (the nearest machine-learning work, Nguyen et al. 2026, used simulated spectra).
+
+![Planted fakes found by the anomaly search](figs/e18a_injections.png "Fraction of planted unusual spectra flagged, by type, strength and source brightness.")
+
+![The flagged sources](figs/e18a_flags.png "Each flagged source (red) against its most similar ordinary neighbours (grey), with the reason it is explained or removed.")
+
 ## Recovering known variable stars {#e10}
 
 Can SPHEREx alone tell which stars changed brightness between visits? We drew 124 variable stars from Gaia DR3's catalogue (long-period variables, RR Lyrae, eclipsing binaries and Cepheids, all varying by at least 0.3 magnitudes in visible light) and 496 ordinary comparison stars of the same brightness in the same pictures (`docs/protocols/E10.md`). Half of the comparison stars set a threshold that only 1% of ordinary stars should pass; the other half then tested it. The frozen rule: the test passes if, on the long-period variables, the lower end of the 95% interval of the fraction recovered is above 50%, and false alarms stay near 1%.

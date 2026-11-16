@@ -351,6 +351,22 @@
    "group": "other"
   },
   {
+   "id": "e18a",
+   "claims": [
+    {
+     "id": "C29",
+     "verdict": "SUPPORTED",
+     "status": "SUPPORTED",
+     "late": false
+    }
+   ],
+   "science": "science.html#e18",
+   "failed": [],
+   "figure": "data/figs/e18a_injections.png",
+   "extra": [],
+   "group": "other"
+  },
+  {
    "id": "e10",
    "claims": [
     {
