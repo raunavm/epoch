@@ -495,3 +495,31 @@ main > h1 { margin-top: var(--s4); }
   .intro .form-h, .intro .coord-form { order: 2; }
 }
 .prose code { overflow-wrap: anywhere; }
+
+/* Live view: the change detector's candidates. The list scrolls inside its own box so the picture stays in view. */
+.cand-box h3 { margin-top: var(--s2); }
+.cand-scroll { max-height: 300px; overflow: auto; border: 1px solid var(--line); }
+.cand-table { margin: 0; font-size: var(--t-sm); }
+.cand-table th { position: sticky; top: 0; background: var(--bg); }
+.cand-table td, .cand-table th { padding: 4px 8px; white-space: nowrap; }
+.cand-table tr.selected td { background: var(--c10); }
+.cand-table tr.dismissed td { color: var(--muted); text-decoration: line-through; }
+.cand-table tr.dismissed td.cand-actions { text-decoration: none; }
+.cand-actions .btn { min-height: 32px; padding: 2px 8px; margin-right: 4px; }
+.cand-actions .btn[aria-pressed="true"] { background: var(--c90); color: #fff; }
+.cand-export { margin-top: var(--s1); }
+.cand-table th { text-transform: none; letter-spacing: 0; }
+.linkish { font: inherit; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline dashed; text-underline-offset: 3px; }
+
+/* Guided tour: the current part is outlined; the explanation sits in a card fixed to the bottom of the screen. */
+.tour-start { margin: var(--s2) 0 0; }
+.tour-lit { outline: 3px solid var(--hds-blue); outline-offset: 4px; scroll-margin-top: 80px; }
+.tour-card { position: fixed; right: var(--s3); bottom: var(--s3); z-index: 50; width: min(380px, calc(100vw - 2 * var(--s2)));
+  background: var(--bg); border: 2px solid var(--c90); padding: var(--s2); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); }
+.tour-card h2 { font-size: var(--t-lg); margin: var(--s1) 0; outline: none; }
+.tour-card p { margin: 0 0 var(--s2); font-size: var(--t-sm); line-height: 1.5; }
+.tour-top, .tour-nav { display: flex; justify-content: space-between; align-items: center; gap: var(--s1); }
+@media (max-width: 640px) {
+  .tour-card { left: var(--s2); right: var(--s2); bottom: var(--s2); width: auto; }
+  .tour-lit { scroll-margin-top: 64px; }
+}

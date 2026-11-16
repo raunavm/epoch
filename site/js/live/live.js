@@ -9,6 +9,7 @@ import { readHeader, readRows } from './fits.js';
 import { makeWCS, waveAt } from './wcs.js';
 import { gridSize, rowsNeeded, resample, aperture, apCorr, toMJy, asinhRGBA, divergingRGBA, SCALE_ARCSEC } from './grid.js';
 import { changeModel, median, despike } from './change.js';
+import { mountCandidates } from './candidates.js';
 import { trackShift, motionFromMarks, shiftImage, stackSN, busiestSpan, peakNear } from './track.js';
 import { fetchGaia, starXY, starRadius, starPM, MAX_STARS } from './gaia.js';
 import { wiseStamp, hipsDates, HIPS } from './wise.js';
@@ -77,6 +78,8 @@ export function mountLive(el, target, onState) {
   const specBox = h('section', { class: 'live-spec', 'aria-labelledby': 'h-live-spec' },
     h('h3', { id: 'h-live-spec' }, t('live.spec_h')), h('p', { class: 'hint' }, t('live.spec_hint')));
   const findingBox = h('div', { class: 'finding-box' });
+  const candBox = h('section', { class: 'cand-box', 'aria-live': 'polite' });
+  let cands = null; // the change detector's candidates, once the pictures are in
   const subsetNote = h('p', { class: 'hint' });
 
   function setMode(m, d) {
@@ -152,6 +155,11 @@ export function mountLive(el, target, onState) {
     put(metaBox, ...META_KEYS.flatMap(([k, key]) => [h('dt', {}, t(key)), h('dd', {}, typeof f.hdr[k] === 'number' && !Number.isInteger(f.hdr[k]) ? fmt(f.hdr[k], 4) : f.hdr[k] ?? '—')]),
       h('dt', {}, t('live.meta_file')), h('dd', {}, h('a', { href: f.url, rel: 'noopener' }, f.obs_id + ` D${f.det}`)));
     markers(ov, f.mjd);
+    if (cands) for (const m of cands.marks(f.idx)) { // the detector's marks: rank number, green when kept
+      const col = m.state === 'keep' ? '#009E73' : '#E69F00', sw = Math.max(0.15, S / 100) * (m.selected ? 2 : 1);
+      ov.append(svg('rect', { x: m.x - 2, y: m.y - 2, width: 5, height: 5, fill: 'none', stroke: col, 'stroke-width': sw }),
+        svg('text', { x: m.x + 3.2, y: m.y - 2.2, fill: col, 'font-size': Math.max(2, S / 22), 'font-family': 'Inter, sans-serif', 'font-weight': 700 }, m.label));
+    }
   }
 
   function markers(o, mjd) {
@@ -415,7 +423,7 @@ export function mountLive(el, target, onState) {
         h('button', { type: 'button', class: 'btn', 'aria-label': t('tm.next'), onclick: () => step(1) }, '→')),
       h('div', { class: 'scrub-wrap' }, scrub, h('div', { class: 'scrub-ends muted' }, h('span', {}, t('tm.timeline_note')))),
       h('div', { class: 'controls film-row' }, contrast.el, film),
-      controls, findingBox,
+      controls, candBox, findingBox,
       h('p', { class: 'muted small' }, t('live.markers'), ' ', t('live.keys')))));
   draw(); loadGaia();
   run().catch(err => { if (!signal.aborted) status.textContent = t('live.error', { msg: err.message }); });
@@ -497,6 +505,15 @@ export function mountLive(el, target, onState) {
       h('p', { class: 'muted small' }, t('live.changes_method', { f: fTxt }), fProvisional ? [' ', h('strong', {}, t('live.provisional', { f: fTxt }))] : null));
     if (st.sel) spectrum();
     draw();
+    cands = await mountCandidates({ box: candBox, frames: st.frames, cm: st.cm, S, f: fFloor, target, onChange: draw,
+      onShow: idx => {
+        const fr = st.frames[idx];
+        st.view = 'blink';
+        if (st.mode === 'det' && fr.det !== st.det) { st.det = fr.det; st.detChosen = true; }
+        st.i = Math.max(0, list().indexOf(fr)); st.playing = false; schedule(); emit(); draw();
+        canvas.scrollIntoView({ block: 'nearest', behavior: REDUCED_MOTION ? 'auto' : 'smooth' });
+      } });
+    if (!signal.aborted) draw();
   }
 
   return {
