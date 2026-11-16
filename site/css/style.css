@@ -523,3 +523,14 @@ main > h1 { margin-top: var(--s4); }
   .tour-card { left: var(--s2); right: var(--s2); bottom: var(--s2); width: auto; }
   .tour-lit { scroll-margin-top: 64px; }
 }
+/* Narrow phones: long reference URLs break, control rows wrap, and the tabs wrap to a second line rather than hide. */
+#about a, .prose a { overflow-wrap: anywhere; }
+.viewer-side .controls { flex-wrap: wrap; }
+@media (max-width: 440px) {
+  .site-header { flex-wrap: wrap; row-gap: 0; padding-top: 4px; padding-bottom: 4px; }
+  .site-header nav { overflow: visible; }
+  nav ul { flex-wrap: wrap; white-space: normal; row-gap: 0; }
+  nav a { padding: 10px 0 8px; }
+}
+#about, .prose { overflow-wrap: break-word; }
+.cand-table th { white-space: normal; vertical-align: bottom; }

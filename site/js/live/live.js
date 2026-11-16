@@ -404,7 +404,9 @@ export function mountLive(el, target, onState) {
   // Order: status, picture, time control, way of showing the pictures, what changed; other tools closed until asked for.
   const more = h('details', { class: 'more-tools' }, h('summary', {}, t('live.more_h')),
     h('div', { class: 'segmented', role: 'group', 'aria-label': t('live.view_label') }, views),
-    h('p', {}, gaiaBtn, ' ', gaiaNote), gaiaTip, addBox, subBox, wiseBox, trackBox,
+    h('p', {}, gaiaBtn, ' ', gaiaNote), gaiaTip,
+    h('p', { class: 'small' }, h('a', { href: `https://aladin.cds.unistra.fr/AladinLite/?target=${target.ra.toFixed(5)}%20${target.dec.toFixed(5)}&fov=${(target.fov / 60).toFixed(4)}`, rel: 'noopener', target: '_blank' }, t('live.aladin')), ' ', h('span', { class: 'muted' }, t('live.aladin_note'))),
+    addBox, subBox, wiseBox, trackBox,
     h('details', { class: 'live-meta-wrap' }, h('summary', {}, t('live.meta_h')), metaBox));
   // Picture on the left, everything that controls or describes it on the right (stacked on narrow screens),
   // so the picture and its time control are on screen together.

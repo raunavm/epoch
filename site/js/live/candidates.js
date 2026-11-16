@@ -25,6 +25,7 @@ export async function mountCandidates({ box, frames, cm, S, f, target, onShow, o
   try { res = detectChanges(frames, cm, S, f, model); } catch (err) { box.replaceChildren(h('h3', {}, t('cand.h')), h('p', { class: 'unavailable' }, t('cand.failed'))); return { marks: () => [] }; }
 
   const calibrated = !!res.thresholds;
+  box.dataset.ms = Math.round(res.ms); box.dataset.model = res.model.id;
   const learned = calibrated && !String(res.model.id).includes('zrank');
   const pick = calibrated ? res.ranked.filter(r => MARK_TIERS.has(r.tier)).slice(0, MAX_ROWS) : res.ranked.slice(0, UNCALIBRATED_ROWS);
   const items = pick.map(r => {
