@@ -30,6 +30,7 @@ def nep_variability():
            ["above", "half", "catalogued_var", "vari_class", "kim2026_name", "milliquas_name"]
     t = t[[c for c in keep if c in t]].rename(columns={"id": "gaia_or_allwise_id", "n": "n_pictures", "above": "variable_candidate",
                                                        "half": "role", "m_ab": "spherex_mean_m_ab"})
+    t["role"] = t["role"].fillna("other")   # cal / test: the two halves of non-variable stars; other: everything else
     t = t.sort_values("ra").reset_index(drop=True)
     for c in t.select_dtypes("float").columns:
         t[c] = t[c].round(6)
