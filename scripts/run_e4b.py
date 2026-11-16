@@ -70,10 +70,51 @@ def run_pass(k):
     return out
 
 
+def slider_steps():
+    """Addendum A1: pass-2 slider steps (order and step sizes as run_e4.build_slider) against the 200 paths."""
+    from run_e4 import items_for, HALF
+    from orrery.stack import combine
+    fr = pass_frames(2)
+    on = items_for(fr)
+    order = sorted(range(len(on)), key=lambda i: -on[i]["p"] / on[i]["A_err"])
+    items = [on[i] for i in order]
+    nulls = [[it[i] for i in order] for it in (items_for(fr, (r * np.cos(a), r * np.sin(a))) for r, a in OFFS)]
+    N = len(items)
+    single = np.array([[x["snr"] for x in ni] for ni in nulls])          # 200 x N
+    single_std = max(float(np.std(single[np.isfinite(single)])), 1.0)
+    singles = []
+    for k, it in enumerate(items):
+        col = single[:, k][np.isfinite(single[:, k])]
+        m, sd = float(col.mean()), float(col.std(ddof=1))
+        singles.append(dict(rank=k, obs_id=it["obs_id"], detector=it["det"], snr_nominal=round(float(it["snr"]), 3),
+                            null200_mean=round(m, 3), null200_std=round(sd, 3), sig_200=round((it["snr"] - m) / sd, 3),
+                            n_null_ge_real=int((col >= it["snr"]).sum()), sig_200_site_rule=round(float(it["snr"] / single_std), 3)))
+    steps = []
+    for n in sorted(set([1, 2, 3, 5, 8, 12, 18, N])):
+        _, _, a_, ae = combine(items[:n], HALF)
+        s = a_ / ae
+        nn = np.array([(lambda c: c[2] / c[3])(combine(ni[:n], HALF)) for ni in nulls])
+        nn = nn[np.isfinite(nn)]
+        m, sd = float(nn.mean()), float(nn.std(ddof=1))
+        steps.append(dict(n=n, snr_nominal=round(float(s), 3), null200_n=int(len(nn)), null200_mean=round(m, 3), null200_std=round(sd, 3),
+                          sig_200=round((s - m) / sd, 3), sig_200_site_rule=round((s - m) / max(sd, 1.0), 3), n_null_ge_real=int((nn >= s).sum())))
+        print(steps[-1], flush=True)
+    return steps, singles, round(single_std, 3)
+
+
 if __name__ == "__main__":
     if sys.argv[1] == "geom":   # placement only: no photometry
         for k in (2, 3):
             print(k, int(clear_mask(pass_frames(k)).sum()), "of", len(OFFS), "paths clear of stars")
+    elif sys.argv[1] == "steps":
+        steps, singles, sstd = slider_steps()
+        d = json.load(open("data/findings/e4b.json"))
+        d["pass2_steps"], d["pass2_singles"] = steps, singles
+        d["pass2_steps_note"] = ("Addendum A1 (docs/protocols/E4b.md): site slider steps, same order as run_e4.build_slider, each against the same "
+                                 "200 empty paths; sig_200 = (S/N - mean)/std; sig_200_site_rule = (S/N - mean)/max(std, 1) as reveal.json; singles' "
+                                 f"site rule = S/N / single_std200 with single_std200 = {sstd}")
+        d["pass2_single_std200"] = sstd
+        json.dump(d, open("data/findings/e4b.json", "w"), indent=1)
     else:
         res = [run_pass(2), run_pass(3)]
         json.dump(dict(protocol="docs/protocols/E4b.md", source="data/findings/e4.json", results=res), open("data/findings/e4b.json", "w"), indent=1)
