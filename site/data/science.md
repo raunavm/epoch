@@ -34,6 +34,14 @@ Methane absorption at 3.3 µm distinguishes T and Y dwarfs from L dwarfs. An ind
 
 ![Methane index against colour](figs/v2/e15_methane.svg "The 4.4–5.0 µm to 1.0–1.3 µm flux ratio against the methane index, for brown dwarfs of known spectral type and for candidates without a published spectrum. The dashed line is the dividing value; bars are 1σ.")
 
+## Candidate cold brown dwarfs {#methane-candidates}
+
+We applied the same methane test, unchanged, to 985 objects that earlier surveys listed as possible brown dwarfs. 687 were bright enough for a clear answer: 20 show the methane dip of cold brown dwarfs (T type or later, below roughly 1300 K), and 667 do not. None of 53 known warmer L dwarfs measured the same way was wrongly given the dip. We found no published spectral type for any of the 20; they are candidates for cold, nearby brown dwarfs, and each needs a spectrum to confirm it.
+
+[Download the table (CSV)](products/epoch_methane_candidates.csv) · [Column descriptions](products/README.md) · [Methods, section 6](methods.html#spectra)
+
+![Methane index of brown-dwarf candidates](figs/v2/e22_methane_census.svg "Methane index (flux at 3.2–3.4 µm relative to the neighbouring wavelengths; lower means deeper methane absorption) against WISE W2 magnitude, for the 985 objects and the known L dwarfs. Stars are the candidates; the dashed line is the dividing value. Objects with no defined index are not shown, and the axis is cut at −1.5 and 2. Bars are 1σ.")
+
 ## Variability at the north ecliptic pole {#e18}
 
 SPHEREx observes the north ecliptic pole on almost every orbit. Within 0.4° of the pole, 2,701 catalogued sources were measured in 17,832 pictures. The measurements of all stars share small errors: calibration offsets that differ from picture to picture, a dependence on position on the detector, and slow drifts over the year. We fit a correction for these to half of the non-variable stars and test it on the other half. With the correction, half of planted sinusoidal variations are recovered at an amplitude of 1% for sources of AB magnitude 12–16, 2% at 16–17 and 5% at 17–19, at a false-alarm rate of 0.30%. Most catalogued variables in the field vary by less than this; 5 of 86 pass the threshold.
