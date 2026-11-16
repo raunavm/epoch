@@ -334,5 +334,7 @@
  "intro.found": "Encontradas: 16 enanas marrones frías cuyo metano mide SPHEREx directamente, ninguna con un espectro publicado. Míralas →",
  "about.team": "Equipo",
  "about.team_text": "J2000: Raunav Mendiratta, Preston Liang, Aarav Gupta, Jack Wu, Palaash Gang y Chance Emrich.",
- "about.p_methane": "Enanas marrones frías con metano medido, con la revisión de cada una (CSV)"
+ "about.p_methane": "Enanas marrones frías con metano medido, con la revisión de cada una (CSV)",
+ "live.methane_dip": "Caída de metano a 3,3 µm (índice {i} ± {e}): esta fuente es probablemente una enana marrón de tipo T o más fría. Enanas marrones de tipo conocido probadas así: las 6 llamadas de este tipo fueron correctas, y ninguna de 63 enanas L más calientes recibió esta llamada.",
+ "live.methane_none": "No hay una caída de metano clara a 3,3 µm. (Las enanas marrones frías y débiles pueden pasarse por alto, así que esto no descarta una.)"
 }

@@ -334,5 +334,7 @@
  "intro.found": "Found: 16 cold brown dwarfs whose methane SPHEREx measures directly, none with a published spectrum. See them →",
  "about.team": "Team",
  "about.team_text": "J2000: Raunav Mendiratta, Preston Liang, Aarav Gupta, Jack Wu, Palaash Gang and Chance Emrich.",
- "about.p_methane": "Cold brown dwarfs with methane measured, with the vetting of each (CSV)"
+ "about.p_methane": "Cold brown dwarfs with methane measured, with the vetting of each (CSV)",
+ "live.methane_dip": "Methane dip at 3.3 µm (index {i} ± {e}): this source is likely a T-type or colder brown dwarf. Brown dwarfs of known type tested this way: 6 of 6 such calls were right, and none of 63 warmer L dwarfs was called.",
+ "live.methane_none": "No clear methane dip at 3.3 µm. (Faint cold brown dwarfs can be missed, so this does not rule one out.)"
 }

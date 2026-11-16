@@ -10,6 +10,7 @@ import { makeWCS, waveAt } from './wcs.js';
 import { gridSize, rowsNeeded, resample, aperture, apCorr, toMJy, asinhRGBA, divergingRGBA, SCALE_ARCSEC } from './grid.js';
 import { changeModel, median, despike } from './change.js';
 import { mountCandidates } from './candidates.js';
+import { methaneTest } from './methane.js';
 import { trackShift, motionFromMarks, shiftImage, stackSN, busiestSpan, peakNear } from './track.js';
 import { fetchGaia, starXY, starRadius, starPM, MAX_STARS } from './gaia.js';
 import { wiseStamp, hipsDates, HIPS } from './wise.js';
@@ -394,10 +395,13 @@ export function mountLive(el, target, onState) {
     const csv = ['obs_id,mjd,detector,wavelength_um,flux_mJy,flux_err_mJy,aperture_correction,group_1_earlier_2_later', ...rows.map(r => [r.obs_id, r.mjd, r.det, r.wl.toFixed(4), r.flux.toPrecision(5), r.err.toPrecision(3), r.apcorr, r.pass].join(','))].join('\n');
     const dl = h('a', { class: 'btn small', download: `epoch_spectrum_${target.ra.toFixed(5)}_${target.dec.toFixed(5)}_px${i}_${j}.csv`, href: URL.createObjectURL(new Blob([csv], { type: 'text/csv' })) }, t('live.csv'));
     const [sra, sdec] = [target.ra, target.dec];
+    const mt = methaneTest(rows); // one-sided: a dip is reported, its absence is not taken as evidence
+    const mLine = mt.dip === true ? h('p', { class: 'methane-dip' }, t('live.methane_dip', { i: mt.index.toFixed(2), e: mt.err.toFixed(2) }))
+      : mt.dip === false ? h('p', { class: 'muted small' }, t('live.methane_none')) : null;
     put(specBox, h('h3', { id: 'h-live-spec' }, t('live.spec_h')),
       h('p', {}, h('strong', {}, t('live.spec_label')), ' ', badge('data'), ' ', t('live.spec_where', { i, j, dx: fmt((c - i) * SCALE_ARCSEC, 3), dy: fmt((c - j) * SCALE_ARCSEC, 3) })),
       rows.length ? plot(series, { xlabel: t('plot.wl'), ylabel: t('plot.flux'), title: t('live.spec_title', { n: rows.length, ra: fmt(sra, 7), dec: fmt(sdec, 7) }) }) : h('p', { class: 'unavailable' }, t('live.spec_none')),
-      h('p', { class: 'muted small' }, t('live.spec_caveat')), rows.length ? dl : null);
+      h('p', { class: 'muted small' }, t('live.spec_caveat')), mLine, rows.length ? dl : null);
   }
 
   // ---- loading ----
