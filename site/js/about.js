@@ -12,8 +12,6 @@ if (!a) box.replaceChildren(unavailable(t('what.about')));
 else put(box,
   sec('data_sources', list(a.data_sources)),
   sec('credits', a.acknowledgement ? h('p', {}, a.acknowledgement) : unavailable('')),
-  sec('note', h('div', { class: 'note-box', role: 'note' }, h('p', { class: 'muted small' }, t('about.note_marker')),
-    a.note_statement ? h('p', {}, a.note_statement) : unavailable(''))),
   safeUrl(a.repo_url) ? sec('repo', h('p', {}, h('a', { href: a.repo_url, rel: 'noopener' }, a.repo_url))) : null,
   sec('citations', list(a.citations)),
 );

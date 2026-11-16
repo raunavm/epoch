@@ -155,7 +155,6 @@ python scripts/fixture.py --all
 <script>alert('this must render as text')</script>
 """)
 dump("about.json", {
-    "note_statement": "Made by the Epoch team.",
     "citations": ["Fixture citation A", {"text": "Fixture citation B", "url": "https://example.invalid"}],
     "acknowledgement": "Fixture acknowledgement text.",
     "data_sources": [{"text": "Fixture data source", "url": "https://example.invalid"}],

@@ -21,7 +21,6 @@ BOLD = "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
 REG = "/System/Library/Fonts/Supplemental/Arial.ttf"
 SITE = "site/data"
 MARGIN = 60
-AI_NOTE = "Made from real SPHEREx data"
 # the only subtitle list: burned into the frames and written to the .srt, so the two cannot differ
 SUBS = [(0, 3.5, "NASA's SPHEREx shoots each spot in a new colour"),
         (3.5, 7, "So a plain blink flickers; one detector at a time removes most of it"),
@@ -170,7 +169,6 @@ def seg_name(url, frames_out, n_frames):
         centred(d, 300, "At this spot in the sky, what really changed?", 38, ACC, bold=False)
         centred(d, 395, url, 34, FG)
         centred(d, 455, "NASA SPHEREx public data · Space Apps 2026", 26, FG, bold=False)
-        centred(d, 505, AI_NOTE, 20, (170, 178, 195), bold=False)
         frames_out.append(im)
 
 
@@ -208,7 +206,7 @@ def main(a):
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(FPS), "-i", "dist/frames/%04d.png",
                     "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20",
                     "-metadata", "title=Orrery: at this spot in the sky, what really changed?",
-                    "-metadata", f"comment={AI_NOTE} (DR1); no generated imagery. See README.",
+                    "-metadata", "comment=From real SPHEREx DR1 data.",
                     "dist/orrery_demo.mp4"], check=True)
     with open("dist/orrery_demo.srt", "w") as f:
         for i, (s_, e_, t) in enumerate(SUBS, 1):

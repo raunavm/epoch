@@ -163,7 +163,6 @@ th[aria-sort="descending"] .sort::after { content: " ▼"; }
 .prose { max-width: 46em; }
 .prose figure img { background: #fff; border-radius: 6px; }
 .prose blockquote { border-left: 3px solid var(--line); margin: 1em 0; padding: 0 1em; color: var(--muted); }
-.note-box { border: 2px solid var(--accent); border-radius: 10px; padding: 4px 16px; }
 
 @media (max-width: 720px) {
   body { font-size: 17px; }
