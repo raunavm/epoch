@@ -1051,12 +1051,14 @@ def stats(D, N, FA, NM, idx, ship, rates=RATES):
                               realised_fa_over_target=round(float(fa / rate), 3), false_candidates=int(FA[m][op].sum()),
                               n_pictures=int(NM[m].sum()), n_detected=D[m][op].sum(0).astype(int).tolist())
     for ch in METH:
-        if ch in ("M2", "M3B"):
+        if ch in ("M2", "M3B", "M3BF"):
             continue
         ver[ch] = {}
         for op, rate in zip(OPS, rates):
             v = {}
-            for base in ("M3B", "M2"):
+            for base in ("M3B", "M2", "M3BF"):                # M3BF: descriptive only, not in the verdict
+                if base == ch:
+                    continue
                 d = (D[ch][op] - D[base][op])
                 dp = float((d.sum(0) / N.sum(0)).mean())
                 db = (d[idx].sum(1) / N[idx].sum(1)).mean(1)
