@@ -11,7 +11,6 @@ const STEPS = [
   ['@ .scrub', 'tour.s_timeline'],
   ['@ .segmented.views', 'tour.s_views'],
   ['@ .flag-counter', 'tour.s_counts'],
-  ['@ .cand-box', 'tour.s_candidates'],
   ['@ .legend-row', 'tour.s_markers'],
   ['#coord-form', 'tour.s_any'],
   ['.site-header nav', 'tour.s_more'],

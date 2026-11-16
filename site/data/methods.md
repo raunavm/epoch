@@ -123,6 +123,8 @@ The test used 20 fields (4,810 pictures). At S/N 20 and 0.01, 0.03 and 0.10 fals
 
 ## 3. Learned change detector {#detector}
 
+The detector below was built and tested but is not used in the tool: on real asteroids it marked 68 of 166 sightings, short of the 50% completeness we required, and fewer than the median reference with the archive's flags (79).
+
 The learned detector ranks candidate changes by how much they resemble a point source that appeared, rather than a bright-star residual or an artefact. It follows the two-stage real–bogus design of optical transient surveys (Goldstein et al. 2015; Duev et al. 2019; Acero-Cuellar et al. 2023), with a reference built from SPHEREx's own pictures.
 
 **Candidates.** Stage 1 takes the positive local maxima with $z^\mathrm{b} \ge 3$ of the M3b map, whose reference never contains the picture itself.
@@ -423,6 +425,8 @@ over 147,651 rates of 0.05–1.0° per day in all directions, spaced so the trai
 ## 10. Tested and not adopted {#not-adopted}
 
 Each method below was tested like those above, on data it was not tuned on, and failed its criterion or passed in a form too weak to use.
+
+**Learned change detector (Section 3).** On real asteroids it marked 68 of 166 sightings, with a 95% lower bound of 34% against the 50% required, and fewer than the median reference with the archive's flags (79). It is not used in the tool.
 
 **Wavelength-aware change model.** At a common threshold it recovers 51% of planted S/N-20 sources against 69% for the plain median. It flags more changes than one detector at a time in 19 of 20 random fields (median ratio 1.26). It stays in the tool as an experimental view (Section 2).
 

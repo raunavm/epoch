@@ -123,6 +123,8 @@ The test used [[e27s.n_test_fields]] fields ([[e27s.test_frames]] pictures). At 
 
 ## 3. Learned change detector {#detector}
 
+The detector below was built and tested but is not used in the tool: on real asteroids it marked [[e34s.ast_v2_hits_V17p5]] of [[e34s.ast_n_V17p5]] sightings, short of the 50% completeness we required, and fewer than the median reference with the archive's flags ([[e34s.ast_M3BK_hits_V17p5]]).
+
 The learned detector ranks candidate changes by how much they resemble a point source that appeared, rather than a bright-star residual or an artefact. It follows the two-stage real–bogus design of optical transient surveys (Goldstein et al. 2015; Duev et al. 2019; Acero-Cuellar et al. 2023), with a reference built from SPHEREx's own pictures.
 
 **Candidates.** Stage 1 takes the positive local maxima with $z^\mathrm{b} \ge 3$ of the M3b map, whose reference never contains the picture itself.
@@ -423,6 +425,8 @@ over [[e17.grid.n_rates|int]] rates of 0.05–1.0° per day in all directions, s
 ## 10. Tested and not adopted {#not-adopted}
 
 Each method below was tested like those above, on data it was not tuned on, and failed its criterion or passed in a form too weak to use.
+
+**Learned change detector (Section 3).** On real asteroids it marked [[e34s.ast_v2_hits_V17p5]] of [[e34s.ast_n_V17p5]] sightings, with a 95% lower bound of [[e34s.ast_v2_lo_V17p5|pct]] against the 50% required, and fewer than the median reference with the archive's flags ([[e34s.ast_M3BK_hits_V17p5]]). It is not used in the tool.
 
 **Wavelength-aware change model.** At a common threshold it recovers [[e2_d1.recall_at_k5.M4.efficiency.4|pct]] of planted S/N-20 sources against [[e2_d1.recall_at_k5.M3.efficiency.4|pct]] for the plain median. It flags more changes than one detector at a time in [[e2.n_fields_corr_gt_naive_det]] of 20 random fields (median ratio [[e2.summary.ratio_corr_over_naive_det.median|f2]]). It stays in the tool as an experimental view (Section 2).
 
