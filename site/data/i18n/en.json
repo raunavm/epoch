@@ -155,7 +155,7 @@
  "cand.h": "Possible real changes",
  "cand.running": "Looking for changes in these pictures…",
  "cand.failed": "The change search could not run on these pictures.",
- "cand.about_nn": "Marked by a small neural network trained on simulated sources, at a setting where about 3 false marks are expected per 100 pictures. Marks found: {n}, strongest first. Real faint asteroids score lower than the simulated sources it was trained on, so faint real changes can be missed.",
+ "cand.about_nn": "Marked by a small neural network trained on simulated sources, at a setting where about 3 false marks are expected per 100 pictures. Marks found: {n}, strongest first. Tested on 20 sky fields it never saw, it finds 41% of simulated sources over a range of brightness (more of the brighter ones), where change maps without the archive's quality flags find almost none. In small views like the default 2′ it does no better than a comparison that uses those flags. Real faint asteroids score lower than the simulated sources it was trained on, so faint real changes can be missed.",
  "cand.about_z": "Ranked by how strongly each spot differs from the median of the other pictures from the same detector, at a setting where about 3 false marks are expected per 100 pictures. Marks found: {n}, strongest first.",
  "cand.about_uncal": "The {n} spots that differ most from the median of the other pictures from the same detector, in rank order. Unfiltered ranking: the top of the list is often cosmic-ray hits and hot pixels, which single pictures contain.",
  "cand.none": "Nothing passed the threshold in these pictures.",
