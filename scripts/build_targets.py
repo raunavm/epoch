@@ -83,6 +83,7 @@ def write(tid, card):
 e4 = load("data/findings/e4.json")
 if e4:
     p = e4["passes"]
+    e4b = load("data/findings/e4bs.json")
     p2 = p[1]
     p3 = p[2].get("neighbour_restored") or p[2]
     sh = e4["centroid_shift_vs_prediction"][0]
@@ -94,10 +95,9 @@ if e4:
                       f"{p2['a_hat_mJy']:.2f} ± {(p2['sigma_a_mJy']**2 + ctrl['a_hat_mJy']**2)**0.5:.2f} mJy in the Nov–Dec 2025 visits, consistent with Spitzer (0.48–0.54 mJy) and WISE (0.41–0.50 mJy) in broader bands."
                       " Between visits it shifts the way "
                       "its known motion predicts, and a source standing still fits the positions far worse. This is a measurement of a known object."),
-        numbers=[num("Signal, Nov–Dec 2025 visits, against 24 empty paths", round(p2["significance"], 1), unit="σ",
-                     nulls=p2.get("null_snrs"), nulls_note="same pictures, path shifted 6–9 px", method="science.html#e4"),
-                 num("Signal, Apr–May 2026 visits (a neighbouring star restored to the model)", round(p3.get("significance", float("nan")), 1), unit="σ",
-                     method="science.html#e4"),
+        # Significance against E4b's 200 empty paths (docs/protocols/E4b.md); E4's 24-path figures (16.5σ, 10.6σ) do not stand.
+        numbers=[num(f"Detection against {e4b['pass2_null200_n']} empty paths, Nov–Dec 2025 visits", round(e4b["pass2_sig_200"], 1), unit="σ",
+                     method="results.html#e4"),
                  num("Brightness at 4.4–5 µm, Nov–Dec 2025 (error includes the short-wavelength control offset)", round(p2["a_hat_mJy"], 3),
                      round((p2["sigma_a_mJy"] ** 2 + ctrl["a_hat_mJy"] ** 2) ** 0.5, 3), unit="mJy"),
                  num("Shift between visit windows: measured", f"{sh['measured_shift_arcsec'][0]:+.1f} ± {sh['err_arcsec'][0]:.1f}″, {sh['measured_shift_arcsec'][1]:+.1f} ± {sh['err_arcsec'][1]:.1f}″", None),
@@ -107,7 +107,7 @@ if e4:
         evidence_links=[dict(text=f"All {e4['counts']['n_frames_primary_4p4_5p0um']} pictures at 4.4–5 µm used for the numbers above", href="science.html#e4"),
                         dict(text="Astrometry: Luhman & Esplin 2016, AJ 152, 78", href="https://arxiv.org/abs/1605.06655")],
         method_note=("Position from proper motion and parallax (Luhman & Esplin 2016); each picture fitted with Gaia stars; pictures at 4.4–5 µm "
-                     "combined per visit window; significance against the same path shifted to 24 empty positions. Caveats: a G = 16.3 star sits "
+                     "combined per visit window; significance against the same pictures combined along 200 empty paths (E4b). Caveats: a G = 16.3 star sits "
                      "0.7–1.4 pixels away (our code first dropped it; restored — see What failed); at short wavelengths, where the brown dwarf is "
                      f"invisible, the Nov–Dec 2025 control is {ctrl['a_hat_mJy']:+.3f} ± {ctrl['sigma_a_mJy']:.3f} mJy, not zero, likely the neighbour's "
                      "model; the May 2025 window has only 3 usable pictures and is not informative."),
