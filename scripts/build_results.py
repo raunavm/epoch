@@ -88,6 +88,26 @@ def extras():
                     hi=round(100 * e3[m]["wilson95"][1], 1), source="data/findings/e3.json") for m in ("M4", "M2")],
         "e15": [dict(key="e15_loo", hits=round(cal["loo_accuracy"] * cal["n_decisive"]), n=cal["n_decisive"],
                      source="data/findings/e15.json")],
+        **new_extras(),
+    }
+
+
+def new_extras():
+    """Headline numbers for the afternoon rows (same shapes as above: hits/n, value, lo/hi in %)."""
+    e10, e16, e17, e18a, e18b = (load(f"data/findings/{k}.json") for k in ("e10", "e16s", "e17s", "e18as", "e18bs"))
+    e19, e20 = load("data/findings/e19s.json"), load("data/findings/e20.json")
+    lpv = e10["recall"]["by_type"]["LPV"]["testable"]
+    return {
+        "e10": [dict(key="e10_lpv", hits=lpv["k"], n=lpv["n"], lo=round(100 * lpv["ci95"][0]), hi=round(100 * lpv["ci95"][1]), source="data/findings/e10.json")],
+        "e16": [dict(key="e16_gain", value=round(100 * e16["reduction"], 1), rule=round(100 * e16["threshold"]), source="data/findings/e16.json")],
+        "e17": [dict(key="e17_depth", value=round(e17["V_abs50"], 1), source="data/findings/e17.json"),
+                dict(key="e17_survivors", value=0, source="data/findings/e17.json")],
+        "e18a": [dict(key="e18a_flags", hits=load("data/findings/e18a.json")["n_flags"], expected=round(load("data/findings/e18a.json")["threshold"]["expected_false_flags"], 1),
+                      unexplained=e18a["n_survivor"], source="data/findings/e18a.json")],
+        "e18b": [dict(key="e18b_floor", value=round(100 * e18b["floor_sin_12_17"]), mag="12–17", fa=round(100 * e18b["fa_rate"], 2), source="data/findings/e18b.json")],
+        "e19": [dict(key="e19_match", spot=[round(e19[k]["c_spot"], 2) for k in ("vycma", "epsoct", "gyuma")],
+                     elsewhere=[round(e19[k]["c_else_median"], 2) for k in ("vycma", "epsoct", "gyuma")], source="data/findings/e19.json")],
+        "e20": [dict(key="e20_lines", hits=e20["N_total"], n=e20["M_total"], ctrl=e20["control_fp"], ctrl_n=e20["control_testable"], source="data/findings/e20.json")],
     }
 
 

@@ -347,7 +347,14 @@
     }
    ],
    "figure": "data/figs/e16_calibration.png",
-   "extra": [],
+   "extra": [
+    {
+     "key": "e16_gain",
+     "value": 1.1,
+     "rule": 20,
+     "source": "data/findings/e16.json"
+    }
+   ],
    "group": "other"
   },
   {
@@ -380,7 +387,15 @@
     }
    ],
    "figure": "data/figs/e18b_floor.png",
-   "extra": [],
+   "extra": [
+    {
+     "key": "e18b_floor",
+     "value": 2,
+     "mag": "12–17",
+     "fa": 0.3,
+     "source": "data/findings/e18b.json"
+    }
+   ],
    "group": "other"
   },
   {
@@ -396,7 +411,15 @@
    "science": "science.html#e18",
    "failed": [],
    "figure": "data/figs/e18a_injections.png",
-   "extra": [],
+   "extra": [
+    {
+     "key": "e18a_flags",
+     "hits": 7,
+     "expected": 6.3,
+     "unexplained": 0,
+     "source": "data/findings/e18a.json"
+    }
+   ],
    "group": "other"
   },
   {
@@ -417,7 +440,16 @@
     }
    ],
    "figure": "data/figs/e10_recall.png",
-   "extra": [],
+   "extra": [
+    {
+     "key": "e10_lpv",
+     "hits": 16,
+     "n": 24,
+     "lo": 47,
+     "hi": 82,
+     "source": "data/findings/e10.json"
+    }
+   ],
    "group": "other"
   },
   {
@@ -433,7 +465,16 @@
    "science": "science.html#e20",
    "failed": [],
    "figure": "data/figs/e20_lines.png",
-   "extra": [],
+   "extra": [
+    {
+     "key": "e20_lines",
+     "hits": 37,
+     "n": 54,
+     "ctrl": 2,
+     "ctrl_n": 155,
+     "source": "data/findings/e20.json"
+    }
+   ],
    "group": "other"
   },
   {
@@ -449,7 +490,18 @@
    "science": "science.html#e17",
    "failed": [],
    "figure": "data/figs/e17_recovery.png",
-   "extra": [],
+   "extra": [
+    {
+     "key": "e17_depth",
+     "value": 18.0,
+     "source": "data/findings/e17.json"
+    },
+    {
+     "key": "e17_survivors",
+     "value": 0,
+     "source": "data/findings/e17.json"
+    }
+   ],
    "group": "other"
   },
   {
@@ -476,7 +528,22 @@
     }
    ],
    "figure": "data/figs/e19_shield.png",
-   "extra": [],
+   "extra": [
+    {
+     "key": "e19_match",
+     "spot": [
+      0.31,
+      0.49,
+      0.49
+     ],
+     "elsewhere": [
+      0.05,
+      0.01,
+      0.04
+     ],
+     "source": "data/findings/e19.json"
+    }
+   ],
    "group": "other"
   }
  ]
