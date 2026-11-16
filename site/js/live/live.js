@@ -1,6 +1,7 @@
 // Live mode: any RA/Dec -> SPHEREx DR1 frames read straight from the public S3 bucket in the browser.
 import { h, put, t, fmt, badge, link, wlColor, REDUCED_MOTION, getJSON } from '../core.js';
 import { evidenceNum } from '../components/evidence.js';
+import { contrastControl, filmButton, fromRGBA } from '../components/film.js';
 import { viewControls, detectorInfo, busiestDetector, VIEWS } from '../components/blink.js';
 import { plot, s as svg } from '../plot.js';
 import { findFrames, spreadInTime } from './index.js';
@@ -402,13 +403,18 @@ export function mountLive(el, target, onState) {
   put(el,
     h('div', { class: 'live-head' }, status, prog, subsetNote),
     blinkBox, more, specBox);
+  const pic = h('figure', { class: 'tm-view viewer-img' }, h('div', { class: 'imgwrap' }, canvas, ov), caption);
+  const contrast = contrastControl(pic);
+  const film = filmButton(() => ({ fps: st.fps, k: contrast.getK(), name: `epoch_${target.ra.toFixed(4)}_${target.dec.toFixed(4)}`,
+    sources: list().map(f => fromRGBA(st.mode === 'corr' && st.cm ? divergingRGBA(st.cm.corr[f.idx]) : f.rgba, S)) }));
   blinkBox.append(h('div', { class: 'viewer' },
-    h('figure', { class: 'tm-view viewer-img' }, h('div', { class: 'imgwrap' }, canvas, ov), caption),
+    pic,
     h('div', { class: 'viewer-side' },
       h('div', { class: 'controls' },
         h('button', { type: 'button', class: 'btn', 'aria-label': t('tm.prev'), onclick: () => step(-1) }, '←'), playBtn,
         h('button', { type: 'button', class: 'btn', 'aria-label': t('tm.next'), onclick: () => step(1) }, '→')),
       h('div', { class: 'scrub-wrap' }, scrub, h('div', { class: 'scrub-ends muted' }, h('span', {}, t('tm.timeline_note')))),
+      h('div', { class: 'controls film-row' }, contrast.el, film),
       controls, findingBox,
       h('p', { class: 'muted small' }, t('live.markers'), ' ', t('live.keys')))));
   draw(); loadGaia();
@@ -484,7 +490,7 @@ export function mountLive(el, target, onState) {
     });
     if (!wiseOnly) put(findingBox, // comparing views needs pictures from every detector
       h('h3', {}, t('live.changes_h')),
-      h('p', {}, h('strong', {}, t('live.changes_view')), ' ', t('live.changes', { all: st.cm.nNaiveAll, det: st.cm.nNaiveDet, corr: st.cm.nCorr }), ' ', badge('derived'), ' ', liveEv[0]),
+      h('p', {}, h('strong', {}, t('live.changes_view')), ' ', t('live.changes', { all: st.cm.nNaiveAll, det: st.cm.nNaiveDet }), ' ', badge('derived'), ' ', liveEv[0]),
       liveEv[1],
       h('p', { class: 'small' }, t('live.changes_differ')),
       h('p', { class: 'small' }, t('live.changes_note')),

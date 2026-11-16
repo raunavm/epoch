@@ -1,6 +1,7 @@
 // A prepared field in three views: plain blink (every picture, in time order), one detector at a time,
 // and the colour-aware view (experimental); with labelled objects, pixel-flag counts and an optional Gaia overlay.
 import { h, put, t, link, loc, asset, badge, fmt, wlColor, CATS, REDUCED_MOTION } from '../core.js';
+import { contrastControl, filmButton, fromURL } from './film.js';
 import { s } from '../plot.js';
 
 const SPEEDS = [0.5, 1, 2, 4];
@@ -218,11 +219,16 @@ export function mountBlink(el, field, { compact = false, minimal = false, view =
   const legend = h('ul', { class: 'legend-row', 'aria-label': t('tm.legend') },
     Object.values(CATS).map(c => h('li', {}, h('span', { class: `key key-${c.shape}`, style: `--c:${c.color}`, 'aria-hidden': 'true' }), t(c.key))));
 
+  const imgs = h('div', { class: 'tm-views viewer-img' }, viewA.root, viewB.root);
+  const contrast = contrastControl(imgs);
+  const film = filmButton(() => ({ sources: list().map(f => fromURL(asset(corr() ? f.corr_png : f.img_png))), fps: st.fps, k: contrast.getK(),
+    name: `epoch_${String(field.field || 'field').replace(/[^\w-]/g, '')}` }));
   put(el, h('div', { class: small ? '' : 'viewer' }, // picture left, its controls right (stacked on narrow screens)
-    h('div', { class: 'tm-views viewer-img' }, viewA.root, viewB.root),
+    imgs,
     h('div', { class: 'viewer-side' },
       minimal ? null : [blinkCtl, sideCtl,
-        h('div', { class: 'scrub-wrap' }, h('label', { for: scrub.id, class: 'sr-only' }, t('tm.timeline')), scrub, ends)],
+        h('div', { class: 'scrub-wrap' }, h('label', { for: scrub.id, class: 'sr-only' }, t('tm.timeline')), scrub, ends),
+        h('div', { class: 'controls film-row' }, contrast.el, film)],
       counter, controls,
       small ? null : h('div', { class: 'segmented', role: 'group', 'aria-label': t('tm.mode_label') }, layoutBtns),
       small ? null : [astList, legend, hasGaia ? h('p', {}, gaiaBtn) : gaiaLive ? h('p', { class: 'small' }, gaiaLive) : null, labelList,

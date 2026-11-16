@@ -442,3 +442,7 @@ main > h1 { margin-top: var(--s4); }
 #showcase > h2 { margin-top: var(--s4); }
 #showcase > .hint { margin-bottom: var(--s1); }
 .field-pick { margin: 0 0 var(--s2); }
+.viewer-img img, .viewer-img canvas { filter: contrast(var(--contrast, 1)); }
+.film-row { gap: var(--s2); }
+.contrast-label { display: inline-flex; align-items: center; gap: var(--s1); font-size: var(--t-sm); }
+.contrast { width: 120px; min-height: 24px; }

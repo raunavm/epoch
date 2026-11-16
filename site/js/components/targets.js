@@ -25,6 +25,8 @@ export async function renderTargetCard(el, id, getJSON) {
     h('h2', { id: 'h-result' }, t('tr.h', { name: tg?.name || id })),
     r.status ? h('p', {}, t('tr.status_short', { status: loc(r, 'status') })) : null,
     h('p', { class: 'plain-result', lang: locLang(r, 'plain_result') }, loc(r, 'plain_result') || ''),
+    r.evidence_links?.length ? h('p', { class: 'small' }, t('tr.evidence'), ' ',
+      r.evidence_links.flatMap((l, i) => [i ? ' · ' : '', h('a', { href: /^https?:/.test(l.href) ? l.href : link(l.href), lang: locLang(l, 'text') }, loc(l, 'text'))])) : null,
     r.numbers?.length ? h('dl', { class: 'facts result-numbers' }, r.numbers.flatMap(n => {
       const [btn, panel] = evidenceNum(value(n), {
         loadFrames: () => frames(id), nulls: n.nulls, nullsNote: loc(n, 'nulls_note'),
@@ -39,7 +41,5 @@ export async function renderTargetCard(el, id, getJSON) {
     }),
     r.slider ? slider : null,
     r.method_note ? h('details', { class: 'method-note' }, h('summary', {}, t('tr.method_h')), h('p', { class: 'small', lang: locLang(r, 'method_note') }, loc(r, 'method_note'))) : null,
-    r.evidence_links?.length ? h('p', { class: 'small' }, t('tr.evidence'), ' ',
-      r.evidence_links.flatMap((l, i) => [i ? ' · ' : '', h('a', { href: /^https?:/.test(l.href) ? l.href : link(l.href), lang: locLang(l, 'text') }, loc(l, 'text'))])) : null,
   );
 }
