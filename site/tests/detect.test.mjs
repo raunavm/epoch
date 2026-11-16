@@ -91,3 +91,23 @@ test('detectChanges without a model ranks M3b candidates by z', () => {
   assert.equal(out.ranked[0].score, out.ranked[0].z);
   assert.ok(Number.isNaN(out.ranked[0].falsePerPicture) && out.ranked[0].tier === null);
 });
+
+test('coincidence: a source in both simultaneous pictures is kept, a single-picture spike is not', async () => {
+  const { detectChanges, partners } = await import('../js/live/detect.js');
+  const S = 16, P = S * S, n = 12, frames = [], vs = [], sigma = [];
+  let seed = 7; const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648 - 0.5);
+  for (let k = 0; k < n; k++) for (const det of [1, 4]) {
+    frames.push({ det, mjd: 60800 + k, obs_id: `o${k}_${det}`, wl: det === 1 ? 0.9 : 2.5 });
+    const v = new Float64Array(P); for (let p = 0; p < P; p++) v[p] = rnd() * 0.2;
+    if (k === 5) v[8 * S + 8] += 50;                       // real: same pixel in both detectors of exposure 5
+    if (k === 9 && det === 1) v[3 * S + 12] += 80;         // artefact: one picture only
+    vs.push(v); sigma.push(0.1);
+  }
+  const pr = partners(frames);
+  assert.equal(pr[0], 1); assert.equal(pr[1], 0);
+  const model = { use: 'zrank_pair', id: 't', zmin: 3, coincidence: { method: 'CZ', pair_dmjd: 1e-4, radius_px: 1.5, partner_zmin: 3, thresholds: { r1: 1e9, r3: 5, r10: 4 } } };
+  const out = detectChanges(frames, { vs, sigma }, S, 0, model);
+  const hits = out.ranked.map(r => `${r.obs_id}:${r.x},${r.y}`);
+  assert.ok(hits.includes('o5_1:8,8') && hits.includes('o5_4:8,8'), hits.join(' '));
+  assert.ok(!hits.some(h => h.startsWith('o9_1:12,3')), hits.join(' '));
+});

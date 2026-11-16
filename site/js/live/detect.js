@@ -180,6 +180,7 @@ const tierOf = (s, t) => (s > t.r1 ? 'r1' : s > t.r3 ? 'r3' : s > t.r10 ? 'r10' 
  * model = null: candidates ranked by M3b z with no calibration (falsePerPicture NaN, tier null, thresholds null).
  */
 export function detectChanges(frames, cm, S, f, model, onProgress) {
+  if (model?.coincidence && /_pair$/.test(model.use ?? '')) return detectPaired(frames, cm, S, f, model, onProgress);
   const t0 = (globalThis.performance ?? Date).now();
   const m = !model ? { kind: 'zrank', id: 'e30-zrank-uncalibrated' } : model.model ? (model.use === 'zrank' ? model.zrank : model.model) : model;
   const zmin = model?.zmin ?? 3;
@@ -202,5 +203,43 @@ export function detectChanges(frames, cm, S, f, model, onProgress) {
   });
   ranked.sort((a, b) => b.score - a.score);
   return { perFrame, ranked, thresholds: m.thresholds ?? null, model: { id: m.id, sha256: model?.weights_sha256 ?? null },
+    ms: (globalThis.performance ?? Date).now() - t0 };
+}
+
+/** Simultaneous partner of each picture: same exposure (|dMJD| < dmjd) on the detector that sees the same sky (det +- 3). */
+export function partners(frames, dmjd = 1e-4) {
+  return frames.map((a, e) => frames.findIndex((b, k) => k !== e && Math.abs(b.mjd - a.mjd) < dmjd && Math.abs(b.det - a.det) === 3));
+}
+
+/**
+ * Coincidence detector (E35): a candidate counts only if the simultaneous partner picture has a stage-1 candidate
+ * (z >= partner_zmin) within radius_px. Real sources are in both pictures of an exposure; detector artefacts are in one.
+ * model.coincidence = {method, pair_dmjd, radius_px, partner_zmin, thresholds: {r1, r3, r10}}; use 'zrank_pair' scores
+ * by z, 'model_pair' by the network. Pictures without a loaded partner cannot carry a mark.
+ */
+function detectPaired(frames, cm, S, f, model, onProgress) {
+  const t0 = (globalThis.performance ?? Date).now();
+  const C = model.coincidence, net = model.use === 'model_pair' ? model.model : null;
+  const zmin = model.zmin ?? 3, r2 = C.radius_px * C.radius_px;
+  const ref = medianReference(cm.vs, cm.sigma, frames.map(fr => fr.det), S, f, onProgress);
+  const cands = frames.map((fr, e) => findCandidates(ref.z[e], ref.c[e], S, zmin));
+  const pz = C.partner_zmin ?? zmin;
+  const part = partners(frames, C.pair_dmjd);
+  const perFrame = [], ranked = [];
+  frames.forEach((fr, e) => {
+    const list = [], q = part[e];
+    if (q >= 0) for (const cd of cands[e]) {
+      if (!cands[q].some(o => o.z >= pz && (o.x - cd.x) ** 2 + (o.y - cd.y) ** 2 <= r2)) continue;
+      const score = net ? forward(net, cutout(cm.vs[e], ref.med[e], ref.z[e], ref.c[e], cm.sigma[e], cd.x, cd.y, S), onehot(fr.det)) : cd.z;
+      const tier = tierOf(score, C.thresholds);
+      if (!tier) continue;
+      list.push({ x: cd.x, y: cd.y, z: cd.z, score, falsePerPicture: NaN, tier, partner: q });
+      ranked.push({ idx: e, obs_id: fr.obs_id, mjd: fr.mjd, det: fr.det, wl: fr.wl, x: cd.x, y: cd.y, z: cd.z, score, falsePerPicture: NaN, tier, partner: q });
+    }
+    perFrame.push(list);
+    if (onProgress && (e % 25 === 0 || e === frames.length - 1)) onProgress(0.5 + 0.5 * (e + 1) / frames.length);
+  });
+  ranked.sort((a, b) => b.score - a.score);
+  return { perFrame, ranked, thresholds: C.thresholds, model: { id: `${model.id}-pair-${C.method}`, sha256: model.weights_sha256 ?? null },
     ms: (globalThis.performance ?? Date).now() - t0 };
 }
