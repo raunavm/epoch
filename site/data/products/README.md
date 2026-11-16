@@ -32,7 +32,7 @@ Caveat: at SPHEREx's spectral resolution, emission from the star cannot be separ
 
 ## epoch_nep_variable_candidates.csv — vetting of the uncatalogued variability candidates (E33)
 
-The 16 sources in `epoch_nep_variability.csv` that pass the variability thresholds but are not in the catalogues checked there (VSX, Gaia DR3 variability, Kim et al. 2026 NEOWISE variables, Milliquas), one row per source, with the result of each vetting rule. Each rule was applied in the same way to non-variable comparison stars, so the rate at which it rejects ordinary stars is known.
+The 16 sources in `epoch_nep_variability.csv` that pass the variability thresholds but are not in the catalogues checked there (VSX, Gaia DR3 variability, Kim et al. 2026 NEOWISE variables, Milliquas), one row per source, with the result of each vetting rule (docs/protocols/E33.md). Each rule was applied in the same way to non-variable comparison stars, so the rate at which it rejects ordinary stars is known.
 
 | Column | Meaning |
 |---|---|
@@ -83,3 +83,5 @@ Stars that Gaia DR3 flags as likely Be or T Tauri stars, measured with the same 
 | catalogues_checked, search_date | what was searched, and when |
 
 Caveats: at SPHEREx's spectral resolution, emission from the star cannot be separated from emission by surrounding gas. Six of the 7 unclassified stars are detected in Brackett-α only, most near the threshold. The literature check is broad but not complete.
+
+Vetting of the methane candidates (columns `vet_verdict`, `vet_reason`, `prior_photometric_type`, `published_type_found`; checked 2026-11-15): KEEP = no published spectral type found and no significant neighbouring source; KNOWN = a published type exists (WISE 0628−8057, methane imaging); DOUBTFUL = a brighter WISE source within one to two SPHEREx pixels could bias the index. All 20 already had a T type estimated from their colours or magnitudes; SPHEREx measures their methane absorption directly. Sources: SIMBAD, VizieR brown-dwarf catalogues, CatWISE2020, AllWISE, Gaia DR3, arXiv. Not checked: the UltracoolSheet, the SpeX Prism Library and full-text searches, so "no published type" means none found in these sources.
