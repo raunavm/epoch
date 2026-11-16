@@ -6,7 +6,8 @@ import e2_cache, build_field as bf
 from astropy.coordinates import SkyCoord, BarycentricMeanEcliptic, Angle
 import astropy.units as u
 
-BASE, SEED = "data/phase2/e34", 2026111560
+import os as _os
+BASE = _os.environ.get("E3X_BASE", "data/phase2/e34"); SEED = int(_os.environ.get("E3X_SEED", "2026111560")); PREFIX = _os.environ.get("E3X_PREFIX", "e34a")
 ROOT, FIELDS = f"{BASE}/efields", f"{BASE}/fields.json"
 
 
@@ -55,6 +56,8 @@ def draw():
         paths = list(ex.map(lambda n: ephem.fetch(n, out=f"{BASE}/ephem"), nums))
     avoid = run_e30.used_centres() + [(x["ra"], x["dec"]) for g in ("calib", "test", "ecliptic", "train_extra")
                                       for x in run_e30.draw()[g]["fields"]]
+    if BASE != "data/phase2/e34":
+        avoid += [(x["ra"], x["dec"]) for x in json.load(open("data/phase2/e34/fields.json"))["fields"]]
     quota, out = {"bright": 8, "faint": 8}, []
     fm, fra, fdec = df.mjd.values, np.radians(df.ra.values), np.radians(df.dec.values)
     import pandas as pd
@@ -86,7 +89,7 @@ def draw():
         ra0, dec0 = float(q.RA) + dra / np.cos(np.radians(float(q.DEC))), float(q.DEC) + ddec
         if any(sep(ra0, dec0, a, b) < 0.5 for a, b in avoid):
             continue
-        out.append(dict(field=f"e34a{len(out):02d}", ra=float(ra0), dec=float(dec0), stratum=s, selected_by=n,
+        out.append(dict(field=f"{PREFIX}{len(out):02d}", ra=float(ra0), dec=float(dec0), stratum=s, selected_by=n,
                         vmag=float(q.V), frame_key=r.key, frame_mjd=float(r.mjd)))
         avoid.append((ra0, dec0)); quota[s] -= 1
         print(out[-1], flush=True)
