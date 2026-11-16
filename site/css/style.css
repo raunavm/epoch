@@ -557,3 +557,12 @@ details.how[open] > summary { margin-bottom: 6px; }
 .obj-card { border: 1px solid var(--line); padding: var(--s1) var(--s2); margin: var(--s1) 0; }
 .obj-card h3 { margin-top: 0; }
 .obj-card .hint:only-child { margin: 0; }
+
+/* Image view: the picture fits the window, controls stay in view */
+#live .viewer-img .imgwrap { max-width: min(100%, calc(100svh - 190px)); margin: 0 auto; }
+@media (min-width: 1000px) {
+  #live .viewer { grid-template-columns: minmax(0, min(calc(100svh - 190px), 60%)) minmax(320px, 1fr); column-gap: var(--s3); align-items: start; }
+  #live .viewer > .viewer-img, #live .viewer > .viewer-time { grid-column: 1; }
+  #live .viewer > .viewer-side { grid-column: 2; grid-row: 1 / span 2; }
+  #live .viewer-img .imgwrap { max-width: 100%; }
+}
