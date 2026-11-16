@@ -19,7 +19,7 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 SOURCES = {os.path.basename(p)[:-5]: os.path.relpath(p, ROOT) for p in sorted(glob.glob(os.path.join(ROOT, "data/findings/*.json")))} \
     | {"meta": "site/data/index/dr1/meta.json", "headline": "site/data/headline.json"}
 TARGETS = ["docs/READY_TO_SEND.md", "docs/video_script.md", "docs/slides.md", "docs/video_captions.srt",
-           "site/data/science.md", "site/data/about.json"]
+           "site/data/science.md", "site/data/methods.md", "site/data/about.json"]
 TOKEN = re.compile(r"\[\[([A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)+)(?:\|(pct|int|date|raw|[fk][0-3]))?\]\]")
 ABBREV = re.compile(r"(?:\b(?:al|e\.g|i\.e|vs|No|St|cf|approx)\.)$")
 

@@ -7,7 +7,7 @@ const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&
 const okUrl = u => !/^\s*(javascript|data|vbscript):/i.test(u);
 
 export function renderMarkdown(src, resolve = u => u, math = null) {
-  const lines = src.replace(/\r\n?/g, '\n').split('\n'), out = [];
+  const lines = src.replace(/\r\n?/g, '\n').replace(/<!--[\s\S]*?-->/g, '').split('\n'), out = []; // HTML comments are authors' notes
   const url = u => okUrl(u) ? esc(/^(https?:|#|mailto:)/.test(u) ? u : resolve(u)) : '#';
   const href = u => (/^(\.\.\/)?[\w-]+\.html([?#]|$)/.test(u) ? esc(u.replace(/^\.\.\//, '')) : url(u));
   const inline = s => {

@@ -1,15 +1,16 @@
 {
  "title": "R Draconis",
  "status": "pulsation measured",
- "plain_result": "R Draconis is a pulsating red giant (a Mira variable) bright enough to saturate the detector, so it is measured from the halo of its image. The date of maximum brightness at 4.4–5.0 µm was predicted from the pictures measured earlier and tested on 512 pictures not used before. Over its 246-day period the star varies by 0.34 ± 0.03 magnitudes either side of its mean, and the fitted maximum, 4 February 2026 ± 2 days, is 2.5 days after the predicted date. The light curve is not a perfect sine wave: with errors set by its own scatter about the fit instead of by comparison stars, the amplitude is 6σ. At 3.8–4.4 µm the new pictures cover too few dates for a fit.",
+ "plain_result": "R Draconis is a pulsating red giant (a Mira variable) bright enough to saturate the detector, so it is measured from the halo of its image. The date of maximum brightness at 4.4–5.0 µm was predicted from the pictures measured earlier and tested on 512 pictures not used before, 461 of them at 4.4–5.0 µm. Over its 246-day period the star varies by 0.34 ± 0.03 magnitudes either side of its mean, and the fitted maximum, 4 February 2026 ± 2 days, is 2.5 days after the predicted date. The light curve is not a perfect sine wave: with errors set by its own scatter about the fit instead of by comparison stars, the amplitude is 6σ. At 3.8–4.4 µm the new pictures cover too few dates for a fit.",
  "numbers": [
   {
    "label": "Pictures (not used before)",
-   "value": 512,
+   "value": "512 (461 at 4.4–5.0 µm)",
    "err": null,
    "kind": "data",
    "unit": "",
-   "label_es": "Imágenes (no utilizadas antes)"
+   "label_es": "Imágenes (no utilizadas antes)",
+   "value_es": "512 (461 a 4,4–5,0 µm)"
   },
   {
    "label": "Semi-amplitude, 4.4–5.0 µm",
@@ -59,6 +60,6 @@
   }
  ],
  "title_es": "R Draconis",
- "plain_result_es": "R Draconis es una gigante roja pulsante (una variable Mira) tan brillante que satura el detector, así que se mide en el halo de su imagen. La fecha de brillo máximo a 4,4–5,0 µm se predijo a partir de las imágenes medidas antes y se puso a prueba con 512 imágenes no utilizadas hasta entonces. A lo largo de su periodo de 246 días, la estrella varía 0,34 ± 0,03 magnitudes a cada lado de su media, y el máximo ajustado, el 4 de febrero de 2026 ± 2 días, cae 2,5 días después de la fecha predicha. La curva de luz no es una sinusoide perfecta: con errores fijados por su propia dispersión respecto al ajuste en lugar de por estrellas de comparación, la amplitud es de 6σ. A 3,8–4,4 µm las nuevas imágenes cubren muy pocas fechas para un ajuste.",
+ "plain_result_es": "R Draconis es una gigante roja pulsante (una variable Mira) tan brillante que satura el detector, así que se mide en el halo de su imagen. La fecha de brillo máximo a 4,4–5,0 µm se predijo a partir de las imágenes medidas antes y se puso a prueba con 512 imágenes no utilizadas hasta entonces, 461 de ellas a 4,4–5,0 µm. A lo largo de su periodo de 246 días, la estrella varía 0,34 ± 0,03 magnitudes a cada lado de su media, y el máximo ajustado, el 4 de febrero de 2026 ± 2 días, cae 2,5 días después de la fecha predicha. La curva de luz no es una sinusoide perfecta: con errores fijados por su propia dispersión respecto al ajuste en lugar de por estrellas de comparación, la amplitud es de 6σ. A 3,8–4,4 µm las nuevas imágenes cubren muy pocas fechas para un ajuste.",
  "status_es": "pulsación medida"
 }

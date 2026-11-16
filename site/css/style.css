@@ -494,3 +494,4 @@ main > h1 { margin-top: var(--s4); }
   .intro-fig { order: 1; max-width: 260px; margin: var(--s2) 0 0; }
   .intro .form-h, .intro .coord-form { order: 2; }
 }
+.prose code { overflow-wrap: anywhere; }
