@@ -12,7 +12,7 @@ SPHEREx takes each picture at a different wavelength with one of six detectors, 
 
 ## A learned change detector {#detector}
 
-Without the archive's quality flags, which the live view does not read, a change map is dominated by cosmic-ray hits and bad pixels. The live view therefore ranks possible changes with a small neural network (about 7,000 parameters) that runs in the browser. It was trained on simulated sources placed into real SPHEREx pictures. Tested on 20 sky fields it never saw, at a setting with about 3 false marks per 100 pictures, it finds 41% of the simulated sources (more of the brighter ones), where change statistics without quality flags find almost none. With the archive's quality flags, the median reference finds 18%; on the small default view the network does no better than that. Real faint asteroids score lower than the simulated sources, so faint real changes can be missed.
+Without the archive's quality flags, which the live view does not read, a change map is dominated by cosmic-ray hits and bad pixels. The live view therefore ranks possible changes with a small neural network (about 7,000 parameters) that runs in the browser. It was trained on simulated sources placed into real SPHEREx pictures. Tested on 20 sky fields it never saw, at a setting with about 3 false marks per 100 pictures, it finds 41% of the simulated sources (more of the brighter ones), where change statistics without quality flags find almost none. With the archive's quality flags, the median reference finds 18%; on the small default view the network does no better than that. In a test on real asteroids it found none of 32 sightings, where the flagged median reference found 12, so it is not yet shown to work on real moving objects.
 
 [Methods, section 3](methods.html#detector)
 
@@ -74,6 +74,12 @@ SPHEREx covers the Paschen-α (1.875 µm) and Brackett-α (4.05 µm) hydrogen li
 
 ![Hydrogen-line excess](figs/v2/e20_lines.svg "a, b, flux relative to the local continuum around Paschen-α (a) and Brackett-α (b) for one candidate (stars) and a control star in the same pictures (crosses); bars are 1σ. c, distribution of the line excess for candidates and controls; the dashed line is the detection threshold.")
 
+## More emission-line stars {#emission-candidates}
+
+We ran the same hydrogen-line test, unchanged, on 691 more stars that Gaia flags as likely Be or T Tauri stars. 241 of 651 that could be measured show line emission, against 10 of 1,719 ordinary stars. For 7 we found no published emission-line classification; they are candidates that need a spectrum to confirm.
+
+[Download the table (CSV)](products/epoch_emission_line_candidates.csv) (88 rows; the column `no_published_emission_classification_found` marks the 7) · [Column descriptions](products/README.md) · [Methods, section 6](methods.html#spectra)
+
 ## Faint asteroids {#stacking-along-an-orbit}
 
 Combining pictures along a known orbit recovers asteroids that no single picture detects: of 7 asteroids with no single detection above 5σ, 3 exceed 5σ when combined. In a blind sample of new asteroids, only 3 of the 5 expected to reach 5σ did so: the noise in the combined pictures is about 2.5 times the formal errors. Their measured brightness matched the prediction (median ratio 0.92).
@@ -89,6 +95,14 @@ A body hundreds of AU from the Sun moves on the sky mainly through parallax, tra
 [Methods, section 9](methods.html#movers)
 
 ![Recovery of injected distant bodies](figs/v2/e21_completeness.svg "Fraction of injected bodies recovered against heliocentric distance, for seven per-visit signal-to-noise ratios (48 injections per point). Bars are 68% Wilson intervals; the dotted line marks half recovered.")
+
+## Candidates for follow-up {#candidates}
+
+Each of these is a candidate, not a confirmed object. Each needs a spectrum or another observation.
+
+- 20 possible cold brown dwarfs, from the methane test ([section](#methane-candidates), [CSV](products/epoch_methane_candidates.csv)).
+- 7 possible emission-line stars with no published classification ([section](#emission-candidates), [CSV](products/epoch_emission_line_candidates.csv)).
+- North ecliptic pole: 16 variables missing from the catalogues were checked and 0 survive ([section](#e18), [CSV](products/epoch_nep_variable_candidates.csv)).
 
 ## References
 

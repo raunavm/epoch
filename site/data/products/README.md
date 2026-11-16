@@ -32,7 +32,7 @@ Caveat: at SPHEREx's spectral resolution, emission from the star cannot be separ
 
 ## epoch_nep_variable_candidates.csv — vetting of the uncatalogued variability candidates (E33)
 
-The 16 sources in `epoch_nep_variability.csv` that pass the variability thresholds but are not in the catalogues checked there (VSX, Gaia DR3 variability, Kim et al. 2026 NEOWISE variables, Milliquas), one row per source, with the result of each vetting rule fixed in advance (docs/protocols/E33.md). Each rule was applied in the same way to non-variable comparison stars, so the rate at which it rejects ordinary stars is known.
+The 16 sources in `epoch_nep_variability.csv` that pass the variability thresholds but are not in the catalogues checked there (VSX, Gaia DR3 variability, Kim et al. 2026 NEOWISE variables, Milliquas), one row per source, with the result of each vetting rule (docs/protocols/E33.md). Each rule was applied in the same way to non-variable comparison stars, so the rate at which it rejects ordinary stars is known.
 
 | Column | Meaning |
 |---|---|
