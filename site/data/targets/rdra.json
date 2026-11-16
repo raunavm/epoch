@@ -1,7 +1,7 @@
 {
  "title": "R Draconis",
- "status": "measured; no change confirmed by our pre-set rule",
- "plain_result": "R Draconis is so bright that only the halo around its overloaded centre can be measured, and the pre-set test could use only three noisy colour bands: there no change passes 5 times the error (43 ordinary bright stars measured the same way). Shown for information only, outside the pre-set range: at 4.7 \u00b5m its brightness rises and falls by about 0.3 magnitudes either side of average and peaks around 1 Feb 2026 (\u00b1 3 days, formal). The catalogue predicts a visible-light maximum near 21 Jan 2026, uncertain by 2\u20133 weeks, so the infrared\u2013visible lag is not measured.",
+ "status": "measured; no change meets the predefined criterion",
+ "plain_result": "R Draconis is so bright that only the halo around its overloaded centre can be measured, and the predefined test could use only three noisy colour bands: there no change passes 5 times the error (43 ordinary bright stars measured the same way). Shown for information only, outside the predefined range: at 4.7 \u00b5m its brightness rises and falls by about 0.3 magnitudes either side of average and peaks around 1 Feb 2026 (\u00b1 3 days, formal). The catalogue predicts a visible-light maximum near 21 Jan 2026, uncertain by 2\u20133 weeks, so the infrared\u2013visible lag is not measured.",
  "numbers": [
   {
    "label": "Pictures",
@@ -12,12 +12,12 @@
    "label_es": "Im\u00e1genes"
   },
   {
-   "label": "Colour bands usable in the pre-set test",
+   "label": "Colour bands usable in the predefined test",
    "value": 3,
    "err": null,
    "kind": "derived",
    "unit": "",
-   "label_es": "Bandas de color utilizables en la prueba fijada de antemano"
+   "label_es": "Bandas de color utilizables en la prueba predefinida"
   },
   {
    "label": "Peak at 4.7 \u00b5m (for information)",
@@ -43,9 +43,9 @@
    "src": "data/figs/e9_rdra.png",
    "href": "science.html#e9",
    "alt": "R Draconis brightness through the year in six SPHEREx colour bands",
-   "caption": "Brightness through the year in six colour bands; open circles are outside the pre-set range and for information only.",
+   "caption": "Brightness through the year in six colour bands; open circles are outside the predefined range and for information only.",
    "alt_es": "Brillo de R Draconis a lo largo del a\u00f1o en seis bandas de color de SPHEREx",
-   "caption_es": "Brillo a lo largo del a\u00f1o en seis bandas de color; los c\u00edrculos huecos est\u00e1n fuera del rango fijado de antemano y son solo informativos."
+   "caption_es": "Brillo a lo largo del a\u00f1o en seis bandas de color; los c\u00edrculos huecos est\u00e1n fuera del rango predefinido y son solo informativos."
   }
  ],
  "evidence_links": [
@@ -60,10 +60,10 @@
    "text_es": "M\u00e9todo (p\u00e1gina de Ciencia)"
   }
  ],
- "method_note": "Halo photometry (annulus 7\u201312 pixels) chosen on comparison stars before R Draconis was measured (docs/protocols/E9.md). For a star this bright, much of the 'halo' is detector bloom rather than starlight (Fazar et al. 2026: bloom reaches 100\u2013270 px and depends on detector position and timing); ordinary stars of this brightness swing by factors of 2\u20134 in detectors 1\u20134, so the pre-set 5\u00d7 threshold corresponds to a 35\u201365% change per band \u2014 a weak test. Detectors 5\u20136 are excluded by a pre-set saturation guard; the 4.4\u20135 \u00b5m light curve was made after the result with that guard switched off, so it is descriptive. Published infrared maxima of such stars lag the visible ones by about 0.05\u20130.13 of a period, 12\u201332 days for R Draconis (Smith et al. 2002).",
+ "method_note": "Halo photometry (annulus 7\u201312 pixels) chosen on comparison stars before R Draconis was measured (docs/protocols/E9.md). For a star this bright, much of the 'halo' is detector bloom rather than starlight (Fazar et al. 2026: bloom reaches 100\u2013270 px and depends on detector position and timing); ordinary stars of this brightness swing by factors of 2\u20134 in detectors 1\u20134, so the predefined 5\u00d7 threshold corresponds to a 35\u201365% change per band \u2014 a weak test. Detectors 5\u20136 are excluded by a predefined saturation guard; the 4.4\u20135 \u00b5m light curve was made after the result with that guard switched off, so it is descriptive. Published infrared maxima of such stars lag the visible ones by about 0.05\u20130.13 of a period, 12\u201332 days for R Draconis (Smith et al. 2002).",
  "method_anchor": "science.html#e9",
  "title_es": "R Draconis",
- "plain_result_es": "R Draconis es tan brillante que solo puede medirse el halo alrededor de su centro saturado, y la prueba fijada de antemano solo pudo usar tres bandas de color ruidosas: en ellas ning\u00fan cambio supera 5 veces el error (43 estrellas brillantes ordinarias medidas de la misma forma). Solo a t\u00edtulo informativo, fuera del rango fijado: a 4,7 \u00b5m su brillo sube y baja unas 0,3 magnitudes a cada lado de la media y alcanza su m\u00e1ximo hacia el 1 de febrero de 2026 (\u00b1 3 d\u00edas, formal). El cat\u00e1logo predice un m\u00e1ximo en luz visible hacia el 21 de enero de 2026, incierto en 2\u20133 semanas, as\u00ed que el desfase infrarrojo\u2013visible no est\u00e1 medido.",
- "status_es": "medido; ning\u00fan cambio confirmado seg\u00fan nuestra regla fijada de antemano",
- "method_note_es": "Fotometr\u00eda del halo (anillo de 7\u201312 p\u00edxeles) elegida con estrellas de comparaci\u00f3n antes de medir R Draconis (docs/protocols/E9.md). Para una estrella tan brillante, gran parte del \u00abhalo\u00bb es desbordamiento del detector y no luz estelar (Fazar et al. 2026: el desbordamiento alcanza 100\u2013270 px y depende de la posici\u00f3n en el detector y del momento); las estrellas ordinarias de este brillo var\u00edan en factores de 2\u20134 en los detectores 1\u20134, as\u00ed que el umbral fijado de 5\u00d7 corresponde a un cambio del 35\u201365 % por banda: una prueba d\u00e9bil. Los detectores 5\u20136 quedan excluidos por un filtro de saturaci\u00f3n fijado de antemano; la curva de luz a 4,4\u20135 \u00b5m se hizo despu\u00e9s del resultado con ese filtro desactivado, as\u00ed que es descriptiva. Los m\u00e1ximos infrarrojos publicados de estas estrellas van por detr\u00e1s de los visibles en unas 0,05\u20130,13 de periodo, 12\u201332 d\u00edas para R Draconis (Smith et al. 2002)."
+ "plain_result_es": "R Draconis es tan brillante que solo puede medirse el halo alrededor de su centro saturado, y la prueba predefinida solo pudo usar tres bandas de color ruidosas: en ellas ning\u00fan cambio supera 5 veces el error (43 estrellas brillantes ordinarias medidas de la misma forma). Solo a t\u00edtulo informativo, fuera del rango fijado: a 4,7 \u00b5m su brillo sube y baja unas 0,3 magnitudes a cada lado de la media y alcanza su m\u00e1ximo hacia el 1 de febrero de 2026 (\u00b1 3 d\u00edas, formal). El cat\u00e1logo predice un m\u00e1ximo en luz visible hacia el 21 de enero de 2026, incierto en 2\u20133 semanas, as\u00ed que el desfase infrarrojo\u2013visible no est\u00e1 medido.",
+ "status_es": "medido; ning\u00fan cambio confirmado seg\u00fan nuestra regla predefinida",
+ "method_note_es": "Fotometr\u00eda del halo (anillo de 7\u201312 p\u00edxeles) elegida con estrellas de comparaci\u00f3n antes de medir R Draconis (docs/protocols/E9.md). Para una estrella tan brillante, gran parte del \u00abhalo\u00bb es desbordamiento del detector y no luz estelar (Fazar et al. 2026: el desbordamiento alcanza 100\u2013270 px y depende de la posici\u00f3n en el detector y del momento); las estrellas ordinarias de este brillo var\u00edan en factores de 2\u20134 en los detectores 1\u20134, as\u00ed que el umbral fijado de 5\u00d7 corresponde a un cambio del 35\u201365 % por banda: una prueba d\u00e9bil. Los detectores 5\u20136 quedan excluidos por un filtro de saturaci\u00f3n predefinido; la curva de luz a 4,4\u20135 \u00b5m se hizo despu\u00e9s del resultado con ese filtro desactivado, as\u00ed que es descriptiva. Los m\u00e1ximos infrarrojos publicados de estas estrellas van por detr\u00e1s de los visibles en unas 0,05\u20130,13 de periodo, 12\u201332 d\u00edas para R Draconis (Smith et al. 2002)."
 }

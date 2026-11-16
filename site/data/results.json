@@ -13,7 +13,7 @@
     {
      "id": "C17",
      "verdict": "FAILED",
-     "status": "FAILED as registered",
+     "status": "FAILED under the predefined criterion",
      "late": false
     },
     {
@@ -38,7 +38,7 @@
     },
     {
      "n": 17,
-     "href": "failed.html#17-barnard-s-star-second-attempt-the-motion-matches-the-pre-set-check-does-not"
+     "href": "failed.html#17-barnard-s-star-second-attempt-the-motion-matches-the-predefined-check-does-not"
     }
    ]
   },
@@ -209,7 +209,7 @@
     {
      "id": "C22",
      "verdict": "FAILED",
-     "status": "FAILED as registered",
+     "status": "FAILED under the predefined criterion",
      "late": true
     }
    ],

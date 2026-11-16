@@ -44,7 +44,7 @@
    "label_es": "Bandas de absorci\u00f3n encontradas en su espectro de SPHEREx (agua, metano, mon\u00f3xido de carbono)"
   },
   {
-   "label": "Parallax from SPHEREx positions (pre-registered test, passed)",
+   "label": "Parallax from SPHEREx positions (predefined test, passed)",
    "value": 243,
    "err": 53,
    "kind": "derived",
@@ -83,7 +83,7 @@
    "text_es": "Gaia DR3 (Vallenari et al. 2023)"
   }
  ],
- "method_note": "Each picture is fitted with the star's position free, saturated pixels masked and Gaia neighbours modelled; the motion is a straight-line fit to SPHEREx positions with Gaia's parallax held fixed. This fit was not written down in advance. Positions sit a steady ~0.5\u2033 south and ~0.2\u2033 east of Gaia's prediction in every window. Gaia's entry is Ba alone and its motion includes its orbit; from the pair's published orbit (Chen et al. 2022) the centre of Ba+Bb's infrared light should sit 0.50\u20130.56\u2033 south and 0.13\u20130.19\u2033 east \u2014 a check we made after the measurement (Science page). Distance test (E12): five quantities fitted to the per-picture positions (offset, motion, parallax); the error is the largest of the fit, a bootstrap and the scatter of 8 ordinary stars fitted the same way; those stars all come out with a parallax below zero (mean -50 mas), a shared bias we did not correct.",
+ "method_note": "Each picture is fitted with the star's position free, saturated pixels masked and Gaia neighbours modelled; the motion is a straight-line fit to SPHEREx positions with Gaia's parallax held fixed. This fit was not predefined. Positions sit a steady ~0.5\u2033 south and ~0.2\u2033 east of Gaia's prediction in every window. Gaia's entry is Ba alone and its motion includes its orbit; from the pair's published orbit (Chen et al. 2022) the centre of Ba+Bb's infrared light should sit 0.50\u20130.56\u2033 south and 0.13\u20130.19\u2033 east \u2014 a check we made after the measurement (Science page). Distance test (E12): five quantities fitted to the per-picture positions (offset, motion, parallax); the error is the largest of the fit, a bootstrap and the scatter of 8 ordinary stars fitted the same way; those stars all come out with a parallax below zero (mean -50 mas), a shared bias we did not correct.",
  "method_anchor": "science.html#motion",
  "_e11": true,
  "figures": [
@@ -99,12 +99,12 @@
    "src": "data/figs/e11_epsindib.png",
    "href": "science.html#e11",
    "alt": "SPHEREx spectrum of Epsilon Indi B from 0.75 to 5 micrometres with water, methane and carbon monoxide bands marked",
-   "caption": "SPHEREx spectrum from 246 pictures. Grey strips: absorption bands that passed our pre-set test. Green: published brightness through standard filters.",
+   "caption": "SPHEREx spectrum from 246 pictures. Grey strips: absorption bands that passed our predefined test. Green: published brightness through standard filters.",
    "alt_es": "Espectro de SPHEREx de Epsilon Indi B de 0.75 a 5 micr\u00f3metros, con las bandas de agua, metano y mon\u00f3xido de carbono marcadas",
-   "caption_es": "Espectro de SPHEREx a partir de 246 im\u00e1genes. Franjas grises: bandas de absorci\u00f3n que superaron nuestra prueba fijada de antemano. Verde: brillo publicado con filtros est\u00e1ndar."
+   "caption_es": "Espectro de SPHEREx a partir de 246 im\u00e1genes. Franjas grises: bandas de absorci\u00f3n que superaron nuestra prueba predefinida. Verde: brillo publicado con filtros est\u00e1ndar."
   }
  ],
+ "title_es": "Epsilon Indi B",
  "plain_result_es": "A partir de las posiciones de SPHEREx (con la distancia de Gaia fija) medimos lo r\u00e1pido que se mueve por el cielo: +3.96 \u00b1 0.07\u2033 y -2.43 \u00b1 0.07\u2033 por a\u00f1o (este\u2013oeste, norte\u2013sur). Gaia, de la ESA, midi\u00f3 +3.98\u2033 y -2.47\u2033. Si adem\u00e1s ajustamos su oscilaci\u00f3n anual, sin tomar nada de Gaia para este objeto, SPHEREx da un paralaje de 243 \u00b1 53 mil\u00e9simas de segundo de arco: una distancia de unos 13 a\u00f1os luz (11\u201317); Gaia da 12.1.",
- "method_note_es": "Cada imagen se ajusta con la posici\u00f3n de la estrella libre, los p\u00edxeles saturados enmascarados y las vecinas de Gaia modeladas; el movimiento es un ajuste en l\u00ednea recta a las posiciones de SPHEREx con el paralaje de Gaia fijo. Este ajuste no se dej\u00f3 por escrito de antemano. Las posiciones quedan de forma constante ~0.5\u2033 al sur y ~0.2\u2033 al este de la predicci\u00f3n de Gaia en todas las ventanas. La entrada de Gaia es solo Ba y su movimiento incluye su \u00f3rbita; seg\u00fan la \u00f3rbita publicada de la pareja (Chen et al. 2022), el centro de la luz infrarroja de Ba+Bb deber\u00eda estar 0.50\u20130.56\u2033 al sur y 0.13\u20130.19\u2033 al este \u2014 una comprobaci\u00f3n que hicimos despu\u00e9s de la medida (p\u00e1gina de Ciencia). Prueba de distancia (E12): cinco cantidades ajustadas a las posiciones de cada imagen (desplazamiento, movimiento, paralaje); el error es el mayor entre el del ajuste, el de un bootstrap y la dispersi\u00f3n de 8 estrellas corrientes ajustadas de la misma manera; todas esas estrellas salen con un paralaje por debajo de cero (media -50 mas), un sesgo compartido que no corregimos.",
- "title_es": "Epsilon Indi B"
+ "method_note_es": "Cada imagen se ajusta con la posici\u00f3n de la estrella libre, los p\u00edxeles saturados enmascarados y las vecinas de Gaia modeladas; el movimiento es un ajuste en l\u00ednea recta a las posiciones de SPHEREx con el paralaje de Gaia fijo. Este ajuste no se dej\u00f3 por predefinido. Las posiciones quedan de forma constante ~0.5\u2033 al sur y ~0.2\u2033 al este de la predicci\u00f3n de Gaia en todas las ventanas. La entrada de Gaia es solo Ba y su movimiento incluye su \u00f3rbita; seg\u00fan la \u00f3rbita publicada de la pareja (Chen et al. 2022), el centro de la luz infrarroja de Ba+Bb deber\u00eda estar 0.50\u20130.56\u2033 al sur y 0.13\u20130.19\u2033 al este \u2014 una comprobaci\u00f3n que hicimos despu\u00e9s de la medida (p\u00e1gina de Ciencia). Prueba de distancia (E12): cinco cantidades ajustadas a las posiciones de cada imagen (desplazamiento, movimiento, paralaje); el error es el mayor entre el del ajuste, el de un bootstrap y la dispersi\u00f3n de 8 estrellas corrientes ajustadas de la misma manera; todas esas estrellas salen con un paralaje por debajo de cero (media -50 mas), un sesgo compartido que no corregimos."
 }

@@ -10,8 +10,8 @@ import json, math, re
 
 OUT = "site/data/results.json"
 VERDICTS = ["NOT CONFIRMED", "SUPPORTED", "FAILED"]  # the three shown; checked in this order
-# Words in a ledger row that mark a check made afterwards, a secondary check, or a descriptive (not pass/fail) result.
-LATE = ["post hoc", "post-hoc", "afterwards", "after the result", "secondary", "not blind", "not pre-registered", "descriptive"]
+# Words in a ledger row that mark a post hoc check, a secondary check, or a descriptive (not pass/fail) result.
+LATE = ["post hoc", "post-hoc", "afterwards", "after the result", "secondary", "not blind", "not predefined", "descriptive"]
 
 
 def load(p):
@@ -121,7 +121,7 @@ def main():
     O = lambda rid, cl, sp, fl, fig, **kw: dict(id=rid, claims=[C[c] for c in cl], science=science(sp), failed=failed(fl),
                                                 figure=fig, extra=ex.get(rid, []), **kw)
     rows = [
-        T("barnard", ["C17", "C15"], ["Motion north–south (SPHEREx)", "Motion north–south (Gaia DR3)", "Pre-set check on faint neighbours"],
+        T("barnard", ["C17", "C15"], ["Motion north–south (SPHEREx)", "Motion north–south (Gaia DR3)", "Predefined check on faint neighbours"],
           "Barnard's Star: the motion", [13, 17]),
         T("epsindib", ["C10", "C16", "C14"], ["Motion east–west (SPHEREx)", "Motion east–west (Gaia DR3)", "Parallax from SPHEREx positions", "Distance"],
           "A distance from one year", []),

@@ -66,7 +66,7 @@ def add_e11(tid, card):
         figs.append(dict(src="data/figs/e11_epsindib.png", href="science.html#e11",
                          alt="SPHEREx spectrum of Epsilon Indi B from 0.75 to 5 micrometres with water, methane and carbon monoxide bands marked",
                          caption=(f"SPHEREx spectrum from {t['n_pictures_used']} pictures. Grey strips: absorption bands that passed our "
-                                  "pre-set test. Green: published brightness through standard filters.")))
+                                  "predefined test. Green: published brightness through standard filters.")))
     elif tid == "barnard":
         card["method_note"] = card.get("method_note", "") + (f" A spectrum also failed: {t['n_pictures'] - t['n_pictures_used']} of {t['n_pictures']} pictures "
                                                              "have a saturated pixel next to the star (Science page, spectra).")
@@ -160,7 +160,7 @@ for tid, name in (("epsindib", "Epsilon Indi B"), ("barnard", "Barnard's Star"))
         evidence_links=[dict(text="Per-picture positions (data/findings/motion_%s.json)" % tid, href="science.html#motion"),
                         dict(text="Gaia DR3 (Vallenari et al. 2023)", href="https://www.cosmos.esa.int/web/gaia/dr3")],
         method_note=("Each picture is fitted with the star's position free, saturated pixels masked and Gaia neighbours modelled; "
-                     "the motion is a straight-line fit to SPHEREx positions with Gaia's parallax held fixed. This fit was not written down in advance. "
+                     "the motion is a straight-line fit to SPHEREx positions with Gaia's parallax held fixed. This fit was not predefined. "
                      + ("Positions sit a steady ~0.5″ south and ~0.2″ east of Gaia's prediction in every window. Gaia's entry is Ba alone and its motion includes its orbit; from the pair's published orbit (Chen et al. 2022) the centre of Ba+Bb's infrared light should sit 0.50–0.56″ south and 0.13–0.19″ east — a check we made after the measurement (Science page)." if tid == "epsindib" else "")),
         method_anchor="science.html#motion"))
 
@@ -199,7 +199,7 @@ if e12 and os.path.exists(f"{OUT}/epsindib.json"):
                              f"{e12['parallax_mas']:.0f} ± {e12['parallax_err_mas']['adopted']:.0f} thousandths of an arcsecond: a distance of about "
                              f"{e12['distance_ly']:.0f} light-years ({lo:.0f}–{hi:.0f}); Gaia gives {3.26156 * e12['gaia_distance_pc']:.1f}.")
     card["numbers"] = [n for n in card["numbers"] if not n["label"].startswith("Pictures used")] + [
-        num("Parallax from SPHEREx positions (pre-registered test, passed)", round(e12["parallax_mas"]), round(e12["parallax_err_mas"]["adopted"]),
+        num("Parallax from SPHEREx positions (predefined test, passed)", round(e12["parallax_mas"]), round(e12["parallax_err_mas"]["adopted"]),
             unit="mas", method="science.html#e12"),
         num("Parallax (Gaia DR3: Ba 270.7; system, from Epsilon Indi A, 274.8)", round(e12["gaia_parallax_mas"], 1), None, kind="data", unit="mas"),
         num("Distance (68% interval)", f"{e12['distance_ly']:.1f} light-years ({lo:.1f}–{hi:.1f})", None, method="science.html#e12")]
@@ -221,7 +221,7 @@ if e8:
     c = e8["controls"]["summary"]
     write("barnard", dict(
         title="Barnard's Star",
-        status="motion matches Gaia; pre-set check failed",
+        status="motion matches Gaia; predefined check failed",
         plain_result=(f"Measured from the centre of its outer glow (its core overloads SPHEREx's detector), Barnard's Star moves "
                       f"{e8['pmdec_arcsec_yr']:+.1f} ± {e8['pmdec_err']:.1f}″ per year north and {e8['pmra_arcsec_yr']:+.1f} ± {e8['pmra_err']:.1f}″ east, "
                       f"against Gaia's {g['pmdec_mas_yr']/1000:+.1f}″ and {g['pmra_mas_yr']/1000:+.1f}″. By the rule we wrote down beforehand the "
@@ -233,7 +233,7 @@ if e8:
                  num("Motion east–west (SPHEREx)", round(e8["pmra_arcsec_yr"], 2), round(e8["pmra_err"], 2), unit="″/yr", method="science.html#e8"),
                  num("Motion east–west (Gaia DR3)", round(g["pmra_mas_yr"] / 1000, 2), None, kind="data", unit="″/yr"),
                  num("Total motion against zero", round(e8["total_sigma"], 1), None, unit="σ", method="science.html#e8"),
-                 num("Pre-set check on faint neighbours", "failed (shared drift)", None)],
+                 num("Predefined check on faint neighbours", "failed (shared drift)", None)],
         figures=[dict(src="data/figs/e8_barnard.png", href="science.html#e8",
                       alt="Barnard's Star's position in two SPHEREx visits about seven months apart, next to Gaia's prediction",
                       caption=(f"Left: SPHEREx positions in two visits ({e8['pictures']['used']} pictures) and Gaia's prediction. Right: how far each "
@@ -259,7 +259,7 @@ if e9:
     zbest = max((d for d in w["a_dw"] if d.get("z") is not None), key=lambda d: abs(d["z"]))
     write("rwaur", dict(
         title="RW Aurigae",
-        status="measured; no change confirmed by our pre-set rule",
+        status="measured; no change meets the predefined criterion",
         plain_result=(f"Its centre overloads SPHEREx's detector, so we measured it from the halo of light around it, a method tested first on "
                       f"{w['comparison']['n_stars']} ordinary stars of similar brightness. Between the two visits (Sep 2025 and Mar 2026) it looks "
                       f"{100*col[1]['c']:.0f} ± {100*col[1]['sigma']:.0f}% brighter at {lam[1]:.1f} µm and {100*col[2]['c']:.0f} ± {100*col[2]['sigma']:.0f}% at {lam[2]:.1f} µm, "
@@ -271,7 +271,7 @@ if e9:
                  num(f"Change at {lam[2]:.2f} µm", f"{100*col[2]['c']:+.0f} ± {100*col[2]['sigma']:.0f}%", None, method="science.html#e9"),
                  num(f"Change at {lam[4]:.2f} µm", f"{100*col[4]['c']:+.0f} ± {100*col[4]['sigma']:.0f}%", None, method="science.html#e9"),
                  num(f"Change at {lam[5]:.2f} µm", f"{100*col[5]['c']:+.0f} ± {100*col[5]['sigma']:.0f}%", None, method="science.html#e9"),
-                 num("Largest single-band change against the pre-set threshold", f"{abs(zbest['z']):.1f} times the error at {lam[zbest['detector']]:.1f} µm (rule: 5×, in 2 bands)", None),
+                 num("Largest single-band change against the predefined threshold", f"{abs(zbest['z']):.1f} times the error at {lam[zbest['detector']]:.1f} µm (rule: 5×, in 2 bands)", None),
                  num("Without the star's own scatter factor", f"{w['without_error_inflation']['windows_with_2_detectors_over_5sigma']} visits with 2 bands over 5×", None),
                  num("Ordinary stars over the threshold", f"{w['comparison']['n_windows_exceeding']} of {w['comparison']['n_windows']} visits", None)],
         figures=[dict(src="data/figs/e9_rwaur.png", href="science.html#e9",
@@ -286,24 +286,24 @@ if e9:
     dm = r["post_hoc_guard_off"]["date_of_maximum"][0]
     write("rdra", dict(
         title="R Draconis",
-        status="measured; no change confirmed by our pre-set rule",
-        plain_result=(f"R Draconis is so bright that only the halo around its overloaded centre can be measured, and the pre-set test could use only "
+        status="measured; no change meets the predefined criterion",
+        plain_result=(f"R Draconis is so bright that only the halo around its overloaded centre can be measured, and the predefined test could use only "
                       f"three noisy colour bands: there no change passes 5 times the error ({r['comparison']['n_stars']} ordinary bright stars measured "
-                      f"the same way). Shown for information only, outside the pre-set range: at {dm['lam_um']:.1f} µm its brightness rises and falls by "
+                      f"the same way). Shown for information only, outside the predefined range: at {dm['lam_um']:.1f} µm its brightness rises and falls by "
                       f"about {dm['semi_amplitude_mag']:.1f} magnitudes either side of average and peaks around {day(dm["mjd_max"])} "
                       f"(± 3 days, formal). The catalogue predicts a visible-light maximum near {day(dm['catalogue_visual_max_mjd'])}, uncertain by 2–3 weeks, so the "
                       "infrared–visible lag is not measured."),
         numbers=[num("Pictures", r["n_pictures"], None, kind="data"),
-                 num("Colour bands usable in the pre-set test", len(r["detectors_used"]), None),
+                 num("Colour bands usable in the predefined test", len(r["detectors_used"]), None),
                  num(f"Peak at {dm['lam_um']:.1f} µm (for information)", day(dm["mjd_max"]), None),
                  num("Catalogue visible-light maximum (VSX period 246 days)", day(dm["catalogue_visual_max_mjd"]), None, kind="model")],
         figures=[dict(src="data/figs/e9_rdra.png", href="science.html#e9",
                       alt="R Draconis brightness through the year in six SPHEREx colour bands",
-                      caption="Brightness through the year in six colour bands; open circles are outside the pre-set range and for information only.")],
+                      caption="Brightness through the year in six colour bands; open circles are outside the predefined range and for information only.")],
         evidence_links=[dict(text="Open the prepared field", href="timemachine.html?field=rdra"), dict(text="Method (Science page)", href="science.html#e9")],
         method_note=("Halo photometry (annulus 7–12 pixels) chosen on comparison stars before R Draconis was measured (docs/protocols/E9.md). "
-                     "For a star this bright, much of the 'halo' is detector bloom rather than starlight (Fazar et al. 2026: bloom reaches 100–270 px and depends on detector position and timing); ordinary stars of this brightness swing by factors of 2–4 in detectors 1–4, so the pre-set 5× threshold corresponds to a 35–65% change per band — a weak test. "
-                     "Detectors 5–6 are excluded by a pre-set saturation guard; the 4.4–5 µm light curve was made after the result with that guard "
+                     "For a star this bright, much of the 'halo' is detector bloom rather than starlight (Fazar et al. 2026: bloom reaches 100–270 px and depends on detector position and timing); ordinary stars of this brightness swing by factors of 2–4 in detectors 1–4, so the predefined 5× threshold corresponds to a 35–65% change per band — a weak test. "
+                     "Detectors 5–6 are excluded by a predefined saturation guard; the 4.4–5 µm light curve was made after the result with that guard "
                      "switched off, so it is descriptive. Published infrared maxima of such stars lag the visible ones by about 0.05–0.13 of a period, "
                      "12–32 days for R Draconis (Smith et al. 2002)."),
         method_anchor="science.html#e9"))

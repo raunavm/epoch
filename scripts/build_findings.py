@@ -1,7 +1,7 @@
 """Assemble site/data/findings.json (Start-here tour) from SUPPORTED claims only (docs/CLAIMS.md).
 f1 = headline (Version B, site/data/headline.json + E2), f2 = stacked asteroid (C5, narrowed),
 f3 = WISE 0855 along its path (C9). Anything whose source file is missing is omitted.
-Also exports the frozen noise floor to site/data/f1_calibration.json.
+Also exports the fixed noise floor to site/data/f1_calibration.json.
 Usage: .venv/bin/python scripts/build_findings.py
 """
 import json, os
@@ -49,7 +49,7 @@ if e13 and "f2" in out and e13.get("n_combined_ge5"):
         f"above 5 times the spread of empty paths beside them, and all {e13['n_ge5_pass_split']} still show up when their pictures are split in half. "
         f"Measured against the brightness predicted from each one's catalogued magnitude they give " + ", ".join(f"{r['amp_ratio_measured_over_predicted']:.2f} ± {r['amp_ratio_err']:.2f}" for r in ok) + " (the comparison code was corrected after its first run). "
         f"The slider shows {out['f2']['detail']['object']}, picked by hand and not the highest-scoring of the three. "
-        "The stack numbers were computed before the split test was written down, so this is a check, not a blind test.")
+        "The stack numbers were computed before the split test was fixed, so this is a check, not a blind test.")
     e13b, e14 = load("data/findings/e13b.json"), load("data/findings/e14.json")
     if e13b:
         z = [r["z"] for r in e13b["results"]]
