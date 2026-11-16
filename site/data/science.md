@@ -34,9 +34,9 @@ Methane absorption at 3.3 µm distinguishes T and Y dwarfs from L dwarfs. An ind
 
 ![Methane index against colour](figs/v2/e15_methane.svg "The 4.4–5.0 µm to 1.0–1.3 µm flux ratio against the methane index, for brown dwarfs of known spectral type and for candidates without a published spectrum. The dashed line is the dividing value; bars are 1σ.")
 
-## Candidate cold brown dwarfs {#methane-candidates}
+## Cold brown dwarfs with methane measured {#methane-candidates}
 
-We applied the same methane test, unchanged, to 985 objects that earlier surveys listed as possible brown dwarfs. 687 were bright enough for a clear answer: 20 show the methane dip of cold brown dwarfs (T type or later, below roughly 1300 K), and 667 do not. None of 53 known warmer L dwarfs measured the same way was wrongly given the dip. We found no published spectral type for any of the 20; they are candidates for cold, nearby brown dwarfs, and each needs a spectrum to confirm it.
+We applied the same methane test, unchanged, to 985 objects that earlier surveys listed as possible brown dwarfs. 687 were bright enough for a clear answer: 20 show the methane dip of cold brown dwarfs (T type or later, below roughly 1300 K), and 667 do not. None of 53 known warmer L dwarfs measured the same way was wrongly given the dip. A second check of the literature and of neighbouring sources removed one with a published methane-imaging type and 3 with a brighter star within one to two SPHEREx pixels, leaving 16 with no published spectral type. Their colours already suggested T dwarfs; SPHEREx now measures their methane directly. Each still needs a spectrum to confirm it.
 
 [Download the table (CSV)](products/epoch_methane_candidates.csv) · [Column descriptions](products/README.md) · [Methods, section 6](methods.html#spectra)
 
@@ -86,7 +86,7 @@ Combining pictures along a known orbit recovers asteroids that no single picture
 
 Each of these is a candidate, not a confirmed object. Each needs a spectrum or another observation.
 
-- 20 possible cold brown dwarfs, from the methane test ([section](#methane-candidates), [CSV](products/epoch_methane_candidates.csv)).
+- 16 cold brown dwarfs with methane measured ([section](#methane-candidates), [CSV](products/epoch_methane_candidates.csv), column `vet_verdict` = KEEP).
 - 7 possible emission-line stars with no published classification ([section](#emission-candidates), [CSV](products/epoch_emission_line_candidates.csv)).
 - North ecliptic pole: 16 variables missing from the catalogues were checked and 0 survive ([section](#e18), [CSV](products/epoch_nep_variable_candidates.csv)).
 
