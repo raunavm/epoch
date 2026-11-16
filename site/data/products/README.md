@@ -28,3 +28,4 @@ Caveats: half of planted 1% variations are recovered at AB 12–16 (2% at 16–1
 Stars that Gaia DR3 classifies as Herbig Ae/Be or Be candidates (role = candidate) and ordinary comparison stars of similar brightness in the same pictures (role = control). For each of Paschen-α (Paa, 1.875 µm), Brackett-γ (Brg, 2.166 µm) and Brackett-α (Bra, 4.05 µm): the fractional excess over the local continuum, its error, the excess statistic Z (calibrated on the controls) and whether it passes the detection rule. `line_excess` is the overall verdict. SIMBAD identifiers and types are given where they exist.
 
 Caveat: at SPHEREx's spectral resolution, emission from the star cannot be separated from emission by surrounding gas.
+- Only testable rows (column `testable` = True) count in the public totals: a star is testable when enough clean pictures fall on and around the lines.
