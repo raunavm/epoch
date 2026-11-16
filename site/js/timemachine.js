@@ -62,7 +62,7 @@ const reveal = el => requestAnimationFrame(() => el.scrollIntoView({ block: 'sta
 form.addEventListener('submit', e => { e.preventDefault(); start(); if (!liveBox.hidden) reveal(liveBox); });
 for (const el of [raIn, decIn]) el.addEventListener('input', () => { preset = null; exact = false; tgtSel.value = ''; note.textContent = ''; });
 
-function start(mode = params.get('mode') || 'raw', all = params.get('all') === '1') {
+function start(mode = params.get('mode') || 'det', all = params.get('all') === '1') {
   let ra = parseRA(raIn.value), dec = parseDec(decIn.value);
   const fov = +fovSel.value;
   if (!Number.isFinite(ra) || !Number.isFinite(dec) || dec < -90 || dec > 90) { err.textContent = t('live.bad_coords'); return; }

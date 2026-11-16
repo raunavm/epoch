@@ -52,7 +52,7 @@ export function viewControls(info, st, onChange) {
 }
 
 // compact: small version (tour). minimal: views + picture only (landing).
-export function mountBlink(el, field, { compact = false, minimal = false, view = 'all' } = {}) {
+export function mountBlink(el, field, { compact = false, minimal = false, view = 'det' } = {}) {
   const frames = [...(field.frames || [])].sort((a, b) => a.mjd - b.mjd);
   if (!frames.length) return null;
   const size = field.size_px || 64;
