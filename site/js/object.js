@@ -6,7 +6,7 @@ await init();
 const root = document.getElementById('obj');
 const id = (new URLSearchParams(location.search).get('id') || '').replace(/[^\w.-]/g, '');
 const o = id ? await getJSON(`objects/${id}.json`) : null;
-if (!o) root.replaceChildren(h('h1', {}, t('title.object')), unavailable(t('what.object')));
+if (!o) root.replaceChildren(h('h1', {}, t('title.object')), h('p', { class: 'unavailable', role: 'status' }, id ? t('common.unavailable', { what: t('what.object') }) : t('obj.none'), ' ', h('a', { href: link('objects.html') }, t('obj.none_link'))));
 else render(o);
 
 function render(o) {
@@ -82,7 +82,7 @@ function render(o) {
       h('dl', { class: 'facts' },
         h('dt', {}, t('obj.release')), h('dd', {}, o.release ?? '—'),
         h('dt', {}, t('obj.code_version')), h('dd', {}, h('code', {}, o.code_version ?? '—')),
-        h('dt', {}, t('obj.rerun')), h('dd', {}, h('a', { href: link('science.html#reproduce-every-figure') }, t('obj.reproduce_link'))))),
+        h('dt', {}, t('obj.rerun')), h('dd', {}, h('a', { href: link('results.html') }, t('obj.reproduce_link'))))),
   );
   if (new URLSearchParams(location.search).get('check') === 'all') { // open every "Check it" panel (for screenshots)
     for (const b of root.querySelectorAll('button.check[aria-expanded="false"]')) b.click();

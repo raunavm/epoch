@@ -1,102 +1,61 @@
 {
  "title": "RW Aurigae",
- "status": "measured; no change meets the predefined criterion",
- "plain_result": "Its centre overloads SPHEREx's detector, so we measured it from the halo of light around it, a method tested first on 41 ordinary stars of similar brightness. Between the two visits (Sep 2025 and Mar 2026) it looks 48 \u00b1 16% brighter at 0.9 \u00b5m and 39 \u00b1 11% at 1.4 \u00b5m, but 21 \u00b1 5% fainter at 4.1 \u00b5m: not a grey change, bigger in the bluest colours, the pattern our literature notes predicted, before this measurement, if the fading reported in early 2025 had ended between our visits. One band passes 5 times its error in one visit, but the rule we wrote down beforehand needs two, and its own pictures scatter 1.1\u20133 times more than the ordinary stars' (which widens its errors), so no change is confirmed.",
+ "status": "no significant change detected",
+ "plain_result": "RW Aurigae saturates the detector and is measured from the halo of light around it. Between September 2025 and March 2026 no change exceeds the threshold set by 41 comparison stars of similar brightness measured the same way.",
  "numbers": [
   {
-   "label": "Change at 0.93 \u00b5m, Mar 2026 vs Sep 2025",
-   "value": "+48 \u00b1 16%",
+   "label": "Change at 0.93 µm",
+   "value": "+48 ± 16%",
    "err": null,
    "kind": "derived",
    "unit": "",
-   "method": "science.html#e9",
-   "label_es": "Cambio a 0.93 \u00b5m, mar 2026 frente a sep 2025",
-   "value_es": "+48 \u00b1 16%"
+   "label_es": "Cambio a 0,93 µm",
+   "value_es": "+48 ± 16%"
   },
   {
-   "label": "Change at 1.38 \u00b5m",
-   "value": "+39 \u00b1 11%",
+   "label": "Change at 1.38 µm",
+   "value": "+39 ± 11%",
    "err": null,
    "kind": "derived",
    "unit": "",
-   "method": "science.html#e9",
-   "label_es": "Cambio a 1.38 \u00b5m",
-   "value_es": "+39 \u00b1 11%"
+   "label_es": "Cambio a 1,38 µm",
+   "value_es": "+39 ± 11%"
   },
   {
-   "label": "Change at 3.12 \u00b5m",
-   "value": "-6 \u00b1 4%",
+   "label": "Change at 3.12 µm",
+   "value": "-6 ± 4%",
    "err": null,
    "kind": "derived",
    "unit": "",
-   "method": "science.html#e9",
-   "label_es": "Cambio a 3.12 \u00b5m",
-   "value_es": "-6 \u00b1 4%"
+   "label_es": "Cambio a 3,12 µm",
+   "value_es": "-6 ± 4%"
   },
   {
-   "label": "Change at 4.12 \u00b5m",
-   "value": "-21 \u00b1 5%",
+   "label": "Change at 4.12 µm",
+   "value": "-21 ± 5%",
    "err": null,
    "kind": "derived",
    "unit": "",
-   "method": "science.html#e9",
-   "label_es": "Cambio a 4.12 \u00b5m",
-   "value_es": "-21 \u00b1 5%"
-  },
-  {
-   "label": "Largest single-band change against the predefined threshold",
-   "value": "5.5 times the error at 4.1 \u00b5m (rule: 5\u00d7, in 2 bands)",
-   "err": null,
-   "kind": "derived",
-   "unit": "",
-   "value_es": "5,5 veces el error a 4,1 \u00b5m (regla: 5\u00d7, en 2 bandas)",
-   "label_es": "Mayor cambio en una sola banda frente al umbral predefinido"
-  },
-  {
-   "label": "Without the star's own scatter factor",
-   "value": "2 visits with 2 bands over 5\u00d7",
-   "err": null,
-   "kind": "derived",
-   "unit": "",
-   "label_es": "Sin el factor de dispersi\u00f3n propio de la estrella",
-   "value_es": "2 visitas con 2 bandas por encima de 5\u00d7"
-  },
-  {
-   "label": "Ordinary stars over the threshold",
-   "value": "0 of 82 visits",
-   "err": null,
-   "kind": "derived",
-   "unit": "",
-   "label_es": "Estrellas corrientes por encima del umbral",
-   "value_es": "0 de 82 visitas"
+   "label_es": "Cambio a 4,12 µm",
+   "value_es": "-21 ± 5%"
   }
  ],
  "figures": [
   {
-   "src": "data/figs/e9_rwaur.png",
-   "href": "science.html#e9",
-   "alt": "RW Aurigae's brightness change between two SPHEREx visits in five colour bands, next to ordinary stars",
-   "caption": "Left: change by colour band, with the scatter of ordinary stars in grey and our 5\u00d7 threshold dashed. Right: the same test on 41 ordinary stars.",
-   "alt_es": "Cambio de brillo de RW Aurigae entre dos visitas de SPHEREx en cinco bandas de color, junto a estrellas corrientes",
-   "caption_es": "Izquierda: cambio por banda de color, con la dispersi\u00f3n de las estrellas corrientes en gris y nuestro umbral de 5\u00d7 en l\u00ednea discontinua. Derecha: la misma prueba con 41 estrellas corrientes."
+   "src": "data/figs/v2/e9_rwaur.svg",
+   "alt": "Brightness change of RW Aurigae",
+   "caption": "a, brightness change between the two visits by wavelength, with the scatter of comparison stars (grey) and the detection threshold (dashed). b, distribution of comparison-star changes.",
+   "caption_es": "a, cambio de brillo entre las dos visitas por longitud de onda, con la dispersión de las estrellas de comparación (gris) y el umbral de detección (discontinua). b, distribución de los cambios de las estrellas de comparación."
   }
  ],
  "evidence_links": [
   {
    "text": "Open the prepared field",
-   "href": "timemachine.html?field=rwaur",
-   "text_es": "Abrir el campo preparado"
-  },
-  {
-   "text": "Method (Science page)",
-   "href": "science.html#e9",
-   "text_es": "M\u00e9todo (p\u00e1gina de Ciencia)"
+   "text_es": "Abrir el campo preparado",
+   "href": "index.html?field=rwaur"
   }
  ],
- "method_note": "Halo photometry (annulus 4\u20137 pixels) chosen and its errors set on comparison stars before RW Aurigae was measured (docs/protocols/E9.md); 4.4\u20135 \u00b5m not used (more saturated than any comparison star). The colour-by-colour errors use the star's own picture scatter, applied after the result (labelled in the results file). RW Aurigae is an unresolved pair 1.5\u2033 apart.",
- "method_anchor": "science.html#e9",
  "title_es": "RW Aurigae",
- "plain_result_es": "Su centro satura el detector de SPHEREx, as\u00ed que la medimos a partir del halo de luz que la rodea, un m\u00e9todo probado antes en 41 estrellas ordinarias de brillo similar. Entre las dos visitas (sep. 2025 y mar. 2026) parece un 48 \u00b1 16 % m\u00e1s brillante a 0,9 \u00b5m y un 39 \u00b1 11 % a 1,4 \u00b5m, pero un 21 \u00b1 5 % m\u00e1s d\u00e9bil a 4,1 \u00b5m: no es un cambio gris, es mayor en los colores m\u00e1s azules, el patr\u00f3n que nuestras notas bibliogr\u00e1ficas predijeron, antes de esta medida, si el oscurecimiento observado a principios de 2025 hab\u00eda terminado entre nuestras visitas. Una banda supera 5 veces su error en una visita, pero la regla que escribimos de antemano exige dos, y sus propias im\u00e1genes dispersan 1,1\u20133 veces m\u00e1s que las de las estrellas ordinarias (lo que ampl\u00eda sus errores), as\u00ed que no se confirma ning\u00fan cambio.",
- "method_note_es": "Fotometr\u00eda del halo (anillo de 4\u20137 p\u00edxeles) elegida, y sus errores fijados, con estrellas de comparaci\u00f3n antes de medir RW Aurigae (docs/protocols/E9.md); no se usa 4.4\u20135 \u00b5m (m\u00e1s saturada que cualquier estrella de comparaci\u00f3n). Los errores color a color usan la dispersi\u00f3n de las propias im\u00e1genes de la estrella, aplicada despu\u00e9s del resultado (indicado en el archivo de resultados). RW Aurigae es una pareja sin resolver con 1.5\u2033 de separaci\u00f3n.",
- "status_es": "medido; ning\u00fan cambio confirmado seg\u00fan nuestra regla predefinida"
+ "plain_result_es": "RW Aurigae satura el detector y se mide a partir del halo de luz que la rodea. Entre septiembre de 2025 y marzo de 2026 ningún cambio supera el umbral fijado por 41 estrellas de comparación de brillo similar medidas de la misma forma.",
+ "status_es": "no se detecta un cambio significativo"
 }

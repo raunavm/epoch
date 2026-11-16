@@ -3,40 +3,43 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Orrery</title>
-<meta name="description" content="Orrery: what really changed, in 102 colours. SPHEREx sky images from NASA, shown so anyone can see how a patch of sky changes over time.">
-<meta name="color-scheme" content="dark light">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2711%27 fill=%27none%27 stroke=%27%2356B4E9%27 stroke-width=%273%27/%3E%3Ccircle cx=%2716%27 cy=%275%27 r=%274%27 fill=%27%23F0E442%27/%3E%3C/svg%3E">
+<title>Epoch</title>
+<meta name="description" content="Epoch shows every picture NASA's SPHEREx telescope has taken of a patch of sky, in time order, so you can see what changed there.">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 fill=%27%2317171b%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-family=%27Arial%27 font-weight=%27700%27 font-size=%2720%27 fill=%27%23fff%27 text-anchor=%27middle%27%3EE%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;600;700&family=Public+Sans:wght@400;600&display=swap">
 <link rel="stylesheet" href="css/style.css">
-<script type="module" src="js/home.js"></script>
+<script type="module" src="js/timemachine.js"></script>
 </head>
-<body data-title="title.home">
+<body data-title="title.timemachine">
 <a class="skip" href="#main" data-i18n="nav.skip">Skip to content</a>
 <header id="site-header" class="site-header"></header>
 <main id="main" tabindex="-1">
-<section class="hero2" aria-labelledby="h-hero">
-  <h1 id="h-hero" data-i18n="home.question">At this spot in the sky, what really changed?</h1>
-  <p class="hero-intro" data-i18n="home.intro"></p>
-  <div class="hero-right">
-    <div id="headline-field" class="panel hero-field"></div>
-    <p class="headline-sentence" id="headline-sentence"></p>
+<h1 data-i18n="tm.h1">SPHEREx time machine</h1>
+<p class="lede" data-i18n="tm.lede"></p>
+<form id="coord-form" class="coord-form" aria-label="Position">
+  <div class="form-row coords">
+    <label><span data-i18n="live.ra">Right ascension</span> <input id="ra" inputmode="text" autocomplete="off" spellcheck="false" aria-describedby="coord-eg"></label>
+    <label><span data-i18n="live.dec">Declination</span> <input id="dec" inputmode="text" autocomplete="off" spellcheck="false" aria-describedby="coord-eg"></label>
+    <label class="fov-label"><span data-i18n="live.fov">Field of view</span> <select id="fov"></select></label>
+    <button class="btn primary" type="submit" data-i18n="live.go">Show</button>
   </div>
-  <div id="headline-number" class="headline-number"></div>
-  <p class="cta"><a class="btn primary" id="explore" href="timemachine.html" data-i18n="home.cta2">Try any spot in the sky</a></p>
-  <div class="hero-try">
-    <h2 class="small-h" data-i18n="home.try_h">Three things to try</h2>
-    <ol>
-      <li><a href="timemachine.html?target=barnard&amp;fov=8&amp;wise=1&amp;gaia=1#live" data-i18n="home.try1">Barnard's Star: NASA's WISE in 2010 next to SPHEREx in 2025–26 — watch it jump</a></li>
-      <li><a href="timemachine.html?target=wise0855" data-i18n="home.try2">The coldest known brown dwarf: its SPHEREx spectrum next to JWST's</a></li>
-      <li><a href="start.html" data-i18n="home.try3">A two-minute guided tour of what we measured</a></li>
-    </ol>
-  </div>
+  <p class="hint"><span id="coord-eg" data-i18n="live.coord_eg"></span> <span id="fov-cost"></span></p>
+  <p id="form-error" class="form-error" role="alert"></p>
+  <div class="presets" role="group" aria-labelledby="presets-h"><span id="presets-h" class="small" data-i18n="live.presets">Targets:</span> <span id="preset-buttons"></span></div>
+  <div class="form-row" hidden><label for="target" class="small" data-i18n="live.target">More fields</label> <select id="target"></select></div>
+  <p id="target-note" class="muted small"></p>
+</form>
+<div id="live" hidden></div>
+<section id="showcase" aria-labelledby="h-showcase">
+<h2 id="h-showcase" data-i18n="live.showcase_h">Prepared field</h2>
+<p class="hint" data-i18n="tm.hint"></p>
+<div class="field-pick"><label for="field" class="small" data-i18n="tm.field">Field</label> <select id="field"></select></div>
+<div id="tm" class="panel"></div>
 </section>
-<section id="faint" class="below-fold" aria-labelledby="h-faint">
-  <h2 id="h-faint" data-i18n="home.faint_h">Too faint for most single pictures</h2>
-  <p class="lede" data-i18n="home.lede"></p>
-  <div id="reveal" class="panel"></div>
-</section>
+<section id="target-result" class="result-card" aria-labelledby="h-result" hidden></section>
 </main>
 <footer id="site-footer" class="site-footer"></footer>
 <noscript><p class="unavailable">This site needs JavaScript to draw the images and charts.</p></noscript>

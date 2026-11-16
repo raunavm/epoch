@@ -65,12 +65,11 @@ export function h(tag, attrs, ...kids) {
   return el;
 }
 
-// Provenance badge. kind: data | model | derived | resid
 // replaceChildren that skips null/false children (replaceChildren would print "null").
 export function put(el, ...kids) { el.replaceChildren(...kids.flat().filter(k => k != null && k !== false)); }
 
-export function badge(kind) {
-  return h('span', { class: `badge b-${kind}`, title: t(`badge.${kind}.help`) }, t(`badge.${kind}`));
+export function badge() { // provenance labels (data / model / derived) are no longer shown, at the owner's request
+  return ''; // an empty string, not null: some callers use the DOM's own append(), which prints null as text
 }
 
 export function fmt(x, sig = 3) {
@@ -120,9 +119,7 @@ export const CATS = {
 };
 
 const NAV = [
-  ['index.html', 'nav.home'], ['start.html', 'nav.start'], ['results.html', 'nav.results'], ['timemachine.html', 'nav.timemachine'],
-  ['objects.html', 'nav.evidence'], ['science.html', 'nav.science'], ['failed.html', 'nav.failed'],
-  ['about.html', 'nav.about'],
+  ['index.html', 'nav.timemachine'], ['results.html', 'nav.results'], ['about.html', 'nav.about'],
 ];
 
 async function loadLang(code) {
@@ -145,7 +142,7 @@ export async function init() {
     }
   }
   const tk = document.body.dataset.title;
-  if (tk) document.title = `${t(tk)} — ${t('site.name')}`;
+  if (tk) document.title = `${t(tk)} | ${t('site.name')}`;
 
   if (FIXTURES) document.body.prepend(h('div', { class: 'fixture-banner', role: 'note' }, t('common.fixture_banner')));
   // Results and method pages come from data files written in English; say so on translated pages.
@@ -154,10 +151,10 @@ export async function init() {
   const here = location.pathname.split('/').pop() || 'index.html';
   const header = document.getElementById('site-header');
   header.append(
-    h('a', { class: 'brand', href: link('index.html') }, h('span', { class: 'brand-mark', 'aria-hidden': 'true' }), t('site.name')),
+    h('a', { class: 'brand', href: link('index.html') }, t('site.name')),
     h('nav', { 'aria-label': t('nav.label') },
       h('ul', {}, NAV.map(([href, key]) => h('li', {},
-        h('a', { href: link(href), 'aria-current': href === here || (here === 'object.html' && href === 'objects.html') ? 'page' : null }, t(key)))))),
+        h('a', { href: link(href), 'aria-current': href === here || (here === 'timemachine.html' && href === 'index.html') ? 'page' : null }, t(key)))))),
   );
   const sel = h('select', { id: 'lang', 'aria-label': t('common.language') },
     LANGS.map(l => h('option', { value: l.code, selected: l.code === LANG }, l.label)));

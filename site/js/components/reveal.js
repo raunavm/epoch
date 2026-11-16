@@ -77,7 +77,7 @@ export function mountReveal(el, data, { compact = false, autoplay = false, snrNo
 function evidenceFor(data) {
   return {
     frames: (data.frames || []).map(f => ({ ...f, date: f.date || (f.mjd ? new Date((f.mjd - 40587) * 864e5).toISOString().slice(0, 10) : null) })),
-    nulls: data.null_snrs, nullsNote: t('ev.reveal_nulls'), method: 'science.html#stacking-along-an-orbit',
+    nulls: data.null_snrs, nullsNote: t('ev.reveal_nulls'), method: 'results.html#stacking-along-an-orbit',
   };
 }
 

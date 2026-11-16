@@ -2,44 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Orrery</title>
-<meta name="description" content="Orrery: what really changed, in 102 colours. SPHEREx sky images from NASA, shown so anyone can see how a patch of sky changes over time.">
-<meta name="color-scheme" content="dark light">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2711%27 fill=%27none%27 stroke=%27%2356B4E9%27 stroke-width=%273%27/%3E%3Ccircle cx=%2716%27 cy=%275%27 r=%274%27 fill=%27%23F0E442%27/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/style.css">
-<script type="module" src="js/timemachine.js"></script>
+<title>Epoch</title>
+<meta name="robots" content="noindex">
+<script>location.replace('index.html' + location.search + location.hash);</script>
+<noscript><meta http-equiv="refresh" content="0; url=index.html"></noscript>
 </head>
-<body data-title="title.timemachine">
-<a class="skip" href="#main" data-i18n="nav.skip">Skip to content</a>
-<header id="site-header" class="site-header"></header>
-<main id="main" tabindex="-1">
-<h1 data-i18n="tm.h1">Time machine</h1>
-<section id="target-result" class="panel result-card" aria-labelledby="h-result" hidden></section>
-<form id="coord-form" class="panel coord-form" aria-labelledby="h-look">
-  <h2 id="h-look" data-i18n="live.form_h">Look anywhere in the sky</h2>
-  <p class="hint" data-i18n="live.form_hint"></p>
-  <div class="form-row"><label for="target" data-i18n="live.target">Famous targets</label> <select id="target"></select></div>
-  <div class="form-row coords">
-    <label><span data-i18n="live.ra">Right ascension</span> <input id="ra" inputmode="text" autocomplete="off" spellcheck="false" placeholder="08h55m10.8s or 133.795"></label>
-    <label><span data-i18n="live.dec">Declination</span> <input id="dec" inputmode="text" autocomplete="off" spellcheck="false" placeholder="-07d14m42.5s or -7.245"></label>
-  </div>
-  <div class="form-row"><label for="fov" data-i18n="live.fov">Field of view</label> <select id="fov"></select> <span id="fov-cost" class="muted small"></span></div>
-  <p><button class="btn primary" type="submit" data-i18n="live.go">Show this patch</button> <span id="form-error" class="form-error" role="alert"></span></p>
-  <p id="target-note" class="muted small"></p>
-</form>
-<div id="live" class="panel" hidden></div>
-<section id="strip" aria-labelledby="h-strip"></section>
-<section id="showcase" aria-labelledby="h-showcase">
-<h2 id="h-showcase" data-i18n="live.showcase_h">Ready-made fields</h2>
-<p class="hint" data-i18n="tm.hint"></p>
-<div class="field-pick"><label for="field" data-i18n="tm.field">Sky field</label> <select id="field"></select></div>
-<div id="tm" class="panel"></div>
-<section id="tm-finding" class="finding-box" aria-labelledby="h-tmf" hidden><h2 id="h-tmf" data-i18n="tm.finding_h">How often raw blinking misleads</h2><div></div></section>
-</section>
-<div id="checklist"></div>
-</main>
-<footer id="site-footer" class="site-footer"></footer>
-<noscript><p class="unavailable">This site needs JavaScript to draw the images and charts.</p></noscript>
-</body>
+<body><p><a href="index.html">Epoch</a></p></body>
 </html>

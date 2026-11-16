@@ -1,5 +1,4 @@
 import { init, getJSON, h, put, t, safeUrl, unavailable } from './core.js';
-import { checklist } from './components/checklist.js';
 
 await init();
 const box = document.getElementById('about');
@@ -15,4 +14,3 @@ else put(box,
   safeUrl(a.repo_url) ? sec('repo', h('p', {}, h('a', { href: a.repo_url, rel: 'noopener' }, a.repo_url))) : null,
   sec('citations', list(a.citations)),
 );
-box.after(checklist());

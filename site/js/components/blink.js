@@ -90,7 +90,7 @@ export function mountBlink(el, field, { compact = false, minimal = false, view =
     t('tm.gaia', { n: field.gaia?.length || 0 }));
   // No prepared star list: the Gaia overlay is drawn in the live view of the same patch.
   const gaiaLive = !hasGaia && field.ra != null && field.dec != null
-    ? h('a', { href: link(`timemachine.html?ra=${field.ra}&dec=${field.dec}&fov=2&gaia=1#live`) }, t('tm.gaia_live_link')) : null;
+    ? h('a', { href: link(`index.html?ra=${field.ra}&dec=${field.dec}&fov=2&gaia=1#live`) }, t('tm.gaia_live_link')) : null;
 
   const layoutBtns = ['blink', 'side'].map(k => h('button', { type: 'button', class: 'seg', onclick: () => { st.layout = k; st.playing = k === 'blink' && st.playing; schedule(); render(); } }, t(`tm.mode_${k}`)));
   const selA = frameSelect('a'), selB = frameSelect('b');
@@ -217,15 +217,15 @@ export function mountBlink(el, field, { compact = false, minimal = false, view =
   const legend = h('ul', { class: 'legend-row', 'aria-label': t('tm.legend') },
     Object.values(CATS).map(c => h('li', {}, h('span', { class: `key key-${c.shape}`, style: `--c:${c.color}`, 'aria-hidden': 'true' }), t(c.key))));
 
-  put(el,
-    controls,
-    small ? null : h('div', { class: 'segmented', role: 'group', 'aria-label': t('tm.mode_label') }, layoutBtns),
-    counter, h('div', { class: 'tm-views' }, viewA.root, viewB.root),
-    minimal ? null : [blinkCtl, sideCtl,
-      h('div', { class: 'scrub-wrap' }, h('label', { for: scrub.id, class: 'sr-only' }, t('tm.timeline')), scrub, ends)],
-    small ? null : [astList, legend, hasGaia ? h('p', {}, gaiaBtn) : gaiaLive ? h('p', { class: 'small' }, gaiaLive) : null, labelList,
-      h('details', { class: 'flags', id: 'tm-flags' }, h('summary', {}, t('tm.flags_h')), flagBox)],
-  );
+  put(el, h('div', { class: small ? '' : 'viewer' }, // picture left, its controls right (stacked on narrow screens)
+    h('div', { class: 'tm-views viewer-img' }, viewA.root, viewB.root),
+    h('div', { class: 'viewer-side' },
+      minimal ? null : [blinkCtl, sideCtl,
+        h('div', { class: 'scrub-wrap' }, h('label', { for: scrub.id, class: 'sr-only' }, t('tm.timeline')), scrub, ends)],
+      counter, controls,
+      small ? null : h('div', { class: 'segmented', role: 'group', 'aria-label': t('tm.mode_label') }, layoutBtns),
+      small ? null : [astList, legend, hasGaia ? h('p', {}, gaiaBtn) : gaiaLive ? h('p', { class: 'small' }, gaiaLive) : null, labelList,
+        h('details', { class: 'flags', id: 'tm-flags' }, h('summary', {}, t('tm.flags_h')), flagBox)])));
 
   const onKey = e => {
     if (e.target.closest?.('input, select, textarea')) return;

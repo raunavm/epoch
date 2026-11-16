@@ -1,447 +1,54 @@
-# How Epoch works, and how we checked it
+# Results
 
-## In plain words
+NASA's SPHEREx telescope maps the whole sky in 102 infrared wavelength bands between 0.75 and 5 µm, photographing each position many times over a year. Epoch reads the 1,179,406 pictures of the first data release (taken 2025-04-24 to 2026-05-14) directly from NASA's public archive and shows any position in time order. The results below use the same pictures.
 
-NASA's SPHEREx telescope photographs the whole sky in 102 colours of infrared light. Epoch plays its pictures of any spot like a short film and answers one question: **at this spot in the sky, what really changed?**
+## Removing false changes {#which-change-is-real}
 
-The difficulty is that SPHEREx photographs each spot in a different colour every time. A star that is brighter at one wavelength than another seems to flicker from picture to picture even when nothing moved, so a plain "blink" fills with false changes. Comparing each picture only with pictures from the same detector, which all fall in one band of colours, removes most of them: a median of 93% across 20 random patches of sky.
+SPHEREx takes each picture at a different wavelength with one of six detectors, so a plain blink between consecutive pictures shows many changes where the sky has not changed. Comparing each picture only with pictures from the same detector removes a median 93% of these changes (95% interval 90–96%) across 20 randomly chosen patches (4,906 pictures). This removes false changes but does not make faint real changes easier to detect: planted sources at 20 times the single-picture noise are recovered at similar rates in both views (37% and 34%).
 
-Some objects are too faint for most single pictures. Adding pictures along a known path brings them out: WISE 0855−0714, the coldest known brown dwarf, stands out at 16.5 times the spread of empty paths, its SPHEREx spectrum averages 0.97 ± 0.03 of JWST's over ten colour steps (the two reddest steps are 30–45% low, unexplained), and it moves between visits months apart as predicted.
+![Changes per patch in a plain blink and one detector at a time](figs/v2/fig_e2.svg "Changes flagged in each patch by a plain blink (crosses), one detector at a time (circles) and the experimental colour-aware view (triangles), ordered by Galactic latitude. Counts are summed over all pictures of a patch; the vertical axis is logarithmic.")
 
-We also built a cleverer, colour-aware view. In our own test, predefined, it did not find fainter changes than a simple median, so it is offered only as an experiment. Every test, including the ones that failed, is described below, and each section says whether it was predefined. Every result number on this page comes from result files in the project repository, and each section says how to re-make it.
+## WISE 0855−0714 {#e4}
 
----
+WISE 0855−0714, the coldest known brown dwarf, is too faint to see in most single pictures. Combining the 22 pictures from the November–December 2025 visits along its predicted path detects it at 16.5σ, measured against the same pictures combined along 24 empty paths. Its flux density at 4.4–5.0 µm is 0.50 ± 0.03 mJy, between the Spitzer and WISE values (0.51 and 0.42 mJy; Luhman & Esplin 2016). Over the 10 wavelength steps where it is detected, the SPHEREx spectrum is 0.97 ± 0.03 times the JWST NIRSpec spectrum (Luhman et al. 2024). The two reddest steps, at 4.8–5.0 µm, fall below it.
 
-## The question
+![SPHEREx spectrum of WISE 0855−0714 next to JWST](figs/v2/e11_wise0855.svg "SPHEREx spectrum in 0.1 µm steps (circles; open circles are below 3σ; bars are 1σ), the JWST NIRSpec spectrum (thin line) averaged over the same steps (squares), and the Spitzer 4.5 µm measurement (diamond).")
 
-The challenge asks for a tool where you enter the coordinates of a patch of sky and watch SPHEREx's pictures of it like a little video, so that moving objects are easy to spot. Epoch does that for any coordinates. Everything else on this page serves one question about the film you are watching: which of the changes you see are real, and which are only SPHEREx changing colour?
+## Distance to Epsilon Indi B {#e12}
 
-Epoch offers three views of change:
+Epsilon Indi B is a pair of brown dwarfs that SPHEREx sees as one source. Fitting its SPHEREx positions over a year for position, proper motion and parallax, with nothing taken from Gaia, gives a parallax of 243 ± 53 mas, a distance of 13.4 light-years (68% interval 11.0–17.2). Gaia measures 270.7 mas. Ordinary stars in the same pictures show a small shared offset that mimics a parallax of -50 mas; it is not subtracted, and the quoted uncertainty is the scatter of those 8 stars.
 
-- **Plain blink:** every picture compared with the one before it in time.
-- **One detector at a time:** each picture compared only with the previous picture from the same detector. This is the view our tests support.
-- **Colour-aware view (experimental):** each picture compared with a model of the steady sky at that picture's colour. It lost its predefined test (below).
+![Epsilon Indi B's path and parallax](figs/v2/e12_parallax.svg "a, positions over a year: single pictures (small points), visit averages (circles), and fits with proper motion only (dotted) and with parallax (dash-dot). b, visit averages with the proper motion removed, and the fitted parallax ellipse. Bars are the standard error of each visit mean.")
 
-Some objects need a fourth tool: **combining pictures along a known path**, for objects too faint for most single pictures.
+## Brown dwarfs classified by methane {#e15}
 
-## Data and index
+Methane absorption at 3.3 µm distinguishes T and Y dwarfs from L dwarfs. An index formed from the flux in the 3.2–3.4 µm window relative to the flux on either side classifies 91% of 23 brown dwarfs with published spectral types correctly when each is left out of the calibration in turn.
 
-- **Pictures:** SPHEREx Data Release 1 (DR1), Level-2 spectral images, read directly from NASA's public archive copy on Amazon Web Services (`https://nasa-irsa-spherex.s3.amazonaws.com/dr1/`). The browser reads only the bytes it needs. Nothing goes through a server of ours, and nothing depends on IRSA's web services, which returned errors when we started (15 Nov 2026).
-- **Our index:** we read the header of every DR1 picture and built our own index: 1,179,406 pictures, taken from 2025-04-24 to 2026-05-14 (`scripts/build_index.py`, `scripts/build_tiles.py`). The browser loads only the small sky tiles it needs.
-- **Each picture** holds an image (MJy/sr), a variance image, quality flags, a zodiacal-light model, a table of point-spread functions and a wavelength map. SPHEREx has six detectors. Detectors 1/4, 2/5 and 3/6 look at the same sky at the same moment, at short (0.75–2.4 µm) and long (2.4–5 µm) wavelengths, and each detector covers one of six bands (0.74–1.12, 1.10–1.65, 1.64–2.42, 2.42–3.82, 3.81–4.42, 4.41–5.00 µm). A linear variable filter makes the wavelength change across each detector, so the same star is seen at a different narrow wavelength within the band on each visit.
-- **Known positions:** ESA Gaia DR3 stars; Luhman & Esplin (2016) for WISE 0855−0714; JPL Horizons with SPHEREx itself as the observer (`500@-163182`) for asteroids; CDS SIMBAD for the five test targets (its values come from Gaia DR3, from Kirkpatrick et al. 2021 for WISE 0855 in the live and time-machine views, and from van Leeuwen 2007 for RW Aurigae); IMCCE SkyBoT for known-asteroid labels.
+![Methane index against colour](figs/v2/e15_methane.svg "The 4.4–5.0 µm to 1.0–1.3 µm flux ratio against the methane index, for brown dwarfs of known spectral type and for candidates without a published spectrum. The dashed line is the dividing value; bars are 1σ.")
 
-## What a "change" is
+## Variability at the north ecliptic pole {#e18}
 
-All pictures of a 48 × 48-pixel patch are put on one north-up grid (6.15″ pixels). A change map gives, for each pixel, the difference between a picture and its reference, divided by the expected noise. A **change** is a group of two or more touching pixels beyond a threshold k.
+SPHEREx observes the north ecliptic pole on almost every orbit. Within 0.4° of the pole, 2,701 catalogued sources were measured in 17,832 pictures. Half of planted 2.0% brightness variations are recovered for sources of AB magnitude 12–17, at a false-alarm rate of 0.30%. Most catalogued variables in the field vary by less than this; 4 of 86 pass the threshold.
 
-```
-blink map    n_e(p) = (v_e(p) − v_e'(p)) / √(σ²_e,p + σ²_e',p)     e' = previous picture (plain), or previous picture from the same detector
-noise        σ²_e,p = σ_e² + (f · |S_p|)²                           S_p = static sky value
-fraction removed = 1 − N_changes(one detector at a time) / N_changes(plain blink)
-```
+![Recovery of planted brightness variations](figs/v2/e18b_floor.svg "Fraction of planted variations recovered against source brightness, for sinusoidal variations (a) and eclipses (b) of amplitude 2%, 5%, 10% and 20%. Shaded bands are 95% intervals; the dotted line marks half recovered.")
 
-The term f · |S_p| is a noise floor proportional to each star's brightness. SPHEREx's pixels are large compared with its sharpest images of stars, so when pictures are lined up bright stars leave residues far larger than the background noise. The value f = 0.151 was measured on a separate calibration patch (RA 7.79°, Dec −65.37°, not a test target) as the value that makes the median χ² on bright Gaia stars equal 1, and fixed before any test patch was analysed (`data/findings/f1_calibration.json`). Every view uses the same noise rule, so comparisons between views are fair.
+## Hydrogen emission lines {#e20}
 
-###### E2
+SPHEREx covers the Paschen-α (1.875 µm) and Brackett-α (4.05 µm) hydrogen lines. Of 54 stars that Gaia classifies as Herbig Ae/Be or Be stars, 37 show an excess in these lines, against 2 of 155 ordinary stars of similar brightness in the same pictures. At SPHEREx's spectral resolution, emission from the star cannot be separated from emission by surrounding gas.
 
-## Which change is real {#which-change-is-real}
+![Hydrogen-line excess](figs/v2/e20_lines.svg "a, b, flux relative to the local continuum around Paschen-α (a) and Brackett-α (b) for one candidate (stars) and a control star in the same pictures (crosses); bars are 1σ. c, distribution of the line excess for candidates and controls; the dashed line is the detection threshold.")
 
-**Test E2: how many of a plain blink's changes come from comparing different detectors?** (Detectors differ in colour, in how sharp stars look after re-gridding, and in their own glitches.) Predefined (`docs/PROTOCOLS.md`, E2).
+## Faint asteroids {#stacking-along-an-orbit}
 
-**Patches.** 20 patches drawn with a fixed random seed (20261115), uniform on the sky: 10 at Galactic latitude |b| > 30°, 5 at 15–30° and 5 below 15°, each with at least 40 pictures. Patches with more than 250 pictures use 250 spread evenly in time (4,906 pictures in all). The threshold is k = 5.
+Combining pictures along a known orbit recovers asteroids that no single picture detects: of 7 asteroids with no single detection above 5σ, 3 exceed 5σ when combined. In a blind sample of new asteroids, only 3 of the 5 expected to reach 5σ did so: the noise in the combined pictures is about 2.5 times the formal errors. Their measured brightness matched the prediction (median ratio 0.92).
 
-**Result.** Viewing one detector at a time removes a median **93%** of the changes a plain time-ordered blink shows (95% field-bootstrap interval 90–96%, 2,000 resamples). Summed over all patches, the plain blink shows 14,202 changes and one detector at a time 840. The worst patch (e2_13, Galactic latitude −61°) loses only 22%, because its plain blink had few changes to begin with (55 → 43). The per-patch counts are listed on the home page under the headline number.
-
-**The colour-aware view did worse than this simple view.** Against one detector at a time it leaves a median 1.26 times as many changes (95% interval 1.12–1.43); it had more changes in 19 of the 20 patches.
-
-**Control patch.** On the patch on the ecliptic declared in advance (RA 180°, Dec 0°), the counts are 389 (plain blink), 52 (one detector at a time) and 57 (colour-aware).
-
-**What this number does and does not say.** It measures how much of a plain blink comes from comparing different detectors (different colour, different sharpness of stars, detector-specific glitches); it does not separate these causes. Two checks on real changes: (1) in a secondary, post hoc check at the referee's request, at one common threshold (k = 5), planted test sources at 20 times the single-picture noise are caught about as often by the one-detector view as by a plain blink (37%, 95% CI 31%–42%, against 34%, CI 28%–38%; `data/findings/e2_d1.json`). At that threshold the plain blink flags 12,686 changes in the same patches against 599 for the one-detector view, so this is not a comparison at equal false alarms; (2) known asteroids are almost never caught in single pictures by any of our views (one-detector 0 of 79 sightings, colour-aware 2 of 79; E3, `data/findings/e3.json`) — see [What failed #14](../failed.html).
-
-![Changes per patch: plain blink, one detector at a time, colour-aware view](figs/fig_e2.png "Changes per patch for the plain blink (M1), one detector at a time (M2) and the colour-aware view (M4), sorted by Galactic latitude. Logarithmic scale.")
-
-###### E1
-
-## Faint changes in single pictures, and a failure
-
-**Test E1: at the same false-alarm rate, which view finds fainter real changes?** This was our primary test, predefined (`docs/PROTOCOLS.md`, E1).
-
-**Methods compared.** M1 plain blink; M2 one detector at a time; M3 a median of the other pictures from the same detector; M4 our colour-aware view; M5 a wavelength-neighbour median proposed as the strongest simple competitor.
-
-**How.** Each method's threshold k was set on the calibration patch, with nothing planted, so that it gives one false change per 100 pictures, and then fixed. Artificial point sources were planted into the raw pictures of the 20 test patches (4,906 pictures), at 3, 5, 8, 12 and 20 times each picture's noise, at positions drawn with fixed seeds. A planted source counts as found if a change lies within 1.5 pixels of it.
-
-**Result: the predefined criterion was not met.** No method found half of the planted sources even at 20 times the single-picture noise, so the comparison is a tie at "too faint for all". The colour-aware view looked ahead at the brightest level, but only because one stray spike on the calibration patch set its threshold lower (k = 7.7 against 23.4 for the median). At a common threshold the plain median found more, and on the test patches with nothing planted the colour-aware view raised more false alarms (0.014 per picture, 95% interval 0.008–0.023, against 0.005, 0.001–0.011; the intervals overlap). We therefore make no claim that the colour-aware view finds fainter changes; the headline uses the simpler one-detector view (Version B, chosen by the rule predefined).
-
-**What we learned.** Catching a change in a single SPHEREx picture is unreliable even for bright changes: at 20 times the noise no method found half of the planted sources. A clean-up rule needed to stop isolated bad pixels from swamping every method also removed some faint real sources, equally for every method (see What failed). Fainter objects need many pictures combined along their path, which is what the next sections do.
-
-![Detection efficiency against planted brightness](figs/fig_e1.png "Fraction of planted sources found, per method, at thresholds set on the calibration patch. The colour-aware view's lead at 20× comes from its lower threshold, not from a better model: at a common threshold the median finds more, and the colour-aware view raises more false alarms. Not an advantage.")
-
-###### E4 {#e4-label}
-
-## WISE 0855−0714, the coldest known brown dwarf {#e4}
-
-**Test E4: is WISE 0855−0714 visible in SPHEREx pictures combined along its known path?** WISE 0855 is one of the challenge's five test targets. It is so cold that it shines mainly at the longest SPHEREx wavelengths, and it is too faint to see clearly in most single pictures. Predefined (`docs/PROTOCOLS.md`, E4).
-
-**Path.** Position, proper motion (-8.118, +0.680 ″/yr) and parallax (0.449″) from Luhman & Esplin (2016), who measured them with NASA's Spitzer and Hubble; the predicted position in 2025–26 is uncertain by about 0.08″, a small fraction of a pixel.
-
-**Measurement.** In each picture we fit a point source at the predicted position together with every Gaia star nearby and a background plane, using the telescope's own measured point-spread function. Pictures with central wavelength 4.4–5.0 µm (46 of them) are combined for each set of visits (May 2025, Nov–Dec 2025, Apr–May 2026) with equal weight per unit brightness:
-
-```
-â ± σ_â = Σ_e p_e A_e / s_e² / Σ_e p_e² / s_e²  ±  (Σ_e p_e² / s_e²)^(−1/2)        p_e = 1 mJy template, A_e, s_e = fitted amplitude and error
-significance = (â/σ_â − mean of nulls) / spread of nulls
-```
-
-**Nulls.** The same pictures are combined along the same path shifted 6 or 9 pixels in 24 directions, where nothing should be. The significance is measured against the spread of those 24 empty paths, not against our own error bars.
-
-**Results.**
-
-| Visits | Pictures | Brightness (mJy) | Significance against empty paths |
-|---|---|---|---|
-| Nov–Dec 2025 visits | 22 | 0.50 ± 0.03 | 16.5σ |
-| Apr–May 2026 visits, neighbour star restored | 21 | 0.52 ± 0.04 | 10.6σ |
-| Apr–May 2026 visits, as first declared | 21 | 0.56 ± 0.03 | 13.6σ |
-
-The May 2025 visits have only 3 usable pictures, one of them badly fitted, and is not informative.
-
-**Brightness.** Spitzer measured 0.51 mJy at 4.5 µm and WISE 0.42 mJy in its W2 band (Luhman & Esplin 2016). Our Nov–Dec 2025 value lies between the two. It is an inverse-variance-weighted mean over the SPHEREx channels between 4.4 and 5.0 µm, assuming a flat spectrum. It is not a synthetic Spitzer or WISE magnitude. Those bands reach shorter wavelengths, where WISE 0855 is fainter, so they are not directly comparable.
-
-**A neighbour star.** Our fitting code treated any Gaia star within 0.7 pixels of the target as "the target itself" and left it out of the model. In the Apr–May 2026 visits a star of Gaia magnitude 16.3 sits 0.67–0.71 pixels from WISE 0855's predicted position. A control at 0.75–3.5 µm, where WISE 0855 is invisible, showed the leak: it gave 0.10 mJy in the Apr–May 2026 visits. With the star put back into the model the control falls to -0.006 mJy and the 4.4–5 µm signal from 13.6σ to 10.6σ. We quote the lower number. In the Nov–Dec 2025 visits the control gives -0.018 ± 0.003 mJy: small, but not zero.
-
-**Motion between visits.** Measured shift from the Nov–Dec 2025 to the Apr–May 2026 visits: -3.3″ east–west and +2.1″ north–south (errors 0.6″ and 1.1″), against a predicted -4.5″ and +0.6″. This is consistent with the prediction (p = 0.08), and a source that does not move is ruled out (p = 3 × 10⁻⁷). The neighbour star can still pull the measured centres slightly.
-
-**What this is.** A measurement of a known object: a point source at the predicted position of WISE 0855−0714 in SPHEREx DR1 pictures at 4.4–5.0 µm, at a brightness consistent with Spitzer (0.48–0.54 mJy) and WISE (0.41–0.50 mJy) in broader bands, moving as predicted. It is not a new object.
-
-**The slider.** The slider on WISE 0855's card combines the 22 pictures of the Nov–Dec 2025 visits only, in order of their expected signal-to-noise (measured brightness never chooses the order). Each step is measured against the same pictures combined along the same 24 empty paths (the spread is never taken below 1), so the number can fall as well as rise when a noisier picture is added. The last step is the 16.5σ in the table above. Single pictures are only rescaled by the spread of single pictures on the empty paths.
-
-![WISE 0855−0714, Nov–Dec 2025](e4/stack_pass2_neighbour_restored.png "Nov–Dec 2025 visits: pictures at 4.4–5 µm combined along WISE 0855's predicted path; it sits in the centre.")
-
-![WISE 0855−0714, Apr–May 2026](e4/stack_pass3_neighbour_restored.png "Apr–May 2026 visits, with the neighbour star restored to the model.")
-
-###### E11 {#e11-label}
-
-## Spectra on the fly, checked against JWST {#e11}
-
-The challenge asks for spectra. Every SPHEREx picture sees a source at one colour, so combining many pictures of a source gives its spectrum. To check that our spectra are right we measured three test targets with the project's per-picture fitting pipeline (the browser's spectra on click use quicker aperture sums; fitted per picture, combined in fixed colour steps chosen before any flux was looked at; `docs/protocols/E11.md`) and compared them with published measurements.
-
-![SPHEREx spectrum of WISE 0855 next to JWST](figs/e11_wise0855.png "WISE 0855−0714: SPHEREx (blue) and JWST (orange)")
-
-**WISE 0855−0714.** From 91 pictures at 3.8–5 µm (238 including the short-wavelength control), 3.8–5 µm in 0.1 µm steps with errors from 24 empty paths: over the 10 steps where it is detected, SPHEREx gives 0.97 ± 0.03 times the JWST NIRSpec spectrum of Luhman et al. (2024), averaged in the same steps. The two reddest steps (4.8–5.0 µm) come out lower than JWST (2.9σ and 2.7σ); we do not know why. JWST's absolute level was tied by its authors to Spitzer, so the agreement in level is not fully independent; the agreement in shape is. A SPHEREx spectrum of WISE 0855 was published before ours (Rustamkulov et al. 2026, made with IRSA's spectrophotometry tool), and large SPHEREx brown-dwarf spectral atlases exist (Gagné et al. 2026; Tu et al. 2026); ours is a check of this tool's method, not a first.
-
-![SPHEREx spectrum of Epsilon Indi B](figs/e11_epsindib.png "Epsilon Indi B: water, methane and carbon monoxide bands")
-
-**Epsilon Indi B** (two brown dwarfs 0.7″ apart, seen as one). From 246 pictures, 0.75–5 µm: six absorption bands pass our predefined test (a dip more than 3 times its error at a published band position) — water at 1.4 and 1.9 µm, methane at 1.6, 2.2 and 3.3 µm, carbon monoxide at 4.5–4.8 µm — as expected for T-type brown dwarfs (King et al. 2010). Through standard filters our brightness is 0.89–1.05 times published values in H, Ks, W1 (1.05–1.16 depending on the WISE catalogue; contaminated by Epsilon Indi A's halo) and Spitzer 4.5 µm, 0.86 at Spitzer 3.6 µm, and 0.73 at J, where our colour steps are too coarse for the narrow 1.27 µm peak (0.88 when the pictures are added without steps; a check added after the first result). Four of the six band tests compare with one side only and assume a flat continuum, so their significances overstate how certain the band depths are; Epsilon Indi B is probably also in the SPIFF SPHEREx atlas (not checked).
-
-**Barnard's Star: failed.** 239 pictures, and all but 1 have a saturated pixel next to the star, so no spectrum passes our rule.
-
-###### Motion {#motion-label}
-
-## Measuring how a star moves, from SPHEREx positions {#motion}
-
-**Epsilon Indi B**, a pair of brown dwarfs 12 light-years away, is one of the challenge's test targets. In each of 140 pictures we fit its position freely (saturated pixels masked, Gaia neighbours modelled), average positions in four time windows over 374 days, and fit a straight-line motion with Gaia's parallax held fixed. This fit was not predefined.
-
-| | East–west (″/yr) | North–south (″/yr) |
-|---|---|---|
-| SPHEREx positions (Gaia parallax fixed) | 3.96 ± 0.07 | -2.43 ± 0.07 |
-| Gaia DR3 | 3.98 | -2.47 |
-
-**A steady offset, and what the pair's orbit predicts.** In all four windows our positions sit a steady 0.5″ south and about 0.2″ east of the position Gaia's catalogue values predict. After the measurement we learned (literature review, `docs/LITERATURE2.md`) that Gaia's entry is the brighter brown dwarf Ba alone, while SPHEREx sees the combined light of Ba and its companion Bb 0.7–0.8″ away; and Ba's Gaia motion includes its orbit around the pair's centre (Chen et al. 2022). From the published orbit we calculate (`scripts/epsindi_orbit_check.py`; a check made after the measurement) that the centre of the pair's infrared light should sit 0.50–0.56″ south and 0.13–0.19″ east of Gaia's extrapolated position at 1.6–3.8 µm, steady through 2025–26 — the size and direction we measure. The same calculation gives a motion of +3.97″, −2.45″ per year for the centre of light, also within our errors.
-
-**Barnard's Star did not work this way.** The same method on Barnard's Star gives a north–south motion of 5.6 ± 1.5 ″/yr, far from Gaia's 10.4 (`data/findings/motion_barnard.json`). Likely cause (untested): it is a bright star (Gaia G = 8.2) that saturates SPHEREx's detector, so with its centre masked the fit rests on its outer light; and only two time windows are available. That first attempt is What failed #13; a second, predefined attempt with a method chosen on comparison stars (E8, below) recovers the motion but fails a predefined control check. Its motion is also plain to see in the tool: subtracting the later pictures (Mar–May 2026) from the earlier ones (Aug–Oct 2025) shows it as an orange–blue pair ([open it](../timemachine.html?ra=269.4463&dec=4.7677&fov=2&mode=subtract)). The tool splits the pictures at the largest gap in time, and this picture is made from the experimental colour-aware pictures. It is a picture, not a measurement.
-
-###### E15 {#e15-label}
-
-## Using 102 colours: telling cold brown dwarfs by their methane {#e15}
-
-The challenge asks how SPHEREx's many colours can help. Cold brown dwarfs (T and Y types) have methane, which absorbs light near 3.3 µm, inside SPHEREx's range. We built one simple test — light in the 3.2–3.4 µm window divided by light on either side — and set its dividing line on 25 brown dwarfs whose types are already published from spectra (`docs/protocols/E15.md`, fixed before any candidate was measured). Leaving each one out in turn, it called 21 of 23 decisive cases correctly (91%; 95% interval about 72–99%); both mistakes sit at the boundary between the warmest methane dwarfs and the coolest L dwarfs.
-
-![Methane test examples](figs/e15_examples.png "SPHEREx spectra: an L dwarf, a T dwarf, a Y dwarf and a candidate")
-
-We then measured 11 faint objects listed as probable cold brown dwarfs from their colours alone, with no published spectrum in the sources we checked (including the large SPHEREx brown-dwarf atlases SPIFF and SUDA). The fixed rule called 5 of the 11 "T or later". Several had methane-window fluxes below zero, a sign that our errors were too small for faint objects; with errors measured at 12 empty positions beside each object (a check added after the results, not predefined), 2 of the 5 remain: CWISE J075648−600130 (5.6σ below the dividing line; its index is still 2.3σ below zero, so its error may still be underestimated) and WISEA J190005−310810 (3.0σ, at the limit). That agrees with the types already guessed from their colours, so it is an independent check of those guesses, not news about what they are; the other nine are too faint for SPHEREx to decide.
-
-![Methane index against colour](figs/e15_methane.png "Methane absorption against colour for known brown dwarfs and candidates")
-
-###### E18 {#e18-label}
-
-## The deep field at the north ecliptic pole {#e18}
-
-SPHEREx passes over the north ecliptic pole on almost every orbit, so a small patch there has hundreds of pictures instead of the usual few. We measured every catalogued source within 0.4° of the pole (2,701 stars and galaxies from Gaia and AllWISE) in each of 17,832 pictures taken over about a year, giving each source a 102-colour spectrum and a light curve (`docs/protocols/E18.md`, rules fixed before the measurements were analysed).
-
-**Looking for unusual spectra without labels (E18-A).** Three machine-learning models, each blind to what any object is (an unsupervised random forest after Baron & Poznanski 2017, an autoencoder, and an isolation forest), score how unlike the rest each spectrum is. The scores are turned into calibrated false-alarm probabilities (conformal p-values, computed separately for faint and bright sources), and a source is flagged only if the combined probability is below 0.5% and two of the three models agree. Before looking at real flags, we planted fake unusual spectra (a cold brown dwarf, a dusty quasar, a carbon star, hydrogen emission lines, ice absorption) into real sources' measurements. The search finds them only in bright sources: at signal-to-noise 100–300 per channel it catches 86% of medium-strength brown-dwarf spectra but few emission lines or ices, so we report flags only above that brightness, where about 6.3 false flags are expected among 1,253 sources. Unaltered sources put through the same process are flagged 0.83% of the time (240 trials), close to the 0.5% design.
-
-**Result.** 7 bright sources were flagged. 3 are star-forming galaxies whose 3.3 µm dust band, shifted by their known redshift, stands out; 4 are removed by our artefact rules (three stars in the faint halo of the Cat's Eye nebula, NGC 6543, whose gas lines leak into their light, and one red dwarf beside a saturated star). **No flagged source is left that the catalogues we checked do not explain.** 7 flags is about what chance alone predicts (6.3). None of the 42 known quasars, emission-line and variable stars held out of training was flagged (12 of them are above the brightness floor), so the search is not a detector of these known classes in this field. This is a tested method with a measured sensitivity that found nothing new, not a list of new objects. As of 15 November 2026 we found no published anomaly search on real SPHEREx spectra; the nearest machine-learning work on real SPHEREx data separates stars from galaxies (Nguyen et al. 2026) or fits galaxy and AGN templates (Ren et al. 2026).
-
-**Looking for brightness changes (E18-B).** Each picture sees a source in a different colour, so we first fit each source's steady spectrum and then look for brightness changes on top of it, with errors and thresholds set on 992 ordinary Gaia stars and checked on 992 others (rules fixed before any variable-star result was looked at). To measure what can be seen, we planted 7,936 fake brightness variations (smooth cycles and eclipses, periods 0.2–50 days) into real stars' measurements. **Half of the fakes are found at a 2.0% change for sources of AB magnitude 12–17, 5.0% at 17–18 and 10% at 18–19**, with 3 of 992 ordinary test stars raising a false alarm (0.30%). Short eclipses need to be deeper (5.0% for bright sources, 20% at magnitude 16–17).
-
-**What it finds.** At this threshold, few catalogued variables are recovered: 1 of the 15 NEOWISE variables in the field (Kim et al. 2026) and 4 of 86 catalogued variables in all, because those with known periods are mostly spotted or Sun-like stars that change by about 0.10% in the infrared, far below the floor, and the NEOWISE variables are faint (median AB magnitude 18.0, where the floor is 5–10%). Checked at their catalogue periods, SPHEREx does recover the 0.66-day spot cycle of a BY Draconis star and the infrared light curve of an RR Lyrae star (0.52 days, 15%), the latter excluded by our predefined rule against periods near half a day. Of 16 uncatalogued sources above the threshold, 1 survives the vetoes (about 8 false ones expected); its 79-day period, noticed post hoc, is shared by more than a hundred unrelated sources (136 peak at 79 or 95 days), so we treat it as a likely instrument effect and do not count it. One veto, for sources in the halo of the Cat's Eye nebula, was added after a partial run's candidates had been seen; it removed 8 of the 16. In a post hoc check, known AGN and NEOWISE variables (21) vary more over the year than 588 uncatalogued sources of the same brightness, as a group on the amplitude statistic (median 1.87 against 0.31 in units of the expected scatter; one-sided rank test p below 10⁻⁸ on this, the strongest of four statistics; the χ² statistic shows no difference), although none passes the strict one-in-a-thousand bar alone.
-
-![What the variability search can see](figs/e18b_floor.png "Fraction of planted brightness changes recovered, by size and source brightness, at 0.1% false alarms.")
-
-![Known periods recovered](figs/e18b_examples.png "Four catalogued variables: SPHEREx light curves and the same data folded at the catalogue period.")
-
-![Planted fakes found by the anomaly search](figs/e18a_injections.png "Fraction of planted unusual spectra flagged, by type, strength and source brightness.")
-
-![The flagged sources](figs/e18a_flags.png "Each flagged source (red) against its most similar ordinary neighbours (grey), with the reason it is explained or removed.")
-
-###### E10 {#e10-label}
-
-## Recovering known variable stars {#e10}
-
-Can SPHEREx alone tell which stars changed brightness between visits? We drew 124 variable stars from Gaia DR3's catalogue (long-period variables, RR Lyrae, eclipsing binaries and Cepheids, all varying by at least 0.3 magnitudes in visible light) and 496 ordinary comparison stars of the same brightness in the same pictures (`docs/protocols/E10.md`). Half of the comparison stars set a threshold that only 1% of ordinary stars should pass; the other half then tested it. The fixed rule: the test passes if, on the long-period variables, the lower end of the 95% interval of the fraction recovered is above 50%, and false alarms stay near 1%.
-
-**Result: inconclusive.** False alarms pass: 2 of 246 test-half comparison stars (0.81%). Of the testable long-period variables, 16 of 24 are recovered (67%, 95% interval 47%–82%): the interval straddles 50%, so the rule gives neither pass nor fail. Over all types, 47 of 96 testable variables are recovered. Ordinary stars scatter by 0.93% between visits, so changes below about 3% cannot be told apart from them. No ordinary star passes the fixed rule for unlisted variable candidates. One crossed the threshold (about 8% brighter in five of six detectors) but has a star 12″ away that SPHEREx cannot separate, which the rule excludes; in ZTF images that resolve the pair it does not vary (a post hoc check), so it is not counted. Every testable variable that swings by more than a magnitude in visible light was recovered (5 of 5). Limits: 52 long-period variables were drawn but most of the bright ones overload the detector, so only 24 could be tested; for short-period stars two visits catch random phases, so their recall reflects chance timing rather than the method.
-
-![Recovered variables](figs/e10_recall.png "Fraction of catalogued variables recovered, by type and amplitude, against the 1% false-alarm threshold.")
-
-###### E20 {#e20-label}
-
-## Hydrogen lines in emission-line stars {#e20}
-
-Gaia's DR3 software sorts stars into emission-line classes from their low-resolution optical spectra. SPHEREx covers two strong infrared hydrogen lines, Paschen-α at 1.875 µm and Brackett-α at 4.05 µm, so it can check those labels independently. Wolf–Rayet stars have been studied this way (Crowther & Smith 2026); we found no SPHEREx census of the other classes. We drew 60 candidates at random from two classes (30 Herbig Ae/Be, 30 Be stars; G 9.5–14) and 157 ordinary stars of similar brightness and colour 20–200″ away, so measured in the same pictures. The rules were fixed before any of their pixels were read (`docs/protocols/E20.md`): in each visit, compare the channel containing the line with a straight line fitted to the neighbouring channels; calibrate on the controls; count a star if the excess reaches 5 times the controls' spread overall and at least 2 in two separate visits. The method counts as working only if at most 2% of controls pass.
-
-**Result.** 2 of 155 controls pass (1.3%; at most 4.0% at 95% confidence), so the method works by the rule we set. **SPHEREx shows Paα/Brα excess consistent with emission-line stars for 17 of 24 Herbig Ae/Be candidates and 20 of 30 Be candidates** (37 of 54 in all, with 0.7 expected by chance). The detected excess is typically 14% (Paα) and 20% (Brα) of the neighbouring brightness. Six Herbig candidates overload the detector and could not be measured; Brackett-γ (2.17 µm) is not detected in any star. In a post hoc tally, SIMBAD lists no emission-line or young-star type for 20 of the 37 (10 are not in SIMBAD at all); for these, the SPHEREx lines add an independent infrared check of Gaia's label (we did not search the literature star by star).
-
-**Limits.** At SPHEREx's resolution one channel spans thousands of km/s, so it cannot tell whether the hydrogen glow comes from the star or from gas around it; 18 of the detections have a WISE mid-infrared excess, and both controls that pass lie in the bright Trumpler 16 nebula. Before the freeze, the crowding rule and the continuum window were changed using catalogue data and a calibration field only (logged). A check at a line-free wavelength, made post hoc, finds no excess for candidates (0 of 51), so the Brα detections do not look like a continuum-shape effect (one line-free check only); detector 3 has no clean point for the same check at Paα.
-
-![Hydrogen-line excess](figs/e20_lines.png "Top: one candidate (orange) and a control in the same pictures, brightness divided by the local continuum, line positions marked. Bottom: line excess for candidates and controls.")
-
-###### E12 {#e12-label}
-
-## A distance from one year of pictures {#e12}
-
-As Earth goes round the Sun, a nearby object seems to trace a small yearly loop against distant stars; the loop's size gives its distance (its parallax). We fitted Epsilon Indi B's SPHEREx positions with five free quantities — position, motion and parallax — taking nothing from Gaia for this object (`docs/protocols/E12.md`, fixed before the fit).
-
-![Epsilon Indi B's path and yearly wobble](figs/e12_parallax.png "Left: path over a year. Right: the yearly wobble with the motion removed.")
-
-**Result.** Parallax 243 ± 53 mas, 4.6σ from zero, 0.5σ below Gaia's 270.7 mas for Ba (the system's value from Epsilon Indi A is 274.8): a distance of about 13.4 light-years (68% interval 11.0–17.2). Without the parallax term the four visit averages fit far worse (χ² 162 against 2.1).
-
-**The control.** 8 ordinary Gaia stars in the same pictures, measured with the same code, should show no parallax. All of them come out slightly negative (mean -50 mas): a small shared shift between spring and autumn pictures that mimics a negative parallax. We did not correct for it; if the shared shift is subtracted, the parallax is 292 ± 27 mas (a post hoc check; not the result under the predefined criterion). The parallax rests mainly on the October 2025 visit against the spring visits, which is where the shift appears. It sets our error bar (53 mas, the largest of the fit, a bootstrap and this scatter). One change after the run is recorded in the protocol (a floor on a clipping threshold); exactly as fixed the result is 243 ± 43 mas, also a pass.
-
-**Context.** We found no published parallax measured from SPHEREx positions; a SPHEREx brown-dwarf atlas notes that parallax is "negligible compared to a SPHEREx pixel" (Gagné et al. 2026) — here it is 0.04 pixels, recovered by averaging 139 pictures. The pair is unresolved; the steady offset from Gaia's position matches the pair's orbit (previous section).
-
-###### E8 {#e8-label}
-
-## Barnard's Star: the motion, and a check that failed {#e8}
-
-Barnard's Star overloads SPHEREx's detector in essentially every picture, and the archive flags a block of 30–50 pixels around it, so our first motion fit (from the few unflagged core pixels) failed (What failed #13). In E8 we chose a new method on 26 bright comparison stars before measuring Barnard's Star: the centre of symmetry of its unflagged outer glow, corrected for a small per-detector offset (`docs/protocols/E8.md`).
-
-![Barnard's Star in two visits next to Gaia](figs/e8_barnard.png "Left: positions in two visits. Right: offsets from Gaia next to comparison stars.")
-
-**Result.** 10.34 ± 0.37″ per year north and -0.75 ± 0.37″ east (236 pictures, two visit windows), against Gaia's +10.36 and −0.80: within 0.2σ, and 27.7σ from zero. With two visits the fit has no spare freedom, so the error cannot be checked on Barnard's Star itself; it is the per-visit scatter of the comparison stars (0.15″), with the method chosen among 16 variants tried on them.
-
-**Why it still counts as failed.** We also required 8 faint stars nearby, measured with the standard fit, to agree with Gaia within their own errors. They share a drift of -0.17″ per year east–west — small (under half of Barnard's error bar) but beyond their own. By our rule the result is FAILED. A reading made post hoc: the drift flips with the detector's orientation between the two visits, which points to a tiny fixed offset in detector pixels — the same effect that biases the control stars in the distance test.
-
-**Checking the explanation on other stars (E16).** If a tiny fixed offset in the detector's own frame causes the neighbours' drift, independent stars should show it too. We measured 471 ordinary Gaia stars in 45 other fields, chose a correction on half of them and tested it on the other half, with rules predefined. The offset is there: about 0.007 pixel along the detector's x axis, the same in both of the telescope's orientations, and it produces the expected back-and-forth pattern on the sky (figure). But our predefined test asked that removing it make the check stars' average positions agree with Gaia at least 20% better, and they improved by only 1.1% (261 → 258 thousandths of an arcsecond), because each star's own scatter is about six times larger than the correction. So the correction counts as failed, was not applied, and the Barnard's Star and Epsilon Indi B re-tests were not run; their verdicts under the predefined criteria stand ([What failed #20](../failed.html)).
-
-![Calibrating the detector offset](figs/e16_calibration.png "The offset in independent stars, by detector and by the telescope's orientation, and the predefined test that failed.")
-
-## Stacking along an orbit {#stacking-along-an-orbit}
-
-For an asteroid with a known orbit, we predict where it is in every picture (JPL Horizons, SPHEREx as observer). We subtract the fitted stars and background, centre each leftover picture on the predicted position, and add them with weights proportional to the expected brightness divided by the noise squared (a matched filter).
-
-```
-â ± σ_â = Σ_e expected_e·A_e/σ_e² / Σ_e expected_e²/σ_e²  ±  (Σ_e expected_e²/σ_e²)^(−1/2)
-```
-
-**Result.** Asteroid 98397 (2000 UC3): no single picture detects it at 5σ (median 0.24σ, best 4.3σ, after dropping 23 pictures with poor local fits identically from singles and stack; single-picture values are divided by the spread of single pictures on the empty paths, with no mean correction). Combining 295 pictures gives 5.4σ, quoted against empty paths beside the orbit: significance = (stack signal-to-noise − mean of empty paths)/spread of empty paths = (7.55 − (-0.73))/1.54. Without removing the -0.73 offset it is 4.9σ. The offset itself is uncertain by about ±0.3σ (12 inner paths). As a check, we split the pictures in two (odd and even, or first and second half in time): each half gives 3.2–4.6σ, against about 3.8σ expected for half the data if the signal is real (`data/findings/f2_split.json`). This is marginal: one object, and the error-calibration check below did not pass cleanly, so we used the larger, more conservative scale.
-
-**How the asteroid was chosen.** This stack was not predefined. Asteroid 98397 was picked by hand after a first pick failed ([What failed #6](../failed.html)). Of the 59 faint asteroids listed in `data/faint_ids.txt`, 17 have pixel fits and 8 could be stacked. 3 of those meet the rule in `scripts/build_reveal.py` (no single picture at 5σ, and a stack of 5σ or more against empty paths), and 98397 scores lowest of them (`data/findings/f2_candidates.csv`). The others have not been checked further and are not claims. The significance is not corrected for the choice. The error scale comes from 24 empty paths (12 used to set it), so the chance of a false signal can only be bounded from them at about 1 in 25; the σ value assumes the spread of empty paths is Gaussian.
-
-**All the asteroids we could stack (E13).** Because one hand-picked asteroid says little, we then checked every asteroid we had stacked, with predefined tests (`docs/protocols/E13.md` in the code repository). Of 8 faint asteroids stacked, 7 have no single picture at 5σ, and 3 of those reach 5σ or more when combined: 14052 (1995 YH3) at 6.9σ, 11874 Gringauz at 6.1σ and 98397 at 5.4σ. Split into odd and even pictures, each half still stands out (5.6/6.5σ, 5.1/5.1σ, 5.7/3.7σ; each half calibrated on its own 12 empty paths, and these scales scatter, so the halves add up to more than the whole stack — with one common scale 98397's halves are 4.0σ and 3.9σ, against 3.8σ expected), and the brightest pixel of each stack is the central one. Measured against the brightness predicted from each asteroid's catalogued absolute magnitude (the comparison code was corrected after its first run), the stacks give 0.98 ± 0.05, 1.20 ± 0.07 and 0.48 ± 0.06 times the prediction (98397 is about half as bright as predicted). Limits: the stack numbers existed before this test was written, so it is a check rather than a blind test; the empty-path spread check (E5) fails for most of the halves, so the larger spread is used; with 24 empty paths per asteroid the chance probability cannot be pinned down below about 1 in 25 from the paths alone. So we ran a stricter check, again predefined (`docs/protocols/E13b.md`): each of the four stacks at 4σ or more was compared with 200 empty paths (the same pictures, combined along the path shifted 5–9 pixels in 40 directions). All four beat every one of their 200 empty paths, a chance probability of at most about 1 in 200 (the smallest that 200 overlapping paths can show); measured against the spread of those paths they stand at 8.6σ (14052), 7.9σ (11874), 5.9σ (98397) and 6.0σ (80253).
-
-**A blind test on new asteroids (E14).** All of the above uses asteroids we had already looked at. So we drew 12 new faint asteroids at random from a catalogue query, and before measuring anything wrote down, for each one, how clearly it should show up when its pictures are combined (`docs/protocols/E14.md`; the predictions were committed before the test ran). The fixed test asked that at least 70% of the asteroids expected to show clearly (no single picture at 5σ, predicted 7σ or more) reach 5σ, and that their median brightness lie within 0.7–1.3 times the prediction. **The first part failed**: 3 of 5 reached 5σ (60%; with only five asteroids, the 95% range is 15%–95%). The second part passed: median brightness 0.92 times the prediction. On empty sky the method raised no false alarm: none of 288 empty paths reached 5σ, or even 3σ. The reason for the shortfall was flagged before the run: our prediction used the noise the fit reports, and the empty paths show the real noise is 1.2–4.4 times larger (median 2.5). With that measured noise (a check declared in advance but reported only), measured and predicted significance agree to 0.31 ± 0.44σ on average. A second limit: for some of these asteroids about half of the pictures failed to download during our run. We checked afterwards: the files are on the public archive and download normally, so these were temporary failures on the day, not missing data; they make every stack fainter than it could be.
-
-![Predicted against measured, blind sample](figs/e14_pred_vs_meas.png "Each new asteroid: predicted significance (before measuring) against measured.")
-
-**The slider.** On the home page slider, each step is measured against the same pictures combined along the same empty paths (the scale is never taken below 1), so the number can fall as well as rise as pictures are added.
-
-![The stack along the orbit against single pictures](figs/fig_reveal.png "Left: the pictures combined along the orbit. Right: single pictures.")
-
-**Not new.** Stacking along known orbits is established: NEOWISE (Masiero et al.), the KBMOD shift-and-stack search (Whidden et al. 2019), IRSA's MOST tutorial, and other Space Apps 2026 teams. We use it as a measured demonstration, not as a new method.
-
-###### E17 {#e17-label}
-
-## Searching blind for moving objects {#e17}
-
-Stacking along a known orbit only finds what is already catalogued. To look for anything that moves, we drew six patches near the ecliptic at random (each about the size of the full Moon, photographed 54–82 times over six days), shifted the pictures along 147,651 possible straight-line motions (0.05–1° per day, every direction), and added them up (`docs/protocols/E17.md`, fixed before the search). The threshold comes from the same search run 60 times with the picture times shuffled, which no real mover survives: a spot must beat S/N 7.8 (after removing the visit that contributes most), which lets through about 0.1 false candidates per patch, 0.6 in all. Before searching we hid 1,200 fake asteroids in the real pictures: averaged over speeds even bright ones are found at most 65% of the time, half are found at V ≈ 18.0 (the fitted curve falls to half its maximum at V = 18.27 ± 0.12), and 268 of 1,200 were found overall; slow bright movers are found almost always and those faster than 0.5° per day rarely, because they leave the patch before a second visit.
-
-**Result.** The search found both catalogued asteroids in the patches bright enough to test, (1888) Zu Chong-Zhi (V 16.0) and (2296) Kugultinov (V 16.9), and none of the fainter ones (155 catalogued asteroids in all; none fell between V 17 and 19.8, so the catalogued check does not probe the depth itself). **No candidate mover that matches no known object survives the fixed filters** (IMCCE SkyBoT, queried 2026-11-15): the only two unmatched tracks above the threshold join the known asteroid (3993) Sorm to a bright artefact at the detector edge. Limits: one artefact filter was coded wrongly and fixed after the search (labelled post hoc; Zu Chong-Zhi still fails it); shuffling single exposures under-represents artefacts that repeat within one visit, so the false-candidate number is a lower bound and shuffling whole visits would be the better control; brightnesses of bright objects are biased low.
-
-![A catalogued asteroid found blind](figs/e17_example.png "(2296) Kugultinov: single pictures against the stack along the rate the search found.")
-
-![What the blind search can find](figs/e17_recovery.png "Fraction of planted fake asteroids found, by brightness and speed.")
-
-###### E9 {#e9-label}
-
-## RW Aurigae and R Draconis: measuring stars too bright for the detector {#e9}
-
-Both variable-star targets overload SPHEREx's detector at their centres in almost every picture, which is why our first per-star test (E7, below) could not reach a verdict. In E9 we measured them from the halo of light around the centre, which grows in proportion to the star's brightness. The halo radii and the error bars were set on ordinary stars of similar brightness before the targets were measured: 41 for RW Aurigae and 43 for R Draconis; when the method was set, 0 of 82 and 0 of 395 of their visits crossed the threshold (1 of 288 for R Draconis's comparison stars with the detectors finally used) (`docs/protocols/E9.md`). The rule: a change is confirmed only if it exceeds 5 times its error.
-
-![RW Aurigae change by colour](figs/e9_rwaur.png "RW Aurigae: change between two visits, by colour band")
-
-**RW Aurigae** (visits Sep 2025 and Mar 2026). One colour band (4.1 µm) passes 5 times its error in one visit; the fixed rule needs two bands in the same visit, so no change is confirmed. Its pictures within each visit scatter 1.1–3 times more than ordinary stars' (probably its own day-to-day variability); the predefined rule widens its errors by that factor. Without that factor the changes at 0.9–1.4 µm and 4.1 µm would pass. Read descriptively, the change is not grey: +48 ± 16% at 0.9 µm, +39 ± 11% at 1.4 µm, −21 ± 5% at 4.1 µm (these colour errors use the same factor, applied after the result). Before this measurement our literature notes predicted exactly this pattern if the fading reported in early 2025 (CBET 5530) had ended between our visits (`docs/LITERATURE2.md` §2.4, committed 12:47); its state on our visit dates is not known to us.
-
-![R Draconis through the year](figs/e9_rdra.png "R Draconis: brightness through the year in six colour bands")
-
-**R Draconis.** The predefined test could use only three noisy colour bands, and no change passes. For a star this bright, much of the halo is detector bloom rather than starlight (Fazar et al. 2026), and ordinary stars of the same brightness swing by factors of 2–4 in detectors 1–4, so the 5× threshold there corresponds to a 35–65% change per band: a weak test. Outside the predefined range (a check made after the result, with a saturation guard switched off), its 4.4–5 µm brightness rises and falls by about 0.3 magnitudes either side of average and peaks in early February 2026, (± 3 days, formal). The catalogue predicts a visible-light maximum near 21 January 2026, uncertain by 2–3 weeks, so the infrared–visible lag is not measured; published infrared maxima of such stars lag by about 0.05–0.13 of a period, 12–32 days for R Draconis (Smith et al. 2002).
-
-###### E19 {#e19-label}
-
-## Replaying a published artefact check {#e19}
-
-In September 2026 a team reported a giant shell of material around the red supergiant VY Canis Majoris, seen in SPHEREx pictures, and withdrew the claim within a week (Banerjee et al. 2026, arXiv:2609.18895). Karambelkar, Sharma & De (2026, arXiv:2609.28612) had shown that the same spiky "shell" appears around unrelated bright stars whenever they land on one spot of detector 1, near pixel (1648, 1752). We repeated their check on the public data, as a test of a tool anyone can run: **does a feature stay with the star, or with the detector?** This is a replication of their work, not a finding of ours.
-
-**The test we wrote down first failed.** Before reading any picture (`docs/protocols/E19.md`), we froze a smooth-ring statistic with a threshold set from 48 pictures of comparison stars elsewhere on the detector (14.4). No picture reached it, at the spot or anywhere else: the "shell" is a set of thin radial spikes at 20–70 pixels, which our sector medians smoothed away, and our comparison stars, matched in near-infrared brightness, are much brighter than the heavily reddened VY CMa at 0.78 µm. That result under the predefined criterion is FAILED ([What failed #19](../failed.html)).
-
-**What did reproduce it (defined after seeing the pictures, so labelled post hoc).** If the shell belongs to the detector, its spike pattern is fixed to the detector pixels: different stars at the spot should share it, and the same star elsewhere should not. This was the second statistic we defined post hoc; the first (a spike score) also failed against the comparison stars. Correlating the glow-subtracted 20–70 pixel pattern in detector coordinates, each star's picture at the spot matches the other stars' spot pictures at 0.31 (VY CMa), 0.49 (eps Oct) and 0.49 (GY UMa); the same stars elsewhere on the detector give medians of 0.05, 0.01 and 0.04 (at most 0.23, 0.09 and 0.08), so each spot picture ranks first among its own star's pictures. The same detector pixels with no bright star on them give a median of -0.004 over 48 pictures, so fixed detector defects do not cause the match. Over all pairs, pictures of different stars at the spot match at a median 0.22 (64 pairs), against 0.04 for spot-versus-elsewhere pairs (576). Limits: each star has only two Band-1 pictures at the spot; not every bright star near the spot shows the pattern, as Karambelkar et al. also note; and we did not repeat their search of every bright star at the exact spot.
-
-**The tool.** `scripts/shield.py` takes a star name or RA/Dec, lists every DR1 picture of that position with its detector pixel, and, given a suspected feature's detector spot and other stars to compare, reports whether the feature follows the detector. For VY CMa it prints "FOLLOWS THE DETECTOR". It has been shown on these three stars only.
-
-![The shell follows the detector](figs/e19_shield.png "Top: three different stars at the same detector spot share the spike pattern. Bottom: the same star elsewhere, and other bright stars, do not. Right: match against distance from the spot.")
-
-###### E6 {#e6-label}
-
-## A scene model built only from Gaia stars {#e6}
-
-We also tried modelling every picture star by star, using ESA Gaia's catalogue (one brightness per star per picture), and treating whatever is left as change. Measured on the calibration patch, its noise allowance was small (4.1% of a star's brightness), so we ran it through the same planted-source test. It found essentially nothing at its fixed alarm threshold, and on the 20 test patches it raised far more false alarms than allowed. The likely reason: infrared sources that Gaia does not list (Gaia sees visible light) stay in every picture. Details: `data/findings/e6.json`.
-
-###### E7 {#e7-label}
-
-## A per-star change test {#e7}
-
-A predefined test (E7) looked at stars one at a time: one smooth spectrum per detector fitted to every picture of a star, against the same spectrum allowed to brighten or fade between visits, with significance judged against ordinary stars. **Error calibration (Gate 0):** on three control patches only, per-picture error bars turned out 1.1–3 times too small, depending on the detector; after a per-detector correction fixed on those patches, the pulls of constant stars have a spread of 1.01 (2.24 before) — figure `e7/gate0_pulls.png`. **Result: no verdict.** The comparison set we predefined held only 7 ordinary stars, so the smallest reachable p-value was 0.125 and our p < 0.01 rule could not be met — a design error on our part. RW Aurigae and R Draconis also saturate the detector: R Draconis left 3 usable pictures of 250, and RW Aurigae's static fit is poor, so a change cannot be separated from a bad fit. Details: `data/findings/e7.json`; [What failed #16](../failed.html).
-
-![Gate 0: pulls of constant control stars before and after the fixed per-detector error correction](e7/gate0_pulls.png)
-
-###### E5 {#e5-label}
-
-## Are the error bars right? {#e5}
-
-**Test E5: error calibration for every stack.** Combining hundreds of pictures can make small, correlated errors look significant. For every stacked significance quoted on this site, we combine the same pictures along 24 empty paths beside the real one. The spread of the 12 inner paths gives a scale factor for our error bars; the 12 outer paths check it: after rescaling, their spread must lie within 0.9–1.1. If it does not, we report the measured spread and use the larger scale.
-
-| Stack | Scale from inner paths | Outer-path spread after rescaling | Check |
-|---|---|---|---|
-| WISE 0855, Nov–Dec 2025 | 1.09 | 0.94 | passed |
-| WISE 0855, Apr–May 2026 | 1.34 | 0.95 | passed |
-| Asteroid 98397 (2000 UC3) | 1.54 | 0.77 | not passed; larger scale used |
-
-Before this test, our stacked error bars were 1.5–2.5 times too small for the asteroid stacks (see What failed). Every stacked significance on the site is therefore quoted against empty paths.
-
-## Error budget
-
-| Term | Size | How handled |
-|---|---|---|
-| Statistical (pixel noise) | per measurement | from the variance image, propagated through the fit |
-| Photometric systematic (Explanatory Supplement Eq. 19: irreducible scatter seen in repeated star measurements) | 3% of flux | added in quadrature to every flux error |
-| Point-spread-function model | larger than the noise on bright sources, within the noise for faint ones (`docs/DATA_NOTE.md`) | not separately propagated: bright-source flux errors may still be underestimated; stacked significances are quoted against 24 empty paths |
-| Residues at bright stars after re-gridding | f = 0.151 of the static brightness | noise floor fixed on the calibration patch before any test |
-| Correlated errors in stacks | error bars 1.5–2.5 times too small (asteroid stacks) before calibration | significance against 24 empty paths; E5 scale check |
-| Mean of the empty paths (asteroid 98397 (2000 UC3)) | -0.73 ± 0.44 in signal-to-noise units | removed from the stack; without it the stack is 4.9σ |
-| Unmodelled neighbour stars | WISE 0855, Apr–May 2026: 13.6σ → 10.6σ | short-wavelength control; star restored; lower value quoted |
-| Predicted position of WISE 0855 | about 0.08″ | from the Luhman & Esplin (2016) errors |
-| SPHEREx band edges | inverse-variance-weighted mean over 4.4–5.0 µm channels, flat spectrum assumed | not converted to a Spitzer or WISE magnitude |
-| Position offset (Epsilon Indi B) | steady 0.5″ | cancels in the motion; matches the offset predicted from the pair's published orbit (check made post hoc) |
-| Wavelength map (WCS-WAVE) | about 1 nm | coarse map used; per-pixel calibration product not yet used |
-| Pixel solid angle | 0.5% | header median used instead of a per-pixel map |
-
-The pixel model was written twice, independently (one with numpy, one with JAX, different interpolation); on real pictures the two agree within 0.23σ. The orientation of the point-spread function was checked on real data.
-
-## Limits
-
-- DR1 only. A later release needs a rebuilt index (`scripts/build_tiles.py`) and a one-line change naming the index folder; live mode shows one release at a time.
-- Single-picture change detection is unreliable: even at 20 times the noise no method found half of the planted sources.
-- Single-picture change maps do not find faint moving asteroids (E3: 0/79 and 2/79 known-asteroid sightings); our masking of the archive's outlier flag erased the brighter ones; a follow-up predefined test with the flag left in (E3b) caught 0 of 17 sightings on 10 new patches (`data/findings/e3b.json`).
-- The colour-aware view is experimental; it lost its predefined test.
-- Spectra on click in the browser use quick aperture sums, not the full model.
-- The viewer does not search for unknown objects. Our separate blind searches (moving objects, E17; unusual spectra and uncatalogued variables at the north ecliptic pole, E18) found no candidate we count as new.
-- Barnard's Star: the first motion fit failed; the second (E8) recovers Gaia's motion within 0.2σ but its predefined control check failed, so the verdict under the predefined criterion is FAILED.
-- RW Aurigae's and R Draconis's brightness changes are measured only from the halo around their saturated centres, and neither passes our predefined rule.
-- The Epsilon Indi B motion fit and the asteroid stack were not predefined; the planted-source comparison at a common threshold is a secondary, post hoc check.
-
-### Sizes and colours
-
-The asteroid pages show sizes from SPHEREx's 3–5 µm heat glow and colours compared with Gaia within one visit. They are evidence that the pixel model works, not claims: sizes came out about 15% too large for the first asteroids and the calibration is unfinished, and the 3 µm water band depends on how the continuum is drawn. No size, water or planet-limit result is claimed anywhere in this entry.
-
-## What failed
-
-We publish every approach that did not work, with what we changed: the first colour-aware model, which flagged more changes than a plain blink; the fair comparison that shrank our first headline; the colour-aware view losing its predefined test; error bars that were too small; a neighbour star silently dropped; and more. See [What failed](../failed.html).
-
-## Reproduce every figure
-
-Python 3.12 with the packages in the Acknowledgements; run from the repository root. Each step writes the result file named in the comment.
-
-```
-# index of every DR1 picture, then browser sky tiles
-.venv/bin/python scripts/build_index.py --release dr1
-.venv/bin/python scripts/build_tiles.py --release dr1
-
-# noise floor on the calibration patch (fixed before any test)   -> data/findings/f1_calibration.json
-.venv/bin/python scripts/build_field.py --name calib --ra 7.79 --dec -65.37 --size 160 --calibrate
-
-# E2: draw and cache the 20 patches, count changes                -> data/findings/e2.json
-OMP_NUM_THREADS=1 .venv/bin/python scripts/e2_cache.py
-OMP_NUM_THREADS=1 .venv/bin/python scripts/e2_counts.py
-
-# E1: thresholds on the calibration patch, planted sources, summary -> data/findings/e1.json, figs/fig_e1.png
-.venv/bin/python scripts/run_e1.py calib
-.venv/bin/python scripts/run_e1.py test
-.venv/bin/python scripts/run_e1.py summary
-OMP_NUM_THREADS=1 .venv/bin/python scripts/e1_test_false_rates.py  # -> data/findings/e1_test_false_rates.json
-
-# E4: WISE 0855 along its path                                    -> data/findings/e4.json, data/e4/*.png
-OMP_NUM_THREADS=1 .venv/bin/python scripts/run_e4.py astrometry
-OMP_NUM_THREADS=1 .venv/bin/python scripts/run_e4.py forced
-OMP_NUM_THREADS=1 .venv/bin/python scripts/run_e4.py analyze
-OMP_NUM_THREADS=1 .venv/bin/python scripts/run_e4.py slider   # only the picture-count slider
-
-# motion (target position and motion as recorded in the result file) -> data/findings/motion_<name>.json
-.venv/bin/python scripts/measure_motion.py --name barnard --ra 269.452 --dec 4.6934
-
-# asteroid stack along an orbit                                   -> data/findings/f2.json
-.venv/bin/python scripts/build_reveal.py --ids-file data/faint_ids.txt --pick 98397   # picked by hand; without --pick the rule takes the top-scoring candidate
-.venv/bin/python scripts/build_findings.py
-
-# figures, then the numbers on this page
-.venv/bin/python scripts/make_figures.py
-python3 scripts/fill_tokens.py
-```
+![Signal-to-noise of an asteroid as pictures are combined](figs/v2/fig_reveal.svg "a, signal-to-noise ratio of asteroid 98397 against the number of pictures combined along its orbit, with the √N expectation. b, signal-to-noise ratio of the single pictures and of empty paths beside the orbit.")
 
 ## References
 
-- Luhman, K. L. et al. 2024, AJ 167, 5 (JWST spectra of WISE 0855−0714), doi:10.3847/1538-3881/ad0b72, arXiv:2311.17316
-- Rustamkulov, Z. et al. 2026, ApJ (SPHEREx spectra of brown dwarfs incl. WISE 0855), arXiv:2607.00543
-- Gagné, J., Faherty, J. K. et al. 2026, ApJ (SPIFF), arXiv:2604.22012; Tu et al. 2026, ApJ (SUDA), arXiv:2604.26771
-- Chen, M. et al. 2022, AJ (orbit of Epsilon Indi Ba+Bb), arXiv:2205.08077
-- King, R. R. et al. 2010, A&A 510, A99 (Epsilon Indi Ba/Bb spectra), arXiv:0911.3143
-- SPHEREx Explanatory Supplement v2.1. https://irsa.ipac.caltech.edu/data/SPHEREx/docs/SPHEREx_Expsupp.pdf
+- Bock, J. et al. 2026, The SPHEREx Satellite Mission, ApJ. https://doi.org/10.3847/1538-4357/ae2be2
+- Akeson, R. et al. 2026, The SPHEREx Image and Spectrophotometry Processing Pipeline, ApJS. https://doi.org/10.3847/1538-4365/ae8843
 - SPHEREx DR1 Spectral Images, doi:10.26131/IRSA678. https://doi.org/10.26131/IRSA678
-- SPHEREx Archive at IRSA User Guide. https://caltech-ipac.github.io/spherex-archive-documentation/
-- Bock et al. 2026, The SPHEREx Satellite Mission, ApJ. https://doi.org/10.3847/1538-4357/ae2be2
-- Akeson et al. 2026, The SPHEREx Image and Spectrophotometry Processing Pipeline, ApJS. https://doi.org/10.3847/1538-4365/ae8843
-- Hui et al. 2026, Spectral Response of SPHEREx, ApJS. https://doi.org/10.3847/1538-4365/ae522c
-- Korngut et al. 2026, The SPHEREx Instrument, arXiv:2603.29835. https://arxiv.org/abs/2603.29835
-- Luhman & Esplin 2016, The Spectral Energy Distribution of the Coldest Known Brown Dwarf, AJ 152, 78. https://arxiv.org/abs/1605.06655
-- Gaia Collaboration, Prusti et al. 2016, The Gaia mission, A&A 595, A1. https://doi.org/10.1051/0004-6361/201629272
-- Gaia Collaboration, Vallenari et al. 2023, Gaia Data Release 3, A&A 674, A1. https://doi.org/10.1051/0004-6361/202243940
-- Wenger et al. 2000, The SIMBAD astronomical database, A&AS 143, 9. https://doi.org/10.1051/aas:2000332
-- Berthier et al. 2006, SkyBoT, a new VO service to identify Solar System objects, ASP Conf. Ser. 351, 367.
-- Kirkpatrick et al. 2021, The Field Substellar Mass Function Based on the Full-sky 20 pc Census of 525 L, T, and Y Dwarfs, ApJS 253, 7 (WISE 0855 position in the live view, via SIMBAD). https://doi.org/10.3847/1538-4365/abd107
-- van Leeuwen 2007, Validation of the new Hipparcos reduction, A&A 474, 653 (RW Aurigae position, via SIMBAD). https://doi.org/10.1051/0004-6361:20078357
-- Anderson & King 2000, Toward High-Precision Astrometry with WFPC2, PASP. https://doi.org/10.1086/316632
-- Whidden et al. 2019, Fast Algorithms for Slow Moving Asteroids, AJ 157, 119. https://doi.org/10.3847/1538-3881/aafd2d
-- Masiero et al. 2021, Asteroid Diameters and Albedos from NEOWISE Reactivation Years Six and Seven, PSJ 2, 162. https://doi.org/10.3847/PSJ/ac15fb
-- IRSA tutorials: SPHEREx introduction, ePSF extension, MOST queries. https://caltech-ipac.github.io/irsa-tutorials/
-- JPL Small-Body Database API. https://ssd-api.jpl.nasa.gov/doc/sbdb.html
-- WiseView (Backyard Worlds), the model this tool follows. http://byw.tools/wiseview
-
-Used by the asteroid pages only: Harris 1998, Icarus 131, 291 (https://doi.org/10.1006/icar.1997.5865); Galluccio et al. 2023, A&A 674, A35 (https://doi.org/10.1051/0004-6361/202243791); Bohlin et al. 2014, PASP 126, 711 (https://doi.org/10.1086/677655); Willmer 2018, ApJS 236, 47 (https://doi.org/10.3847/1538-4365/aabfdf); CALSPEC solar model sun_mod_001 (https://archive.stsci.edu/hlsps/reference-atlases/cdbs/current_calspec/sun_mod_001.fits).
-
-## Acknowledgements
-
-This publication makes use of data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration.
-
-This research has made use of the NASA/IPAC Infrared Science Archive, which is funded by the National Aeronautics and Space Administration and operated by the California Institute of Technology.
-
-SPHEREx DR1 Spectral Images: doi:10.26131/IRSA678. This work has made use of data from the European Space Agency (ESA) mission Gaia (https://www.cosmos.esa.int/gaia), processed by the Gaia Data Processing and Analysis Consortium (DPAC, https://www.cosmos.esa.int/web/gaia/dpac/consortium). Funding for the DPAC has been provided by national institutions, in particular the institutions participating in the Gaia Multilateral Agreement. Gaia DR3 was queried through the AIP mirror. This research has made use of the SIMBAD database, operated at CDS, Strasbourg, France. It also uses JPL Horizons and the JPL Small-Body Database, NEOWISE diameters from the Planetary Data System, and IMCCE SkyBoT. Epoch is not endorsed by NASA.
-
-Software: astropy, numpy, scipy, pandas, pyarrow, pyvo, astroquery, matplotlib, jax, fsspec, aiohttp, requests, Pillow.
+- Luhman, K. L. & Esplin, T. L. 2016, AJ 152, 78. https://arxiv.org/abs/1605.06655
+- Luhman, K. L. et al. 2024, AJ 167, 5. https://doi.org/10.3847/1538-3881/ad0b72
+- Gaia Collaboration, Vallenari, A. et al. 2023, A&A 674, A1. https://doi.org/10.1051/0004-6361/202243940

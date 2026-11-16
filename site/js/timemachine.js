@@ -1,11 +1,9 @@
-import { init, getJSON, h, t, fmt, loc, link, unavailable } from './core.js';
-import { headlineLine } from './components/evidence.js';
+import { init, getJSON, h, t, fmt, loc, unavailable } from './core.js';
 import { mountBlink } from './components/blink.js';
 import { mountLive, loadIndex, bytesPerFrame, mjdDate } from './live/live.js';
 import { parseRA, parseDec, gridSize } from './live/grid.js';
 import { TARGETS, propagate, movedTarget, J2000_MJD } from './live/targets.js';
-import { renderTargetCard, renderStrip } from './components/targets.js';
-import { checklist } from './components/checklist.js';
+import { renderTargetCard } from './components/targets.js';
 
 await init();
 const $ = id => document.getElementById(id);
@@ -27,6 +25,13 @@ const refMjd = idx ? (idx.meta.mjd_min + idx.meta.mjd_max) / 2 : null;
 
 tgtSel.append(h('option', { value: '' }, t('live.target_pick')),
   h('optgroup', { label: t('live.target_challenge') }, TARGETS.map(x => h('option', { value: x.id }, x.name))));
+// Fixed positions with no motion and no result card (the URL takes ?target=<id> for these too).
+const PLACES = [{ id: 'nep', name: t('live.place_nep'), ra: 270.0, dec: 66.56 }];
+const showPlace = pl => { tgtSel.value = ''; preset = null; note.textContent = ''; raIn.value = pl.ra.toFixed(6); decIn.value = pl.dec.toFixed(6); start(); markPreset(pl.id); };
+const presetBtns = [...TARGETS, ...PLACES].map(x => h('button', { type: 'button', class: 'btn small', 'aria-pressed': 'false', 'data-id': x.id,
+  onclick: () => { if (TARGETS.includes(x)) { openTarget(x); reveal($('showcase').hidden ? liveBox : $('showcase')); } else { showPlace(x); reveal(liveBox); } } }, x.name));
+$('preset-buttons').append(...presetBtns);
+const markPreset = id => presetBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === id)));
 const fieldIndex = await getJSON('timemachine/index.json');
 const extraFields = (fieldIndex || []).filter(f => !TARGETS.some(x => x.id === f.field)); // challenge targets are listed once, above
 if (extraFields.length) tgtSel.append(h('optgroup', { label: t('live.target_showcase') }, extraFields.map(f => h('option', { value: `field:${f.field}` }, loc(f, 'name')))));
@@ -52,7 +57,9 @@ function choosePreset(tg) {
   note.textContent = t('live.note_epoch', { name: tg.name, ra: tg.ra.toFixed(6), dec: tg.dec.toFixed(6), date: mjdDate(ep), moved: fmt(moved, 3) }) + ' ' + t(tg.note);
 }
 
-form.addEventListener('submit', e => { e.preventDefault(); start(); });
+// After a visitor's own request, bring the picture and its time control into view together.
+const reveal = el => requestAnimationFrame(() => el.scrollIntoView({ block: 'start', behavior: 'auto' }));
+form.addEventListener('submit', e => { e.preventDefault(); start(); if (!liveBox.hidden) reveal(liveBox); });
 for (const el of [raIn, decIn]) el.addEventListener('input', () => { preset = null; exact = false; tgtSel.value = ''; note.textContent = ''; });
 
 function start(mode = params.get('mode') || 'raw', all = params.get('all') === '1') {
@@ -78,6 +85,7 @@ function start(mode = params.get('mode') || 'raw', all = params.get('all') === '
   if (preset && cardFor !== preset.id) { cardFor = preset.id; renderTargetCard($('target-result'), preset.id, getJSON); }
   const pm = preset && refMjd ? { pmra: preset.pmra, pmdec: preset.pmdec, epochMjd: refMjd } : null;
   const state = { ra, dec, fov, mode, all, ...overlays, track };
+  markPreset(preset?.id);
   const sync = () => {
     const p = new URLSearchParams(location.search);
     p.set('ra', ra.toFixed(6)); p.set('dec', dec.toFixed(6)); p.set('fov', fov); p.set('mode', state.mode);
@@ -95,11 +103,13 @@ function start(mode = params.get('mode') || 'raw', all = params.get('all') === '
 // URL parameters: ?ra=&dec=&fov=&mode=&gaia=1&wise=1 (or ?target=barnard, which opens the result card and its prepared field;
 // with &gaia=1, &wise=1 or &mode=add|subtract it opens the live view centred on the target instead)
 const tp = TARGETS.find(x => x.id === params.get('target'));
+const tpPlace = PLACES.find(x => x.id === params.get('target'));
 if (FOVS.includes(+params.get('fov'))) { fovSel.value = params.get('fov'); showCost(); }
 const wantsLive = overlays.gaia || overlays.wise || ['add', 'subtract', 'track'].includes(params.get('mode'));
 const openCard = tp && !params.has('ra') && !wantsLive;
 if (openCard) { /* opened below, after the showcase fields are known */ }
 else if (tp && !params.has('ra')) { tgtSel.value = tp.id; choosePreset(tp); start(); }
+else if (tpPlace && !params.has('ra')) showPlace(tpPlace);
 else if (params.has('ra') && params.has('dec')) {
   raIn.value = params.get('ra'); decIn.value = params.get('dec');
   if (tp) { tgtSel.value = tp.id; preset = tp; }
@@ -117,11 +127,6 @@ else {
   if (openCard) openTarget(tp);
   else if (!live) loadField();
 }
-renderStrip($('strip'), getJSON, tp?.id);
-$('checklist').append(checklist());
-getJSON('track_example.json').then(ex => { // the "Follow a mover" view, on a known asteroid
-  if (ex?.href) $('target-note').before(h('p', { class: 'small' }, t('live.track_try'), ' ', h('a', { href: link(ex.href) }, t('live.track_example', { name: ex.name })), '.'));
-});
 
 // A challenge target opens on its own measured result: result card + its prepared field (live stays one click away).
 function openTarget(tg) {
@@ -129,8 +134,8 @@ function openTarget(tg) {
   tgtSel.value = tg.id; choosePreset(tg);
   const card = $('target-result');
   card.hidden = false;
-  card.after($('showcase')); // the target's prepared field right under its result
-  cardFor = tg.id; renderTargetCard(card, tg.id, getJSON);
+  $('showcase').after(card); // the target's measured result under its prepared field
+  cardFor = tg.id; renderTargetCard(card, tg.id, getJSON); markPreset(tg.id);
   const p = new URLSearchParams(location.search);
   for (const k of ['ra', 'dec', 'mode', 'all', 'gaia', 'wise', 'exact', ...TRACK_KEYS]) p.delete(k);
   p.set('target', tg.id); history.replaceState(null, '', `?${p}`);
@@ -151,9 +156,3 @@ async function loadField() {
   showcase = mountBlink(box, field);
 }
 
-const headline = await getJSON('headline.json');
-if (headline?.sentence) {
-  const sec = $('tm-finding');
-  sec.hidden = false;
-  sec.querySelector('div').append(headlineLine(headline, t('tm.f1_line')));
-}

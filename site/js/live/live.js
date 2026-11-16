@@ -1,6 +1,6 @@
 // Live mode: any RA/Dec -> SPHEREx DR1 frames read straight from the public S3 bucket in the browser.
 import { h, put, t, fmt, badge, link, wlColor, REDUCED_MOTION, getJSON } from '../core.js';
-import { headlineLine, evidenceNum } from '../components/evidence.js';
+import { evidenceNum } from '../components/evidence.js';
 import { viewControls, detectorInfo, busiestDetector, VIEWS } from '../components/blink.js';
 import { plot, s as svg } from '../plot.js';
 import { findFrames, spreadInTime } from './index.js';
@@ -123,6 +123,7 @@ export function mountLive(el, target, onState) {
     controls.update(st.mode, st.det, !st.cm, info);
     controls.hidden = st.view !== 'blink'; // Add, Subtract and the WISE comparison do not use the three blink views
     views.forEach((b, k) => { b.setAttribute('aria-pressed', String(VIEW_KEYS[k] === st.view)); b.disabled = k > 0 && !st.cm; });
+    if (st.view !== 'blink') more.open = true;
     blinkBox.hidden = st.view !== 'blink'; addBox.hidden = st.view !== 'add'; subBox.hidden = st.view !== 'subtract'; wiseBox.hidden = st.view !== 'wise'; trackBox.hidden = st.view !== 'track';
     playBtn.textContent = t(st.playing ? 'tm.pause' : 'tm.play');
     gaiaBtn.setAttribute('aria-pressed', String(st.gaia));
@@ -382,7 +383,7 @@ export function mountLive(el, target, onState) {
     }).filter(r => Number.isFinite(r.flux) && Number.isFinite(r.wl));
     const series = [1, 2].map(pn => { const r = rows.filter(x => x.pass === pn); return { x: r.map(x => x.wl), y: r.map(x => x.flux), err: r.map(x => x.err), kind: 'points', color: PASS_COLORS[pn - 1], label: t(`live.pass_${pn}`) }; }).filter(s => s.x.length);
     const csv = ['obs_id,mjd,detector,wavelength_um,flux_mJy,flux_err_mJy,group_1_earlier_2_later', ...rows.map(r => [r.obs_id, r.mjd, r.det, r.wl.toFixed(4), r.flux.toPrecision(5), r.err.toPrecision(3), r.pass].join(','))].join('\n');
-    const dl = h('a', { class: 'btn small', download: `orrery_spectrum_${target.ra.toFixed(5)}_${target.dec.toFixed(5)}_px${i}_${j}.csv`, href: URL.createObjectURL(new Blob([csv], { type: 'text/csv' })) }, t('live.csv'));
+    const dl = h('a', { class: 'btn small', download: `epoch_spectrum_${target.ra.toFixed(5)}_${target.dec.toFixed(5)}_px${i}_${j}.csv`, href: URL.createObjectURL(new Blob([csv], { type: 'text/csv' })) }, t('live.csv'));
     const [sra, sdec] = [target.ra, target.dec];
     put(specBox, h('h3', { id: 'h-live-spec' }, t('live.spec_h')),
       h('p', {}, h('strong', {}, t('live.spec_label')), ' ', badge('data'), ' ', t('live.spec_where', { i, j, dx: fmt((c - i) * SCALE_ARCSEC, 3), dy: fmt((c - j) * SCALE_ARCSEC, 3) })),
@@ -391,22 +392,25 @@ export function mountLive(el, target, onState) {
   }
 
   // ---- loading ----
+  // Order: status, picture, time control, way of showing the pictures, what changed; other tools closed until asked for.
+  const more = h('details', { class: 'more-tools' }, h('summary', {}, t('live.more_h')),
+    h('div', { class: 'segmented', role: 'group', 'aria-label': t('live.view_label') }, views),
+    h('p', {}, gaiaBtn, ' ', gaiaNote), gaiaTip, addBox, subBox, wiseBox, trackBox,
+    h('details', { class: 'live-meta-wrap' }, h('summary', {}, t('live.meta_h')), metaBox));
+  // Picture on the left, everything that controls or describes it on the right (stacked on narrow screens),
+  // so the picture and its time control are on screen together.
   put(el,
     h('div', { class: 'live-head' }, status, prog, subsetNote),
-    controls,
-    h('div', { class: 'segmented', role: 'group', 'aria-label': t('live.view_label') }, views),
-    h('p', {}, gaiaBtn, ' ', gaiaNote), gaiaTip,
-    blinkBox, addBox, subBox, wiseBox, trackBox, findingBox, specBox);
-  blinkBox.append(
-    h('div', { class: 'live-grid' },
-      h('figure', { class: 'tm-view' }, h('div', { class: 'imgwrap' }, canvas, ov), caption),
-      h('details', { class: 'live-meta-wrap' }, h('summary', {}, t('live.meta_h')), metaBox)),
-    h('div', { class: 'controls' },
-      h('button', { type: 'button', class: 'btn', 'aria-label': t('tm.prev'), onclick: () => step(-1) }, '←'), playBtn,
-      h('button', { type: 'button', class: 'btn', 'aria-label': t('tm.next'), onclick: () => step(1) }, '→'),
-      h('span', { class: 'muted small' }, t('live.keys'))),
-    h('div', { class: 'scrub-wrap' }, scrub, h('div', { class: 'scrub-ends muted' }, h('span', {}, t('tm.timeline_note')))),
-    h('p', { class: 'muted small' }, t('live.markers')));
+    blinkBox, more, specBox);
+  blinkBox.append(h('div', { class: 'viewer' },
+    h('figure', { class: 'tm-view viewer-img' }, h('div', { class: 'imgwrap' }, canvas, ov), caption),
+    h('div', { class: 'viewer-side' },
+      h('div', { class: 'controls' },
+        h('button', { type: 'button', class: 'btn', 'aria-label': t('tm.prev'), onclick: () => step(-1) }, '←'), playBtn,
+        h('button', { type: 'button', class: 'btn', 'aria-label': t('tm.next'), onclick: () => step(1) }, '→')),
+      h('div', { class: 'scrub-wrap' }, scrub, h('div', { class: 'scrub-ends muted' }, h('span', {}, t('tm.timeline_note')))),
+      controls, findingBox,
+      h('p', { class: 'muted small' }, t('live.markers'), ' ', t('live.keys')))));
   draw(); loadGaia();
   run().catch(err => { if (!signal.aborted) status.textContent = t('live.error', { msg: err.message }); });
 
@@ -473,17 +477,17 @@ export function mountLive(el, target, onState) {
     st.frames.forEach((f, k) => { f.idx = k; });
     st.cm = changeModel(st.frames.map(f => ({ v: f.v, lam: f.lam, det: f.det, mjd: f.mjd })), S, fFloor);
     status.textContent = t('live.done', { n: st.frames.length, failed, mb: fmt(st.bytes / 1e6, 3), first: fmt(first, 2), total: fmt(total, 2) });
-    const headline = await getJSON('headline.json'), fTxt = fmt(fFloor, 2);
+    const fTxt = fmt(fFloor, 2);
     const liveEv = evidenceNum(t('live.changes_ev', { n: st.frames.length }), {
       frames: st.frames.map(f => ({ obs_id: f.obs_id, date: f.date, wl_um: f.wl, detector: f.det, s3_url: f.url })),
-      method: 'science.html#which-change-is-real',
+      method: 'results.html#which-change-is-real',
     });
     if (!wiseOnly) put(findingBox, // comparing views needs pictures from every detector
       h('h3', {}, t('live.changes_h')),
-      headline?.number != null ? headlineLine(headline, t('tm.f1_line')) : null,
       h('p', {}, h('strong', {}, t('live.changes_view')), ' ', t('live.changes', { all: st.cm.nNaiveAll, det: st.cm.nNaiveDet, corr: st.cm.nCorr }), ' ', badge('derived'), ' ', liveEv[0]),
       liveEv[1],
-      h('p', { class: 'small' }, t('live.changes_note'), ' ', h('a', { href: link('failed.html') }, t('nav.failed')), '.'),
+      h('p', { class: 'small' }, t('live.changes_differ')),
+      h('p', { class: 'small' }, t('live.changes_note')),
       h('p', { class: 'muted small' }, t('live.changes_method', { f: fTxt }), fProvisional ? [' ', h('strong', {}, t('live.provisional', { f: fTxt }))] : null));
     if (st.sel) spectrum();
     draw();
