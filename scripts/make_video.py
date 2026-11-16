@@ -4,9 +4,9 @@ Segments: title card 0–2 s; plain blink vs one-detector change maps 2–7 s; W
 7–13 s; Barnard's Star, NASA WISE 2010 blinked with SPHEREx 2025–26, 13–19 s; measured numbers, one at a time, 19–26 s; name and
 address 26–29.8 s. English subtitles (SUBS, one list) are burned in and also written as an .srt file. Numbers are
 read from site/data/headline.json, data/findings/e4.json, e11.json and e13.json.
-Usage: .venv/bin/python scripts/make_video.py --url "<github-user>.github.io/orrery" --team "<team-name>"
+Usage: .venv/bin/python scripts/make_video.py --url "<github-user>.github.io/epoch" --team "<team-name>"
        [--field ecliptic_control]
-Outputs: dist/orrery_demo.mp4, dist/orrery_demo.srt (length verified with ffprobe).
+Outputs: dist/epoch_demo.mp4, dist/epoch_demo.srt (length verified with ffprobe).
 """
 import argparse, json, os, subprocess
 import numpy as np
@@ -118,7 +118,7 @@ def seg_blink_vs_det(field_name, frames_out, n_frames):
 def seg_title(team, frames_out, n_frames):
     for k in range(n_frames):
         im, d = canvas()
-        centred(d, 250, f"Orrery · NASA SPHEREx · {team}", 64, FG)
+        centred(d, 250, f"Epoch · NASA SPHEREx · {team}", 64, FG)
         frames_out.append(im)
 
 
@@ -165,7 +165,7 @@ def seg_numbers(nums, frames_out, n_frames):
 def seg_name(url, frames_out, n_frames):
     for k in range(n_frames):
         im, d = canvas()
-        centred(d, 150, "Orrery", 120, FG)
+        centred(d, 150, "Epoch", 120, FG)
         centred(d, 300, "At this spot in the sky, what really changed?", 38, ACC, bold=False)
         centred(d, 395, url, 34, FG)
         centred(d, 455, "NASA SPHEREx public data · Space Apps 2026", 26, FG, bold=False)
@@ -205,20 +205,20 @@ def main(a):
         im.save(f"dist/frames/{i:04d}.png")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(FPS), "-i", "dist/frames/%04d.png",
                     "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20",
-                    "-metadata", "title=Orrery: at this spot in the sky, what really changed?",
+                    "-metadata", "title=Epoch: at this spot in the sky, what really changed?",
                     "-metadata", "comment=From real SPHEREx DR1 data.",
-                    "dist/orrery_demo.mp4"], check=True)
-    with open("dist/orrery_demo.srt", "w") as f:
+                    "dist/epoch_demo.mp4"], check=True)
+    with open("dist/epoch_demo.srt", "w") as f:
         for i, (s_, e_, t) in enumerate(SUBS, 1):
             f.write(f"{i}\n{srt_time(s_)} --> {srt_time(e_)}\n{t}\n\n")
-    dur = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", "dist/orrery_demo.mp4"]).decode())
+    dur = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", "dist/epoch_demo.mp4"]).decode())
     print("duration_s", dur)
     assert dur <= 29.9, "video must stay at or under 29.9 s"
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--url", default="<github-user>.github.io/orrery")
+    ap.add_argument("--url", default="<github-user>.github.io/epoch")
     ap.add_argument("--team", default="<team-name>", help="registered team name for the title card")
     ap.add_argument("--field", default="ecliptic_control")
     ap.add_argument("--wise-shot", default="dist/barnard_wise2010.png", help="live-mode WISE panel (timemachine.html?target=barnard&fov=8&wise=1)")
