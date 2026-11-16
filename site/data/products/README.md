@@ -29,3 +29,39 @@ Stars that Gaia DR3 classifies as Herbig Ae/Be or Be candidates (role = candidat
 
 Caveat: at SPHEREx's spectral resolution, emission from the star cannot be separated from emission by surrounding gas.
 - Only testable rows (column `testable` = True) count in the public totals: a star is testable when enough clean pictures fall on and around the lines.
+
+## epoch_nep_variable_candidates.csv — vetting of the uncatalogued variability candidates (E33)
+
+The 16 sources in `epoch_nep_variability.csv` that pass the variability thresholds but are not in the catalogues checked there (VSX, Gaia DR3 variability, Kim et al. 2026 NEOWISE variables, Milliquas), one row per source, with the result of each vetting rule fixed in advance (docs/protocols/E33.md). Each rule was applied in the same way to non-variable comparison stars, so the rate at which it rejects ordinary stars is known.
+
+| Column | Meaning |
+|---|---|
+| gaia_or_allwise_id, ra, dec, spherex_mean_m_ab, G, W1mag, n_pictures | as in epoch_nep_variability.csv |
+| chi2r, chi2r_det, s2, ls, z_*, amp, P_best | variability statistics and z-scores (corrected photometry), as in epoch_nep_variability.csv |
+| pass_a_period | not at the shared 79.36 / 95.06-day periods, and not a Lomb–Scargle-only detection at 60–120 days |
+| pass_b_extended | not within 3.5′ of NGC 6543, within a catalogued galaxy's size + 18″ (2MASS XSC, HyperLEDA), or within 60″ of a star with W1 < 8 or G < 9 |
+| pass_c_neighbour | no brighter passing source within 6.2″ (one pixel), and not one of a group of ≥ 3 passing sources within 1′ |
+| pass_d_halves | passes again in both halves of the data (detectors 1–3 vs 4–6, or first vs second half of the year) |
+| pass_f_artefact | passes the E18-B crosstalk, persistence, airglow and leave-one-out checks |
+| vetted_candidate | passes every rule |
+| veto_reasons | the rules that rejected it, in words |
+| literature | for vetted candidates: "known" or "we found no published variability"; otherwise "not checked (vetoed)" |
+
+Result: none of the 16 pass every rule, so this table holds no vetted candidates. Most are rejected by the shared 79/95-day pattern, by the NGC 6543 nebula, or by a group of passing sources around one bright star near 18:03:16 +66:20:50. The 5 sources above threshold that are already catalogued are not in this table.
+
+## epoch_methane_candidates.csv — methane brown-dwarf candidates (E22)
+
+Brown-dwarf candidates from published lists (Kirkpatrick et al. 2021 and 2024, Meisner et al. 2020a/b; Dal Ponte et al. 2023 DES photometric L/T candidates) that SPHEREx shows with the methane absorption at 3.3 µm typical of T and Y dwarfs (below roughly 1300 K), and for which we found no published spectral type. One row per candidate. Rule, fixed beforehand on brown dwarfs of known type: methane index = mean flux at 3.2–3.4 µm divided by the mean of the fluxes at 2.9–3.1 and 3.9–4.1 µm; "T or later" when the index is at least 3σ below 0.356, with errors from 12 empty positions around each object. Of 985 objects measured, 687 were bright enough for a clear call: 20 "T or later", 667 "L-like". None of 63 spectroscopically typed L dwarfs measured the same way was called "T or later".
+
+| Column | Meaning |
+|---|---|
+| name, simbad_ids | catalogue designation; SIMBAD identifiers where they exist |
+| tier, input_catalogue, catalogue_photometric_type | tier1 = Kirkpatrick/Meisner lists, tier2 = Dal Ponte 2023 DES; the photometric type given there, if any |
+| ra_deg, dec_deg, position_epoch_mjd | position used, and its epoch |
+| W1, W2 | WISE magnitudes |
+| n_pictures | SPHEREx pictures measured |
+| methane_index, methane_index_err, sigma_below_threshold | the index, its error, and how many σ it lies below 0.356 |
+| call | "T or later" for every row |
+| literature_status, search_date | result of the search for a published spectral type (SIMBAD, VizieR tables, arXiv), and its date |
+
+Caveats: these are candidates; each needs a spectrum to confirm its type. WISE 0628−8057 already has a methane-imaging photometric type (Tinney et al. 2018). Most candidates lie 3–4.7σ below the threshold. Tier-2 positions assume epoch 2016.0.
