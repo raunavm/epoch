@@ -19,5 +19,6 @@ s = e12["null"]["summary"]
 for k in ("rms_about_zero_mas", "std_mas", "mean_mas", "n_used"):
     if k in s:
         out[f"epsindib_null_{k}"] = s[k]
+out["e23_n_vizier_catalogues"] = len(json.load(open("data/phase2/e23/lit_catalogues.json")))
 json.dump(out, open("data/findings/deriveds.json", "w"), indent=1)
 print(out)

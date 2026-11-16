@@ -65,3 +65,21 @@ Brown-dwarf candidates from published lists (Kirkpatrick et al. 2021 and 2024, M
 | literature_status, search_date | result of the search for a published spectral type (SIMBAD, VizieR tables, arXiv), and its date |
 
 Caveats: these are candidates; each needs a spectrum to confirm its type. WISE 0628−8057 already has a methane-imaging photometric type (Tinney et al. 2018). Most candidates lie 3–4.7σ below the threshold. Tier-2 positions assume epoch 2016.0.
+
+## epoch_emission_line_candidates.csv — hydrogen-line census (E23)
+
+Stars that Gaia DR3 flags as likely Be or T Tauri stars, measured with the same hydrogen-line rule as `epoch_emission_lines.csv` (Paschen-α 1.875 µm, Brackett-α 4.05 µm; a line counts when Z ≥ 5 overall and Z_w ≥ 2 in at least two visits, each with its own continuum). The rule passed 10 of 1,719 ordinary comparison stars measured in the same pictures (0.58%). One row for each of the 88 detected stars that has no emission-line or young-star type in SIMBAD, with the results of a wider literature check. The sample is the first 691 of 816 selected fields, in a fixed random order.
+
+| Column | Meaning |
+|---|---|
+| gaia_dr3_source_id, ra, dec, G | Gaia DR3 identifier, position (degrees) and G magnitude |
+| gaia_espels_class | Gaia DR3 emission-line class (beStar or TTauri) |
+| Paa_Z, Bra_Z, Brg_Z; *_detected; *_excess | line statistic, detection by the rule, and fractional excess over the continuum |
+| simbad_main_id, simbad_type, simbad_other_emission_types | SIMBAD identifier and types |
+| vsx_entries, vizier_emission_catalogues | VSX entries within 5″; emission-line, Be, Herbig, T Tauri, YSO or Hα catalogues matched within 2″ |
+| only_yso_catalogue_match | matched only a YSO-candidate list |
+| no_published_emission_classification_found | True for the 7 stars with no match in any catalogue checked |
+| midir_excess_flag, W1_W3 | AllWISE mid-infrared excess flag and colour |
+| catalogues_checked, search_date | what was searched, and when |
+
+Caveats: at SPHEREx's spectral resolution, emission from the star cannot be separated from emission by surrounding gas. Six of the 7 unclassified stars are detected in Brackett-α only, most near the threshold. The literature check is broad but not complete.
