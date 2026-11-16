@@ -274,7 +274,7 @@ def normalize(
 
     NaN is preserved as NaN rather than becoming 0, so the renderer can paint
     masked pixels distinctly instead of as legitimate dark sky. Confusing a
-    masked column for real dark sky is how a chip gap becomes a discovery.
+    masked column for real dark sky is how a chip gap becomes a false detection.
     """
     f = transfer(mode, q=q)
     span = z2 - z1

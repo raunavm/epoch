@@ -80,18 +80,30 @@ TRACKLET = {
 }
 NOTES = {
     "nep": ("Tracklet's frozen search re-run on SPHEREx DR1 Level-2, detector 1, North Ecliptic Pole. "
-        "No candidate (also none when 14 or 13 of 30 visits are required). Time-permutation nulls give the "
-        "false-alarm rate per search. The frozen 95% rule is formally met in one cell only (17 sigma per "
-        "visit at 1,200 AU, 47/48 recovered, recovery chance 0.96; one fewer would fail it); in reflected "
-        "light at albedo 0.30 that cell corresponds to bodies of about 90 Earth radii or more, far larger "
-        "than any planet, so no planet-sized body (Earth to Jupiter) is excluded at 90% or 95% anywhere in "
-        "200-1,200 AU. Half of planted bodies are recovered from about 14 Earth radii at 500 AU. Below "
-        "about 400 AU the parallax loop (radius 206265/d arcsec, 168 px at 200 AU) is larger than the "
-        "193-px stamp, so bodies leave the stamp in most visits and completeness is near zero: a stamp-size "
-        "limit, not a sensitivity limit. The field is 0.044 square degrees. Candidates, if any, would be "
+        "No candidate (also none when 14 or 13 of 30 visits are required); 0 of 400 time-permutation nulls "
+        "returned one (false-alarm rate < 0.75% per search, 95% upper limit). The frozen 95% rule is formally "
+        "met in one cell only (17 sigma per visit at 1,200 AU, 47/48 recovered, recovery chance 0.96; one fewer "
+        "would fail it); an independent supplementary set of bodies (seed 8) recovered 48/48 in the same cell "
+        "(pooled 95/96), so the cell holds. In reflected light at albedo 0.30 it corresponds to bodies of about "
+        "89 Earth radii or more (90%: about 79), far larger than any planet, so no planet-sized body (Earth to "
+        "Jupiter) is excluded at 90% or 95% anywhere in 200-1,200 AU. Half of planted bodies are recovered "
+        "from about 14 Earth radii at 500 AU. Below about 400 AU the parallax loop (radius 206265/d arcsec, "
+        "168 px at 200 AU) is larger than the 193-px stamp, so bodies leave the stamp in most visits and "
+        "completeness is near zero, and at 500 AU it stays near 60% even at 30 sigma: a stamp-size limit, not "
+        "a sensitivity limit. The field is 0.044 square degrees. Candidates, if any, would be "
         "reported only as moving with parallax in SPHEREx data, not identified with known objects, not "
         "confirmed."),
-    "sep": "",
+    "sep": (
+        "Second field, frozen rules unchanged. SPHEREx DR1 covers the South Ecliptic Pole for only 93 days "
+        "(26 detector-1 visits, Sep-Dec 2025), as the Quick Release did for Tracklet. No candidate (none at 13, "
+        "12 or 11 of 26 visits); 0 of 400 time-permutation nulls returned one. The 500 AU / 12 sigma check FAILED: "
+        "the body is detected in 17 of the 25 visits it is on the stamp (3 of them cut as static), and a direct "
+        "five-parameter fit to those detections gives 487 +- 13 AU, but over a 93-day arc parallax and orbital "
+        "drift are almost degenerate (correlation 0.985), and Tracklet's linker refuses any fit with correlation "
+        "0.98 or more as not separable, so no candidate is formed. Completeness is at most 18 of 48 (17 sigma, "
+        "1,000 AU) and no exclusion is reached at 50%, 90% or 95%. The field is crowded (about 4 degrees from "
+        "the Large Magellanic Cloud): 9 of 26 visits reach Tracklet's 500-detection-per-visit cap. This field "
+        "needs a later SPHEREx visit (a second season) before it can constrain anything."),
 }
 
 out = {
@@ -177,7 +189,7 @@ lo, hi = np.nanpercentile(med, [5, 99.5])
 fig, ax = plt.subplots(figsize=(6.4, 6.0), dpi=150)
 ax.imshow(med, origin="lower", cmap="gray_r", vmin=lo, vmax=hi, interpolation="nearest")
 mj = np.array([e["mjd"] for e in man["epochs"]])
-pl = [p for p in chk["planted"] if p["xy"]]
+pl = [p for p in chk["planted"] if p["xy"] and 0 <= p["xy"][0] <= 192 and 0 <= p["xy"][1] <= 192]
 px = np.array([p["xy"][0] for p in pl]); py = np.array([p["xy"][1] for p in pl])
 # a body at rest at 500 AU through one year, through the stamp's own TAN grid
 cand = None
@@ -198,7 +210,7 @@ fit_txt = (f"fitted d = {chk['fitAu']:.1f} ± {chk['fitErrAu']:.1f} AU (planted 
 ax.set_title(f"E21 · {LABEL}, SPHEREx DR1 D1, {real['n_epochs']} visits / {real['baseline_days']:.0f} d\n{fit_txt}",
              fontsize=9)
 cb = fig.colorbar(sc, ax=ax, fraction=0.046, pad=0.03); cb.set_label("days since first visit")
-ax.legend(loc="lower left", fontsize=7, framealpha=0.9)
+ax.legend(loc="best", fontsize=7, framealpha=0.9)
 fig.tight_layout(); fig.savefig(FIG / f"e21{SUF}_parallax.png"); plt.close(fig)
 
 # ---- figure 2: completeness maps ---------------------------------------------------------------
