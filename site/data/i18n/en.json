@@ -153,7 +153,7 @@
  "cand.failed": "The change search could not run on these pictures.",
  "cand.about_nn": "Marked by a small neural network trained on simulated sources, at a setting where about 3 false marks are expected per 100 pictures. {n} marks, strongest first.",
  "cand.about_z": "Ranked by how strongly each spot differs from the median of the other pictures from the same detector, at a setting where about 3 false marks are expected per 100 pictures. {n} marks, strongest first.",
- "cand.about_uncal": "The {n} strongest differences from the median of the other pictures from the same detector, strongest first. How many of them are false is not yet calibrated.",
+ "cand.about_uncal": "The {n} spots that differ most from the median of the other pictures from the same detector, in rank order. Unfiltered ranking: the top of the list is often cosmic-ray hits and hot pixels, which single pictures contain.",
  "cand.none": "Nothing passed the threshold in these pictures.",
  "cand.none_uncal": "No spot differs from the other pictures by 3σ or more.",
  "cand.col_date": "Date (click to show)",

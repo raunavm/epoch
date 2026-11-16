@@ -70,10 +70,10 @@ export async function mountCandidates({ box, frames, cm, S, f, target, onShow, o
     if (!items.length) { tableBox.replaceChildren(h('p', { class: 'muted small' }, t(calibrated ? 'cand.none' : 'cand.none_uncal'))); return; }
     const btn = (it, s) => h('button', { type: 'button', class: 'btn small', 'aria-pressed': String(store[it.id]?.state === s), onclick: () => setState(it, s) }, t(`cand.${s}`));
     tableBox.replaceChildren(h('table', { class: 'data-table cand-table' },
-      h('thead', {}, h('tr', {}, ['#', t('cand.col_date'), t('cand.col_wl'), t('cand.col_det'), t(calibrated && learned ? 'cand.col_score' : 'cand.col_z'),
+      h('thead', {}, h('tr', {}, ['#', t('cand.col_date'), t('cand.col_wl'), t('cand.col_det'), calibrated ? t(learned ? 'cand.col_score' : 'cand.col_z') : null,
         calibrated ? t('cand.col_false') : null, h('span', { class: 'sr-only' }, t('cand.col_actions'))].filter(Boolean).map(x => h('th', { scope: 'col' }, x)))),
       h('tbody', {}, items.map((it, k) => h('tr', { class: [store[it.id]?.state === 'dismiss' ? 'dismissed' : '', it.key === selected ? 'selected' : ''].join(' ').trim() || null },
-        h('td', {}, k + 1), h('td', {}, h('button', { type: 'button', class: 'linkish', title: t('cand.show'), onclick: () => show(it) }, it.date.slice(0, 10))), h('td', {}, fmt(it.wl, 3)), h('td', {}, it.det), h('td', {}, fmt(it.score, 3)),
+        h('td', {}, k + 1), h('td', {}, h('button', { type: 'button', class: 'linkish', title: t('cand.show'), onclick: () => show(it) }, it.date.slice(0, 10))), h('td', {}, fmt(it.wl, 3)), h('td', {}, it.det), calibrated ? h('td', {}, fmt(it.score, 3)) : null,
         calibrated ? h('td', {}, fmt(100 * it.falsePerPicture, 2)) : null,
         h('td', { class: 'cand-actions' }, btn(it, 'keep'), btn(it, 'dismiss')))))));
   }

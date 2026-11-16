@@ -153,7 +153,7 @@
  "cand.failed": "La búsqueda de cambios no pudo ejecutarse con estas imágenes.",
  "cand.about_nn": "Marcados por una pequeña red neuronal entrenada con fuentes simuladas, con un ajuste en el que se esperan unas 3 marcas falsas por cada 100 imágenes. {n} marcas, de la más fuerte a la más débil.",
  "cand.about_z": "Ordenados según cuánto difiere cada punto de la mediana de las demás imágenes del mismo detector, con un ajuste en el que se esperan unas 3 marcas falsas por cada 100 imágenes. {n} marcas, de la más fuerte a la más débil.",
- "cand.about_uncal": "Las {n} diferencias más fuertes respecto a la mediana de las demás imágenes del mismo detector, de la más fuerte a la más débil. Aún no está calibrado cuántas son falsas.",
+ "cand.about_uncal": "Los {n} puntos que más difieren de la mediana de las demás imágenes del mismo detector, por orden. Clasificación sin filtrar: lo primero de la lista suelen ser impactos de rayos cósmicos y píxeles calientes, que aparecen en imágenes sueltas.",
  "cand.none": "Nada superó el umbral en estas imágenes.",
  "cand.none_uncal": "Ningún punto difiere de las demás imágenes en 3σ o más.",
  "cand.col_date": "Fecha (clic para ver)",
