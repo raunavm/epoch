@@ -181,6 +181,14 @@ test('spreadInTime keeps n distinct frames spanning the whole time range', () =>
   assert.ok(sub.every((f, k) => !k || f.mjd > sub[k - 1].mjd));
 });
 
+test('spreadInTime keeps simultaneous pairs together', () => {
+  const fr = [...Array(1000)].flatMap((_, i) => [{ mjd: i * 0.3, det: 1 }, { mjd: i * 0.3 + 2e-5, det: 4 }]);
+  const sub = spreadInTime(fr, 300);
+  assert.equal(sub.length, 300);
+  for (let k = 0; k < sub.length; k += 2) assert.ok(Math.abs(sub[k].mjd - sub[k + 1].mjd) < 1e-4 && sub[k].det !== sub[k + 1].det);
+  assert.equal(sub[0], fr[0]); assert.equal(sub[299], fr[1999]);
+});
+
 test('typed old-epoch positions of fast movers are recognised; slow or unrelated positions are not', () => {
   const now = 60982; // about the middle of DR1
   assert.equal(movedTarget(parseRA('08h55m10.831s'), parseDec('-7d14m42.53s'), now)?.id, 'wise0855'); // the challenge text (2010)

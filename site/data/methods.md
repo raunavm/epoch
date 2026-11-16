@@ -123,7 +123,7 @@ The test used 20 fields (4,810 pictures). At S/N 20 and 0.01, 0.03 and 0.10 fals
 
 ## 3. Learned change detector {#detector}
 
-The detector below was built and tested but is not used in the tool: on real asteroids it marked 68 of 166 sightings, short of the 50% completeness we required, and fewer than the median reference with the archive's flags (79).
+The detector below is used in the tool in its paired form: a mark counts only where SPHEREx's simultaneous short- and long-wave pictures both show a candidate at the same spot. On real asteroids in 16 further new fields the paired form marked 71 of 147 sightings, more than any other method we tested, including the median reference with the archive's flags (56). Its 95% lower bound (40%) is below the 50% completeness we required, and we state that shortfall wherever the tool shows its marks.
 
 The learned detector ranks candidate changes by how much they resemble a point source that appeared, rather than a bright-star residual or an artefact. It follows the two-stage real–bogus design of optical transient surveys (Goldstein et al. 2015; Duev et al. 2019; Acero-Cuellar et al. 2023), with a reference built from SPHEREx's own pictures.
 
@@ -426,7 +426,7 @@ over 147,651 rates of 0.05–1.0° per day in all directions, spaced so the trai
 
 Each method below was tested like those above, on data it was not tuned on, and failed its criterion or passed in a form too weak to use.
 
-**Learned change detector (Section 3).** On real asteroids it marked 68 of 166 sightings, with a 95% lower bound of 34% against the 50% required, and fewer than the median reference with the archive's flags (79). It is not used in the tool. A last version kept a mark only where SPHEREx's simultaneous short- and long-wave pictures both show a candidate at the same spot, since cosmic rays and bad pixels hit one picture only. On 16 further new fields it marked 71 of 147 real asteroid sightings, more than any other method including the flagged median reference (56), but still below the 50% completeness we required, so it is not used.
+**Learned change detector without pairing (Section 3).** On real asteroids it marked 68 of 166 sightings, with a 95% lower bound of 34% against the 50% required, and fewer than the median reference with the archive's flags (79). A last version keeps a mark only where SPHEREx's simultaneous short- and long-wave pictures both show a candidate at the same spot, since cosmic rays and bad pixels hit one picture only. On 16 further new fields it marked 71 of 147 real asteroid sightings, more than any other method including the flagged median reference (56), but still below the 50% completeness we required. The tool uses this paired form and states that shortfall.
 
 **Wavelength-aware change model.** At a common threshold it recovers 51% of planted S/N-20 sources against 69% for the plain median. It flags more changes than one detector at a time in 19 of 20 random fields (median ratio 1.26). It stays in the tool as an experimental view (Section 2).
 

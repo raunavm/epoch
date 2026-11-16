@@ -155,7 +155,7 @@
  "cand.h": "Possible real changes",
  "cand.running": "Looking for changes in these pictures…",
  "cand.failed": "The change search could not run on these pictures.",
- "cand.about_nn": "Marked by a small neural network that learned from real stars and simulated sources, at a setting with about 3 to 4 false marks per 100 pictures. Marks found: {n}, strongest first. Tested on real asteroids in 16 new fields, it marked 68 of 166 sightings brighter than magnitude 17.5, where change maps without the archive's quality flags mark none; it still misses some bright asteroids and most fainter than magnitude 16.",
+ "cand.about_nn": "Marked by a small neural network, and only where both of SPHEREx's simultaneous pictures (one short-wave, one long-wave detector) show something at the same spot, so cosmic rays and bad pixels, which hit one picture only, are left out. Marks found: {n}, strongest first. On real asteroids in 16 new fields it marked 71 of 147 sightings brighter than magnitude 17.5 (three in four of those brighter than 16), more than any other method we tested, at about 3 false marks per 100 pictures. It misses many fainter ones.",
  "cand.about_z": "Ranked by how strongly each spot differs from the median of the other pictures from the same detector, at a setting where about 3 false marks are expected per 100 pictures. Marks found: {n}, strongest first.",
  "cand.about_uncal": "The {n} spots that differ most from the median of the other pictures from the same detector, in rank order. Unfiltered ranking: the top of the list is often cosmic-ray hits and hot pixels, which single pictures contain.",
  "cand.none": "Nothing passed the threshold in these pictures.",
@@ -303,7 +303,7 @@
  "tour.s_counts_h": "Changes flagged",
  "tour.s_counts": "This counts the spots that changed more than expected. Compare the two views: flipping through every picture flags far more, and almost all of those are false.",
  "tour.s_candidates_h": "Possible real changes",
- "tour.s_candidates": "A small neural network marks the spots most likely to be real changes, strongest first. It finds many real changes but misses some, and a few marks are false. Click a date to see that picture, then Keep or Dismiss it. You can download the ones you keep as a table.",
+ "tour.s_candidates": "A small neural network marks the spots most likely to be real changes, strongest first, and only where both of SPHEREx's simultaneous pictures show something. It finds many real changes but misses some, and a few marks are false. Click a date to see that picture, then Keep or Dismiss it. You can download the ones you keep as a table.",
  "tour.s_markers_h": "What the marks mean",
  "tour.s_markers": "Marks on the picture show known stars, known asteroids, variable stars, flaws in the picture, and changes nobody has explained yet.",
  "tour.s_any_h": "Look anywhere",
@@ -330,5 +330,9 @@
  "film.contrast": "Contrast",
  "film.save": "Save film",
  "film.saving": "Preparing picture {i} of {n}…",
- "film.unsupported": "This browser cannot save the film."
+ "film.unsupported": "This browser cannot save the film.",
+ "intro.found": "Found: 16 cold brown dwarfs whose methane SPHEREx measures directly, none with a published spectrum. See them →",
+ "about.team": "Team",
+ "about.team_text": "J2000: Raunav Mendiratta, Preston Liang, Aarav Gupta, Jack Wu, Palaash Gang and Chance Emrich.",
+ "about.p_methane": "Cold brown dwarfs with methane measured, with the vetting of each (CSV)"
 }

@@ -6,7 +6,8 @@ import { detectChanges } from './detect.js';
 import { gridToWorld } from './grid.js';
 
 const STORE = 'epoch.candidates.v1';
-const MARK_TIERS = new Set(['r1', 'r3']);   // 'r3' is the headline setting: 3 false marks expected per 100 pictures
+const MARK_TIERS = new Set(['r1', 'r3']);
+const TIER_PER_100 = { r1: 1, r3: 3 };      // the setting's expected false marks per 100 pictures, shown when a row has no own rate   // 'r3' is the headline setting: 3 false marks expected per 100 pictures
 const MAX_ROWS = 50, UNCALIBRATED_ROWS = 20;
 
 const readStore = () => { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; } };
@@ -46,7 +47,7 @@ export async function mountCandidates({ box, frames, cm, S, f, target, onShow, o
     if (store[it.id]?.state === s) delete store[it.id];
     else store[it.id] = { state: s, ra: +it.ra.toFixed(6), dec: +it.dec.toFixed(6), obs_id: it.obs_id, detector: it.det,
       wavelength_um: +it.wl.toFixed(4), date: it.date, mjd: +it.mjd.toFixed(6), score: +it.score.toFixed(3),
-      false_per_100_pictures: Number.isFinite(it.falsePerPicture) ? +(100 * it.falsePerPicture).toPrecision(3) : '', model: it.model };
+      false_per_100_pictures: Number.isFinite(it.falsePerPicture) ? +(100 * it.falsePerPicture).toPrecision(3) : (TIER_PER_100[it.tier] ?? ''), model: it.model };
     writeStore(store); render(); onChange();
   };
   const exportKept = () => {
@@ -75,7 +76,7 @@ export async function mountCandidates({ box, frames, cm, S, f, target, onShow, o
         calibrated ? t('cand.col_false') : null, h('span', { class: 'sr-only' }, t('cand.col_actions'))].filter(Boolean).map(x => h('th', { scope: 'col' }, x)))),
       h('tbody', {}, items.map((it, k) => h('tr', { class: [store[it.id]?.state === 'dismiss' ? 'dismissed' : '', it.key === selected ? 'selected' : ''].join(' ').trim() || null },
         h('td', {}, k + 1), h('td', {}, h('button', { type: 'button', class: 'linkish', title: t('cand.show'), onclick: () => show(it) }, it.date.slice(0, 10))), h('td', {}, fmt(it.wl, 3)), h('td', {}, it.det), calibrated ? h('td', {}, fmt(it.score, 3)) : null,
-        calibrated ? h('td', {}, fmt(100 * it.falsePerPicture, 2)) : null,
+        calibrated ? h('td', {}, Number.isFinite(it.falsePerPicture) ? fmt(100 * it.falsePerPicture, 2) : `≤ ${TIER_PER_100[it.tier] ?? '?'}`) : null,
         h('td', { class: 'cand-actions' }, btn(it, 'keep'), btn(it, 'dismiss')))))));
   }
   render();

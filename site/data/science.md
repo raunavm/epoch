@@ -10,6 +10,41 @@ SPHEREx takes each picture at a different wavelength with one of six detectors, 
 
 ![Changes per patch in a plain blink and one detector at a time](figs/v2/fig_e2.svg "Changes flagged in each patch by a plain blink (crosses), one detector at a time (circles) and the experimental colour-aware view (triangles), ordered by Galactic latitude. Counts are summed over all pictures of a patch; the vertical axis is logarithmic.")
 
+## A learned change detector {#detector}
+
+Without the archive's quality flags, which the live view does not read, change maps are dominated by cosmic-ray hits and bad pixels. The live view therefore marks possible changes with a small neural network that runs in the browser, and keeps a mark only where both of SPHEREx's simultaneous pictures (one short-wave, one long-wave detector) show something at the same spot; cosmic rays and bad pixels hit one picture only. On real asteroids in 16 new fields it marked 71 of 147 sightings brighter than V 17.5 (54 of 71 brighter than V 16), more than any other method we tested, including the median reference with the archive's flags (56), with about 0.03 false marks per picture. Our target was a 95% lower bound above 50%; it reached 40%, so it misses many fainter asteroids and is a tool for finding candidates, not a complete search.
+
+[Methods, section 3](methods.html#detector)
+
+## Cold brown dwarfs with methane measured {#methane-candidates}
+
+We applied the same methane test, unchanged, to 985 objects that earlier surveys listed as possible brown dwarfs. 687 were bright enough for a clear answer: 20 show the methane dip of cold brown dwarfs (T type or later, below roughly 1300 K), and 667 do not. None of 53 known warmer L dwarfs measured the same way was wrongly given the dip. A second check of the literature and of neighbouring sources removed one with a published methane-imaging type and 3 with a brighter star within one to two SPHEREx pixels, leaving 16 with no published spectral type. Their colours already suggested T dwarfs; SPHEREx now measures their methane directly. Each still needs a spectrum to confirm it.
+
+The 16 brown dwarfs, deepest methane first. Open any of them in the time machine.
+
+| Name | RA (°) | Dec (°) | Methane index | Below the dividing value (σ) | |
+|---|---|---|---|---|---|
+| CWISEP J201510.68-675005.6 | 303.7942 | -67.8349 | -0.00 ± 0.06 | 6.0 | [Open](index.html?ra=303.79423&dec=-67.83489&fov=2) |
+| CWISE 0756-6001 | 119.2013 | -60.0252 | -0.25 ± 0.11 | 5.6 | [Open](index.html?ra=119.20134&dec=-60.02516&fov=2) |
+| DES 1356995693 | 45.0103 | -34.6456 | -0.06 ± 0.09 | 4.7 | [Open](index.html?ra=45.01025&dec=-34.64555&fov=2) |
+| WISEA J075438.20+090044.9 | 118.6595 | +9.0121 | -0.52 ± 0.20 | 4.4 | [Open](index.html?ra=118.65954&dec=9.01211&fov=2) |
+| DES 1129766088 | 15.5683 | -35.7549 | -0.13 ± 0.11 | 4.4 | [Open](index.html?ra=15.56830&dec=-35.75491&fov=2) |
+| DES 1441279267 | 61.2497 | -64.5476 | 0.15 ± 0.05 | 3.9 | [Open](index.html?ra=61.24970&dec=-64.54755&fov=2) |
+| DES 1082529367 | 8.7837 | -45.4298 | 0.14 ± 0.06 | 3.9 | [Open](index.html?ra=8.78367&dec=-45.42983&fov=2) |
+| DES 1409842617 | 55.3863 | -19.4299 | 0.13 ± 0.06 | 3.8 | [Open](index.html?ra=55.38631&dec=-19.42994&fov=2) |
+| CWISE 1102+3503 | 165.5074 | +35.0597 | -0.12 ± 0.13 | 3.5 | [Open](index.html?ra=165.50735&dec=35.05965&fov=2) |
+| DES 1401517232 | 53.9784 | -44.6545 | 0.15 ± 0.06 | 3.5 | [Open](index.html?ra=53.97837&dec=-44.65449&fov=2) |
+| DES 881410669 | 313.2557 | -62.5178 | 0.06 ± 0.09 | 3.3 | [Open](index.html?ra=313.25570&dec=-62.51782&fov=2) |
+| DES 1055175672 | 4.5538 | -47.5032 | 0.14 ± 0.07 | 3.2 | [Open](index.html?ra=4.55380&dec=-47.50323&fov=2) |
+| DES 1159833050 | 19.8151 | -59.1893 | 0.12 ± 0.08 | 3.2 | [Open](index.html?ra=19.81509&dec=-59.18927&fov=2) |
+| CWISEP J010650.61+225159.1 | 16.7108 | +22.8663 | 0.06 ± 0.10 | 3.1 | [Open](index.html?ra=16.71079&dec=22.86632&fov=2) |
+| CWISEP J233216.39-290025.0 | 353.0682 | -29.0069 | -0.10 ± 0.14 | 3.1 | [Open](index.html?ra=353.06824&dec=-29.00693&fov=2) |
+| WISE 1900-3108 | 285.0240 | -31.1369 | -0.41 ± 0.25 | 3.0 | [Open](index.html?ra=285.02398&dec=-31.13689&fov=2) |
+
+[Download the table (CSV)](products/epoch_methane_candidates.csv) · [Column descriptions](products/README.md) · [Methods, section 6](methods.html#spectra)
+
+![Methane index of brown-dwarf candidates](figs/v2/e22_methane_census.svg "Methane index (flux at 3.2–3.4 µm relative to the neighbouring wavelengths; lower means deeper methane absorption) against WISE W2 magnitude, for the 985 objects and the known L dwarfs. Stars are the candidates; the dashed line is the dividing value. Objects with no defined index are not shown, and the axis is cut at −1.5 and 2. Bars are 1σ.")
+
 ## WISE 0855−0714 {#e4}
 
 WISE 0855−0714, the coldest known brown dwarf, is barely above the noise in a single picture. Combining the 22 pictures from the November–December 2025 visits along its predicted path detects it at 12.1σ: its signal exceeds that of the same pictures combined along 200 empty paths by about 12 times their scatter, and none of the paths is as bright. Its flux density at 4.4–5.0 µm is 0.50 ± 0.04 mJy (the error calibrated on the empty paths), consistent with Spitzer's 0.51 mJy at 4.5 µm (Luhman & Esplin 2016) and within the 0.41–0.50 mJy spanned by published WISE measurements. Over the 10 wavelength steps where it is detected, the SPHEREx spectrum is 0.97 ± 0.03 times the JWST NIRSpec spectrum (Luhman et al. 2024). The two reddest steps, at 4.8–5.0 µm, fall below it. Passing the JWST spectrum through each SPHEREx picture's own spectral response, rather than averaging it in 0.1 µm steps, gives the same ratio, 0.97 ± 0.03, and the two reddest steps stay low. A SPHEREx spectrum of WISE 0855 has been published (Rustamkulov et al. 2026); ours is an independent comparison with JWST.
@@ -33,14 +68,6 @@ Methane absorption at 3.3 µm distinguishes T and Y dwarfs from L dwarfs. An ind
 [Methods, section 6](methods.html#spectra)
 
 ![Methane index against colour](figs/v2/e15_methane.svg "The 4.4–5.0 µm to 1.0–1.3 µm flux ratio against the methane index, for brown dwarfs of known spectral type and for candidates without a published spectrum. The dashed line is the dividing value; bars are 1σ.")
-
-## Cold brown dwarfs with methane measured {#methane-candidates}
-
-We applied the same methane test, unchanged, to 985 objects that earlier surveys listed as possible brown dwarfs. 687 were bright enough for a clear answer: 20 show the methane dip of cold brown dwarfs (T type or later, below roughly 1300 K), and 667 do not. None of 53 known warmer L dwarfs measured the same way was wrongly given the dip. A second check of the literature and of neighbouring sources removed one with a published methane-imaging type and 3 with a brighter star within one to two SPHEREx pixels, leaving 16 with no published spectral type. Their colours already suggested T dwarfs; SPHEREx now measures their methane directly. Each still needs a spectrum to confirm it.
-
-[Download the table (CSV)](products/epoch_methane_candidates.csv) · [Column descriptions](products/README.md) · [Methods, section 6](methods.html#spectra)
-
-![Methane index of brown-dwarf candidates](figs/v2/e22_methane_census.svg "Methane index (flux at 3.2–3.4 µm relative to the neighbouring wavelengths; lower means deeper methane absorption) against WISE W2 magnitude, for the 985 objects and the known L dwarfs. Stars are the candidates; the dashed line is the dividing value. Objects with no defined index are not shown, and the axis is cut at −1.5 and 2. Bars are 1σ.")
 
 ## Variable stars {#e18}
 

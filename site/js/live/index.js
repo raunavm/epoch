@@ -66,14 +66,20 @@ export async function findFrames(meta, ra, dec, fovDeg, getTile) {
   return { tiles: names, frames: [...byKey.values()].sort((a, b) => a.mjd - b.mjd) };
 }
 
-// Pick n frames (sorted by mjd) closest to n evenly spaced times, without repeats.
+// Pick about n frames (sorted by mjd) spread evenly in time, keeping simultaneous pictures together: SPHEREx images
+// each exposure on a short-wave and a long-wave detector at once, and the change search needs both pictures of a pair.
+// Exposures are the distinct times (pictures within 1e-4 d belong to one exposure).
 export function spreadInTime(frames, n) {
-  const t0 = frames[0].mjd, t1 = frames[frames.length - 1].mjd, taken = new Set();
-  for (let k = 0; k < n; k++) {
-    const target = t0 + (t1 - t0) * k / (n - 1);
+  const exp = [];
+  for (const f of frames) if (!exp.length || f.mjd - exp[exp.length - 1] >= 1e-4) exp.push(f.mjd);
+  const m = Math.min(exp.length, Math.ceil(n * exp.length / frames.length)), t0 = exp[0], t1 = exp[exp.length - 1], taken = new Set();
+  for (let k = 0; k < m; k++) {
+    const target = m > 1 ? t0 + (t1 - t0) * k / (m - 1) : t0;
     let best = -1, bd = Infinity;
-    for (let i = 0; i < frames.length; i++) if (!taken.has(i) && Math.abs(frames[i].mjd - target) < bd) { bd = Math.abs(frames[i].mjd - target); best = i; }
+    for (let i = 0; i < exp.length; i++) if (!taken.has(i) && Math.abs(exp[i] - target) < bd) { bd = Math.abs(exp[i] - target); best = i; }
     taken.add(best);
   }
-  return [...taken].sort((a, b) => a - b).map(i => frames[i]);
+  const chosen = [...taken].map(i => exp[i]).sort((a, b) => a - b);
+  let c = 0;
+  return frames.filter(f => { while (c < chosen.length - 1 && chosen[c] + 1e-4 <= f.mjd) c++; return Math.abs(f.mjd - chosen[c]) < 1e-4; });
 }
